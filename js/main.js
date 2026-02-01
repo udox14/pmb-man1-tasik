@@ -1,11 +1,10 @@
 // js/main.js
 
-let selectedJalur = 'REGULER'; // Default
-let currentSlideIndex = 0; // Melacak slide aktif
+let selectedJalur = 'REGULER'; 
+let currentSlideIndex = 0;
 
 function selectTab(jalur) {
     if (document.getElementById(`tab-${jalur.toLowerCase()}`).classList.contains('disabled')) return;
-    
     selectedJalur = jalur;
     document.querySelectorAll('.jalur-tab').forEach(el => el.classList.remove('active'));
     if (jalur === 'REGULER') {
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check Jalur Status
     await checkJalurStatus();
 
-    // FIX UI: Hilangkan scroll pada popup panitia & Perbaiki Tampilan Nama
+    // Fix UI Help
     const helpList = document.querySelector('.help-list');
     if (helpList) {
         helpList.style.maxHeight = 'none';
@@ -40,26 +39,21 @@ function moveSlide(n) {
     const slides = document.querySelectorAll('.slide');
     if (slides.length === 0) return;
 
-    // Sembunyikan slide saat ini
     slides[currentSlideIndex].classList.remove('active');
 
-    // Hitung index baru
     currentSlideIndex += n;
     if (currentSlideIndex >= slides.length) currentSlideIndex = 0;
     if (currentSlideIndex < 0) currentSlideIndex = slides.length - 1;
 
-    // LAZY LOAD: Cek apakah slide tujuan masih pakai data-src
     const targetSlide = slides[currentSlideIndex];
     if (targetSlide.hasAttribute('data-src')) {
         targetSlide.src = targetSlide.getAttribute('data-src');
-        targetSlide.removeAttribute('data-src'); // Tandai sudah di-load
+        targetSlide.removeAttribute('data-src');
     }
 
-    // Tampilkan slide baru
     targetSlide.classList.add('active');
 }
 
-// ... (KODE SISANYA DI BAWAH INI SAMA SEPERTI SEBELUMNYA, JANGAN DIUBAH) ...
 async function checkJalurStatus() {
     try {
         const { data, error } = await db.from('pengaturan').select('*');
@@ -78,18 +72,15 @@ async function checkJalurStatus() {
 
         tabReg.classList.remove('disabled');
         tabPres.classList.remove('disabled');
-        tabReg.innerHTML = '<i class="ph ph-student"></i> Jalur Reguler';
-        tabPres.innerHTML = '<i class="ph ph-trophy"></i> Jalur Prestasi';
+        // REVISI: Teks tidak diubah, hanya status disabled/enabled yang main
 
         if (!regOpen) {
             tabReg.classList.add('disabled');
-            tabReg.innerHTML += ' (Tutup)';
             if (selectedJalur === 'REGULER') selectTab('PRESTASI');
         }
 
         if (!presOpen) {
             tabPres.classList.add('disabled');
-            tabPres.innerHTML += ' (Tutup)';
             if (selectedJalur === 'PRESTASI' && regOpen) selectTab('REGULER');
         }
         

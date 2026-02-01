@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - PMB MAN 1 Tasikmalaya</title>
-    <!-- Gunakan CSS Global -->
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,21 +16,24 @@
         <!-- SIDEBAR -->
         <aside class="admin-sidebar" id="sidebar">
             <div class="sidebar-header">
-                <i class="ph ph-shield-check" style="font-size: 1.8rem; color: var(--accent);"></i>
-                <span class="sidebar-brand-text">ADMIN PMB</span>
+                <div style="display: flex; align-items: center;">
+                    <i class="ph ph-shield-check" style="font-size: 1.8rem; color: var(--accent);"></i>
+                    <span class="sidebar-brand-text">ADMIN PMB</span>
+                </div>
+                <!-- Tombol Close Khusus Mobile -->
+                <button class="mobile-close-btn" onclick="toggleSidebar()">
+                    <i class="ph ph-x"></i>
+                </button>
             </div>
             <nav class="sidebar-menu">
                 <a href="#" class="menu-item active" onclick="loadPendaftar()">
-                    <i class="ph ph-users"></i>
-                    <span>Data Pendaftar</span>
+                    <i class="ph ph-users"></i><span>Data Pendaftar</span>
                 </a>
                 <a href="#" class="menu-item" onclick="aturJalur()">
-                    <i class="ph ph-gear"></i>
-                    <span>Pengaturan Sistem</span>
+                    <i class="ph ph-gear"></i><span>Pengaturan Sistem</span>
                 </a>
                 <a href="#" class="menu-item" onclick="logout()" style="margin-top: 30px; color: #f87171;">
-                    <i class="ph ph-sign-out"></i>
-                    <span>Keluar</span>
+                    <i class="ph ph-sign-out"></i><span>Keluar</span>
                 </a>
             </nav>
         </aside>
@@ -50,6 +52,7 @@
                 </div>
             </div>
 
+            <!-- ... (SISA KONTEN TABLE TETAP SAMA) ... -->
             <div class="admin-content-pad">
                 
                 <!-- STATS CARDS -->
@@ -86,9 +89,7 @@
                 <!-- DATA TABLE CARD -->
                 <div class="admin-card">
                     <div class="table-controls">
-                        <!-- Left Controls: Limit & Filters -->
                         <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-                            <!-- Dropdown Limit -->
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <select id="rowsPerPage" onchange="changeLimit()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white;">
                                     <option value="10">10</option>
@@ -97,15 +98,11 @@
                                     <option value="100">100</option>
                                 </select>
                             </div>
-
-                            <!-- Filter Verifikasi -->
                             <select id="filterVerif" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
                                 <option value="">Semua Status Berkas</option>
                                 <option value="true">✅ Terverifikasi</option>
                                 <option value="false">⏳ Pending / Ditolak</option>
                             </select>
-
-                            <!-- Filter Kelulusan -->
                             <select id="filterLulus" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
                                 <option value="">Semua Status Kelulusan</option>
                                 <option value="PENDING">⏳ Menunggu</option>
@@ -113,8 +110,6 @@
                                 <option value="TIDAK DITERIMA">🚫 Tidak Diterima</option>
                             </select>
                         </div>
-
-                        <!-- Right Controls: Search -->
                         <div class="search-box">
                             <input type="text" id="searchInput" placeholder="Cari Nama / NISN..." onkeyup="filterTable()" 
                                    style="padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; width: 250px; outline: none;">

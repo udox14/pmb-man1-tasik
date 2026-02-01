@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        /* FIX NAVIGASI: Pastikan tombol menyebar Kiri-Kanan */
+        /* FIX NAVIGASI FORMULIR: Pastikan tombol menyebar Kiri-Kanan */
         .nav-buttons {
             display: flex !important;
             justify-content: space-between !important;
@@ -29,7 +29,7 @@
             flex-grow: 1 !important;
         }
 
-        /* Warna Section Khusus (Inline style dipindahkan ke sini agar lebih rapi) */
+        /* Warna Section Khusus */
         .section-box {
             padding: 25px;
             border-radius: 16px;
@@ -42,6 +42,24 @@
         
         .box-title {
             margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;
+        }
+
+        /* --- OPTIMASI HEADER KHUSUS FORMULIR (MOBILE) --- */
+        @media (max-width: 768px) {
+            /* Kecilkan padding container header */
+            header .container { padding: 0 15px !important; }
+            
+            /* Logo & Judul: Lebih Ringkas */
+            .brand-wrapper { gap: 10px !important; }
+            .kemenag-logo { width: 35px !important; }
+            .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
+            .brand-subtitle { display: none !important; } /* Sembunyikan alamat */
+            
+            /* Tombol Kembali: Hanya Icon */
+            .nav-actions .btn span { display: none; } /* Sembunyikan teks "Batal / Kembali" */
+            .nav-actions .btn { padding: 8px !important; width: 36px; height: 36px; justify-content: center; border-radius: 50%; }
+            .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
+            .page-context { display: none !important; }
         }
     </style>
 </head>
@@ -60,8 +78,9 @@
                 </div>
                 <div class="nav-actions">
                     <span class="page-context">Formulir Online</span>
-                    <a href="index.html" class="btn btn-secondary">
-                        <i class="ph ph-arrow-left"></i> KEMBALI
+                    <!-- Tombol Kembali (Dioptimalkan di CSS Mobile di atas) -->
+                    <a href="index.html" class="btn btn-secondary" title="Kembali ke Beranda">
+                        <i class="ph ph-arrow-left"></i> <span>Batal / Kembali</span>
                     </a>
                 </div>
             </nav>
@@ -78,7 +97,7 @@
                 <!-- Instruksi dipindah ke POPUP -->
             </div>
 
-            <!-- STEPPER ICON -->
+            <!-- STEPPER -->
             <div class="wizard-progress">
                 <div class="wizard-step active" id="step-icon-1"><i class="ph ph-user"></i></div>
                 <div class="wizard-step" id="step-icon-2"><i class="ph ph-users-three"></i></div>
@@ -286,7 +305,9 @@
 
                     <div style="margin-top: 30px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fcd34d;">
                         <label style="font-weight:700; color:#b45309; display:block; margin-bottom:10px;">Upload Bukti Sertifikat (Gabung 1 PDF, Max 300KB) *</label>
-                        <input type="file" id="file_sertifikat" accept=".pdf" class="input-modern-form" style="background:white;">
+                        <!-- ADDED onchange validation -->
+                        <input type="file" id="file_sertifikat" accept=".pdf" class="input-modern-form" style="background:white;" onchange="validateSimpleUpload(this, 300)">
+                        <small id="lbl-file_sertifikat" style="display:block; margin-top:5px; color:#b45309;">Belum ada file dipilih</small>
                     </div>
                 </div>
 
@@ -341,22 +362,107 @@
         </div>
     </div>
 
-    <!-- Script update nama file -->
+    <!-- SCRIPT VALIDASI FILE -->
     <script>
+        // Validasi untuk Upload Grid (Section 4)
         function updateFileName(input) {
             const label = document.getElementById('lbl-' + input.id);
-            if (input.files && input.files.length > 0) {
-                label.innerText = input.files[0].name;
-                label.style.color = 'var(--primary)';
-                label.style.fontWeight = 'bold';
+            const file = input.files[0];
+            
+            if (file) {
+                // Tentukan Limit
+                let limit = 200; // Default PDF
+                let typeMsg = 'PDF';
+                
+                if (input.id === 'file_foto') {
+                    limit = 100;
+                    typeMsg = 'JPG/PNG';
+                }
+
+                // Cek Tipe
+                const isPdf = file.type === 'application/pdf';
+                const isImage = file.type.startsWith('image/');
+                let validFormat = false;
+
+                if (input.id === 'file_foto' && isImage) validFormat = true;
+                else if (input.id !== 'file_foto' && isPdf) validFormat = true;
+
+                if (!validFormat) {
+                    Swal.fire('Format Salah', `File harus berupa ${typeMsg}.`, 'error');
+                    input.value = ''; // Reset
+                    if (label) {
+                        label.innerText = `Format salah! Harus ${typeMsg}`;
+                        label.style.color = '#dc2626';
+                    }
+                    input.parentElement.style.borderColor = '#dc2626';
+                    input.parentElement.style.backgroundColor = '#fef2f2';
+                    return;
+                }
+
+                // Cek Ukuran
+                const sizeKB = file.size / 1024;
+                if (sizeKB > limit) {
+                    Swal.fire('File Terlalu Besar', `Ukuran file (${sizeKB.toFixed(0)} KB) melebihi batas maksimal ${limit} KB.`, 'error');
+                    input.value = ''; // Reset
+                    if (label) {
+                        label.innerText = `Terlalu Besar! Max ${limit}KB`;
+                        label.style.color = '#dc2626';
+                    }
+                    input.parentElement.style.borderColor = '#dc2626';
+                    input.parentElement.style.backgroundColor = '#fef2f2';
+                    return;
+                }
+
+                // Jika Valid
+                if (label) {
+                    label.innerText = file.name;
+                    label.style.color = 'var(--primary)';
+                    label.style.fontWeight = 'bold';
+                }
                 input.parentElement.style.borderColor = 'var(--primary)';
-                input.parentElement.style.background = '#f0fdfa';
+                input.parentElement.style.backgroundColor = '#f0fdfa';
+            }
+        }
+
+        // Validasi untuk Upload Sertifikat Simple (Section 5)
+        function validateSimpleUpload(input, limitKB) {
+            const label = document.getElementById('lbl-' + input.id);
+            const file = input.files[0];
+
+            if (file) {
+                // Cek Tipe PDF
+                if (file.type !== 'application/pdf') {
+                    Swal.fire('Format Salah', 'File sertifikat harus berupa PDF.', 'error');
+                    input.value = '';
+                    if(label) {
+                        label.innerText = 'Format salah! Harus PDF';
+                        label.style.color = '#dc2626';
+                    }
+                    return;
+                }
+
+                // Cek Ukuran
+                const sizeKB = file.size / 1024;
+                if (sizeKB > limitKB) {
+                    Swal.fire('File Terlalu Besar', `Ukuran file (${sizeKB.toFixed(0)} KB) melebihi batas maksimal ${limitKB} KB.`, 'error');
+                    input.value = '';
+                    if(label) {
+                        label.innerText = `Terlalu Besar! Max ${limitKB}KB`;
+                        label.style.color = '#dc2626';
+                    }
+                    return;
+                }
+
+                // Valid
+                if(label) {
+                    label.innerText = "File terpilih: " + file.name;
+                    label.style.color = 'var(--primary)';
+                }
             }
         }
 
         // Logic Modal Instruksi
         document.addEventListener('DOMContentLoaded', () => {
-            // Tampilkan modal saat halaman dimuat
             document.getElementById('instructionModal').style.display = 'flex';
         });
 

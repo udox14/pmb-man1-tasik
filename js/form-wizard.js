@@ -1,52 +1,77 @@
 // js/form-wizard.js
 
-// 1. Cek Sesi
+// 1. Cek Sesi (User tidak boleh buka link ini langsung tanpa cek NISN di depan)
 const urlParams = new URLSearchParams(window.location.search);
 let nisnSesi = localStorage.getItem('pmb_nisn');
 let jalurSesi = localStorage.getItem('pmb_jalur');
 
+// Fallback: Jika LocalStorage kosong, coba ambil dari URL
 if (!nisnSesi) nisnSesi = urlParams.get('nisn');
 if (!jalurSesi) jalurSesi = urlParams.get('jalur');
 
+// Validasi Ketat: Jika tidak ada data sesi, tendang keluar
 if (!nisnSesi || !jalurSesi) {
-    alert('Akses ditolak. Silakan masukkan NISN di halaman utama.');
-    window.location.href = 'index.html';
-    throw new Error("Sesi data hilang");
+    // Cek apakah ini halaman formulir? (Berdasarkan ID form)
+    if(document.getElementById('pmbForm')) {
+        alert('Akses ditolak. Silakan masukkan NISN di halaman utama.');
+        window.location.href = 'index.html';
+        throw new Error("Sesi data hilang");
+    }
 } else {
+    // Simpan ulang ke storage agar aman
     localStorage.setItem('pmb_nisn', nisnSesi);
     localStorage.setItem('pmb_jalur', jalurSesi);
 }
 
-document.getElementById('nisn').value = nisnSesi;
+// Set Info di Header (Jika ada elemennya)
+const elNisn = document.getElementById('nisn');
+if (elNisn) elNisn.value = nisnSesi;
 
 // Variabel Kontrol Wizard
 let currentStep = 1;
 let totalStep = 4; 
 if (jalurSesi === 'PRESTASI') {
-    totalStep = 5;
-    document.getElementById('step-icon-5').style.display = 'flex';
-    // Init UI Prestasi jika jalur prestasi
-    setTimeout(initPrestasiUI, 500); 
+    totalStep = 5; 
+    const stepIcon5 = document.getElementById('step-icon-5');
+    if (stepIcon5) {
+        stepIcon5.style.display = 'flex';
+        // Init UI Prestasi jika jalur prestasi
+        setTimeout(initPrestasiUI, 500); 
+    }
 }
 
-// --- FUNGSI API WILAYAH (DENGAN AUTO-RESTORE DRAFT) ---
+// --- FUNGSI API WILAYAH (ROBUST ERROR HANDLING) ---
 const API_BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
 
 async function fetchWilayah(endpoint) {
     try {
         const response = await fetch(`${API_BASE}/${endpoint}.json`);
+        if (!response.ok) throw new Error("Gagal mengambil data wilayah");
         return await response.json();
-    } catch (error) { return []; }
+    } catch (error) {
+        console.error('API Error:', error);
+        return [];
+    }
 }
 
+// Load Provinsi (Jalankan hanya jika elemen ada)
 (async function initWilayah() {
-    const provinces = await fetchWilayah('provinces');
     const select = document.getElementById('provinsi');
+    if (!select) return; // Stop jika bukan di halaman form
+
+    const provinces = await fetchWilayah('provinces');
+    
+    if (provinces.length === 0) {
+        select.innerHTML = '<option value="">- Gagal Memuat Data (Cek Koneksi) -</option>';
+        return;
+    }
+
     select.innerHTML = '<option value="">- Pilih Provinsi -</option>';
     provinces.forEach(p => {
         select.innerHTML += `<option value="${p.id}" data-name="${p.name}">${p.name}</option>`;
     });
 
+    // RESTORE PROVINSI DARI DRAFT
     const savedProv = localStorage.getItem('draft_provinsi');
     if (savedProv) {
         select.value = savedProv;
@@ -54,14 +79,24 @@ async function fetchWilayah(endpoint) {
     }
 })();
 
-async function loadKabupaten() {
+// Fungsi Load Kabupaten (Global Scope agar bisa dipanggil HTML onchange)
+window.loadKabupaten = async function() {
     const provId = document.getElementById('provinsi').value;
     const select = document.getElementById('kabupaten');
-    select.innerHTML = '<option value="">Loading...</option>'; select.disabled = true;
+    if(!select) return;
+
+    select.innerHTML = '<option value="">Loading...</option>'; 
+    select.disabled = true;
+    
     localStorage.setItem('draft_provinsi', provId);
 
     if (provId) {
         const data = await fetchWilayah(`regencies/${provId}`);
+        if(data.length === 0) {
+             select.innerHTML = '<option value="">- Gagal Memuat -</option>';
+             return;
+        }
+
         select.innerHTML = '<option value="">- Pilih Kota/Kab -</option>';
         data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
         select.disabled = false;
@@ -74,14 +109,23 @@ async function loadKabupaten() {
     }
 }
 
-async function loadKecamatan() {
+window.loadKecamatan = async function() {
     const kabId = document.getElementById('kabupaten').value;
     const select = document.getElementById('kecamatan');
-    select.innerHTML = '<option value="">Loading...</option>'; select.disabled = true;
+    if(!select) return;
+
+    select.innerHTML = '<option value="">Loading...</option>'; 
+    select.disabled = true;
+    
     localStorage.setItem('draft_kabupaten', kabId);
 
     if (kabId) {
         const data = await fetchWilayah(`districts/${kabId}`);
+        if(data.length === 0) {
+             select.innerHTML = '<option value="">- Gagal Memuat -</option>';
+             return;
+        }
+
         select.innerHTML = '<option value="">- Pilih Kecamatan -</option>';
         data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
         select.disabled = false;
@@ -94,14 +138,23 @@ async function loadKecamatan() {
     }
 }
 
-async function loadDesa() {
+window.loadDesa = async function() {
     const kecId = document.getElementById('kecamatan').value;
     const select = document.getElementById('desa');
-    select.innerHTML = '<option value="">Loading...</option>'; select.disabled = true;
+    if(!select) return;
+
+    select.innerHTML = '<option value="">Loading...</option>'; 
+    select.disabled = true;
+    
     localStorage.setItem('draft_kecamatan', kecId);
 
     if (kecId) {
         const data = await fetchWilayah(`villages/${kecId}`);
+        if(data.length === 0) {
+             select.innerHTML = '<option value="">- Gagal Memuat -</option>';
+             return;
+        }
+
         select.innerHTML = '<option value="">- Pilih Desa/Kel -</option>';
         data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
         select.disabled = false;
@@ -113,8 +166,9 @@ async function loadDesa() {
     }
 }
 
+// Event Listener untuk Desa
 document.addEventListener('change', function(e) {
-    if (e.target.id === 'desa') {
+    if (e.target && e.target.id === 'desa') {
         localStorage.setItem('draft_desa', e.target.value);
     }
 });
@@ -122,7 +176,8 @@ document.addEventListener('change', function(e) {
 // --- LOGIKA WIZARD ---
 function showStep(step) {
     document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
-    document.getElementById(`section-${step}`).classList.add('active');
+    const section = document.getElementById(`section-${step}`);
+    if(section) section.classList.add('active');
     
     document.querySelectorAll('.wizard-step').forEach((el, index) => {
         if (index + 1 === step) el.classList.add('active');
@@ -130,18 +185,22 @@ function showStep(step) {
         else el.classList.remove('active', 'finished');
     });
 
-    document.getElementById('btn-prev').style.display = step === 1 ? 'none' : 'inline-block';
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnSubmit = document.getElementById('btn-submit');
+
+    if(btnPrev) btnPrev.style.display = step === 1 ? 'none' : 'inline-flex';
     
     if (step === totalStep) {
-        document.getElementById('btn-next').style.display = 'none';
-        document.getElementById('btn-submit').style.display = 'inline-block';
+        if(btnNext) btnNext.style.display = 'none';
+        if(btnSubmit) btnSubmit.style.display = 'inline-flex';
     } else {
-        document.getElementById('btn-next').style.display = 'inline-block';
-        document.getElementById('btn-submit').style.display = 'none';
+        if(btnNext) btnNext.style.display = 'inline-flex';
+        if(btnSubmit) btnSubmit.style.display = 'none';
     }
 }
 
-// --- VALIDASI DIPERBAIKI (STYLE ENAK DILIHAT) ---
+// --- VALIDASI VISUAL (BORDER MERAH, BACKGROUND PUTIH) ---
 function validateSection(step) {
     const section = document.getElementById(`section-${step}`);
     const inputs = section.querySelectorAll('input[required], select[required], textarea[required]');
@@ -153,16 +212,18 @@ function validateSection(step) {
             isEmpty = input.files.length === 0;
         }
 
+        const errorBorder = '#ef4444';
+        const errorBg = '#fff5f5'; 
+        const normalBorder = '#cbd5e1';
+        const normalBg = '#ffffff';
+        const fileBg = '#f0fdfa';
+
         if (isEmpty) {
             isValid = false;
             
-            // STYLE ERROR: Border Merah, Background Merah Sangat Muda (Agar teks terbaca)
-            const errorBorder = '#ef4444';
-            const errorBg = '#fff5f5'; // Merah sangat pudar (clean)
-
             if (input.type === 'file' && input.parentElement.classList.contains('upload-card-item')) {
                 input.parentElement.style.borderColor = errorBorder;
-                input.parentElement.style.backgroundColor = errorBg;
+                input.parentElement.style.backgroundColor = normalBg; 
                 
                 const statusSpan = input.parentElement.querySelector('.upload-status-text');
                 if (statusSpan) { 
@@ -175,19 +236,11 @@ function validateSection(step) {
                 input.style.backgroundColor = errorBg;
             }
         } else {
-            // STYLE SUCCESS/RESET
-            const normalBorder = '#cbd5e1';
-            const normalBg = '#ffffff';
-            const fileBg = '#f0fdfa'; // Hijau muda khusus file terisi
-
+            // RESET STYLE
             if (input.type === 'file' && input.parentElement.classList.contains('upload-card-item')) {
-                // Jangan reset visual jika user belum ganti file, 
-                // tapi karena ini loop validasi, kita reset jika valid.
-                // Visual nama file dihandle oleh onchange di HTML.
-                // Kita hanya pastikan merahnya hilang.
                 if(input.parentElement.style.borderColor === 'rgb(239, 68, 68)' || input.parentElement.style.borderColor === '#ef4444') {
-                     input.parentElement.style.borderColor = 'var(--primary)';
-                     input.parentElement.style.backgroundColor = fileBg;
+                     input.parentElement.style.borderColor = 'var(--primary)'; 
+                     input.parentElement.style.backgroundColor = fileBg; 
                 }
             } else {
                 input.style.borderColor = normalBorder;
@@ -197,12 +250,12 @@ function validateSection(step) {
     });
 
     if (!isValid) {
-        Swal.fire('Data Belum Lengkap', 'Mohon lengkapi kolom yang berwarna merah.', 'warning');
+        Swal.fire('Data Belum Lengkap', 'Mohon isi semua kolom yang bertanda garis merah.', 'warning');
     }
     return isValid;
 }
 
-function nextStep() {
+window.nextStep = function() {
     if (validateSection(currentStep)) {
         currentStep++;
         showStep(currentStep);
@@ -210,13 +263,13 @@ function nextStep() {
     }
 }
 
-function prevStep() {
+window.prevStep = function() {
     currentStep--;
     showStep(currentStep);
     window.scrollTo(0,0);
 }
 
-// --- LOGIKA PRESTASI ---
+// --- LOGIKA PRESTASI (4 KATEGORI) ---
 function initPrestasiUI() {
     const container = document.getElementById('container-prestasi');
     if (!container) return;
@@ -224,7 +277,6 @@ function initPrestasiUI() {
     const oldBtn = document.querySelector('button[onclick="tambahPrestasi()"]');
     if(oldBtn) oldBtn.style.display = 'none';
 
-    // Inject CSS
     const style = document.createElement('style');
     style.innerHTML = `
         .pres-category-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
@@ -280,7 +332,6 @@ function initPrestasiUI() {
         </div>
     `;
     
-    // Hide old element
     const oldFile = document.querySelector('#section-5 .input-modern-form[type="file"]');
     if(oldFile && oldFile.parentElement) oldFile.parentElement.style.display = 'none';
 }
@@ -332,6 +383,10 @@ function compressImage(file, quality) {
 
 // --- SYSTEM: AUTO SAVE TEXT ONLY ---
 document.addEventListener('DOMContentLoaded', () => {
+    // Hanya jalankan jika di halaman formulir
+    const form = document.getElementById('pmbForm');
+    if (!form) return;
+
     const inputs = document.querySelectorAll('#pmbForm input:not([type="file"]), #pmbForm select, #pmbForm textarea');
     inputs.forEach(input => {
         if (input.id === 'nisn' || input.id === 'provinsi' || input.id === 'kabupaten' || input.id === 'kecamatan' || input.id === 'desa') return;
@@ -352,20 +407,21 @@ function clearDraftData() {
 }
 
 // --- SUBMIT ---
-async function submitForm() {
+window.submitForm = async function() {
     if (!validateSection(currentStep)) return;
 
     if (jalurSesi === 'PRESTASI') {
         const certFile = document.getElementById('file_sertifikat');
         if (certFile.files.length === 0) {
             Swal.fire('Berkas Kurang', 'Wajib upload file sertifikat prestasi.', 'warning');
+            // Highlight kotak upload sertifikat
+            certFile.parentElement.style.borderColor = '#ef4444';
+            certFile.parentElement.style.backgroundColor = '#fff5f5';
             return;
         }
-        // Minimal 1 prestasi atau Tahfidz
         const rows = document.querySelectorAll('.pres-row');
         const tahfidzJuz = document.querySelector('.tahfidz-juz');
         const isTahfidzFilled = tahfidzJuz && tahfidzJuz.value && parseInt(tahfidzJuz.value) >= 10;
-        
         if (rows.length === 0 && !isTahfidzFilled) {
             Swal.fire('Data Kurang', 'Wajib mengisi minimal satu data prestasi atau Tahfidz (Min. 10 Juz).', 'warning');
             return;

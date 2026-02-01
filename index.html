@@ -11,6 +11,31 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Phosphor Icons (Minimalist Icons) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- OPTIMASI HEADER KHUSUS LANDING PAGE (MOBILE) --- */
+        @media (max-width: 768px) {
+            /* Kecilkan padding container header */
+            header .container { padding: 0 15px !important; }
+            
+            /* Logo & Judul: Lebih Ringkas */
+            .brand-wrapper { gap: 10px !important; }
+            .kemenag-logo { width: 35px !important; }
+            .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
+            .brand-subtitle { display: none !important; } /* Sembunyikan alamat */
+            
+            /* Tombol Login: Hanya Icon */
+            .nav-actions .btn span { display: none; } /* Sembunyikan teks "LOGIN" */
+            .nav-actions .btn { 
+                padding: 8px !important; 
+                width: 36px; 
+                height: 36px; 
+                justify-content: center; 
+                border-radius: 50%; 
+            }
+            .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
+        }
+    </style>
 </head>
 <body>
 
@@ -19,6 +44,7 @@
         <div class="container">
             <nav>
                 <div class="brand-wrapper">
+                    <!-- Logo menggunakan file lokal images/logo.png -->
                     <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
@@ -26,8 +52,9 @@
                     </div>
                 </div>
                 <div class="nav-actions">
+                    <!-- Tombol Login Siswa (DIBUNGKUS SPAN AGAR BISA DI-HIDE DI HP) -->
                     <a href="login.html" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;">
-                        <i class="ph ph-sign-in"></i> LOGIN
+                        <i class="ph ph-sign-in"></i> <span>LOGIN</span>
                     </a>
                 </div>
             </nav>
@@ -41,6 +68,8 @@
                 
                 <!-- KIRI: Text & Actions -->
                 <div class="hero-content">
+                    
+                    <!-- NEW TITLE STRUCTURE -->
                     <h1 class="hero-title-custom">
                         <span class="line-1">Penerimaan Murid</span>
                         <span class="line-2">Baru (PMB)</span>
@@ -52,6 +81,7 @@
                         Ayo bergabung di MAN 1 Tasikmalaya, menjadi pribadi berprestasi, berakhlak, dan mandiri!
                     </p>
 
+                    <!-- Pilihan Jalur (Tab Style Colorful) -->
                     <div class="jalur-tabs">
                         <div class="jalur-tab active" onclick="selectTab('REGULER')" id="tab-reguler">
                             <i class="ph ph-student"></i> Jalur Reguler
@@ -61,6 +91,7 @@
                         </div>
                     </div>
 
+                    <!-- Input NISN & Action Compact -->
                     <div class="compact-action">
                         <input type="number" id="input-nisn" class="input-modern" placeholder="Masukkan 10 Digit NISN">
                         <button class="btn btn-primary" onclick="cekNisnDanDaftar()">
@@ -68,32 +99,29 @@
                         </button>
                     </div>
 
+                    <!-- Opsi Login -->
                     <div class="login-link-container">
-                        Sudah mendaftar? <a href="login.html">Login Siswa di Sini</a>
+                        Sudah mendaftar? <a href="login.html">Login Siswa Disini</a>
                     </div>
                 </div>
 
                 <!-- KANAN: Slideshow Foto Sekolah -->
                 <div class="hero-visual">
                     <div class="slideshow-container" id="slideshow">
+                        <img src="images/slide1.jpeg" class="slide active" onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide2.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide3.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide4.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide5.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=1000&auto=format&fit=crop'">
                         
-                        <!-- Slide 1 (Langsung Load) -->
-                        <img src="images/slide1.jpg" class="slide active" onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'">
+                        <!-- Overlay Gradient -->
+                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
                         
-                        <!-- Slide 2-5 (Lazy Load: Gunakan data-src) -->
-                        <img data-src="images/slide2.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide3.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide4.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide5.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=1000&auto=format&fit=crop'">
-                        
-                        <!-- Tombol Navigasi Manual -->
+                        <!-- Navigasi Slider -->
                         <div class="slider-nav">
                             <button class="nav-btn" onclick="moveSlide(-1)"><i class="ph ph-caret-left"></i></button>
                             <button class="nav-btn" onclick="moveSlide(1)"><i class="ph ph-caret-right"></i></button>
                         </div>
-
-                        <!-- Overlay Gradient -->
-                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
                     </div>
                 </div>
 
@@ -171,7 +199,7 @@
         </div>
     </footer>
 
-    <!-- WIDGET CONTACT (Fixed: List Names Added) -->
+    <!-- WIDGET CONTACT -->
     <div class="help-widget">
         <div class="help-popup" id="helpPopup">
             <div class="help-header">
@@ -179,7 +207,6 @@
                 <p>Klik nama untuk chat via WhatsApp</p>
             </div>
             <div class="help-list">
-                <!-- List Panitia sesuai request -->
                 <a href="https://wa.me/6281323325771" target="_blank" class="help-item">
                     <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
                     <div class="contact-info"><span class="contact-name">Dede Fathul Umam</span><span class="contact-role">Panitia PMB</span></div>
@@ -190,7 +217,7 @@
                 </a>
                 <a href="https://wa.me/6281287722857" target="_blank" class="help-item">
                     <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
-                    <div class="contact-info"><span class="contact-name">M. Ropik Nazib</span><span class="contact-role">Panitia PMB</span></div>
+                    <div class="contact-info"><span class="contact-name">Muh. Ropik Nazib</span><span class="contact-role">Panitia PMB</span></div>
                 </a>
                 <a href="https://wa.me/6282218943383" target="_blank" class="help-item">
                     <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
