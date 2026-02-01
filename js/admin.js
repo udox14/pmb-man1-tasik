@@ -29,7 +29,7 @@ async function loadPendaftar() {
     try {
         const { data, error } = await db
             .from('pendaftar')
-            .select('*'); // Ambil semua data untuk kebutuhan detail & sort
+            .select('*');
 
         if (error) throw error;
 
@@ -215,9 +215,8 @@ window.bulkAction = async function(action) {
     }
 }
 
-// 10. Detail Siswa (FIXED: RESPONSIVE LAYOUT)
+// 10. Detail Siswa
 window.viewDetail = async function(id) {
-    // Tampilkan Loading
     Swal.fire({
         title: 'Memuat Data...',
         allowOutsideClick: false,
@@ -225,8 +224,8 @@ window.viewDetail = async function(id) {
     });
 
     try {
-        const p = allPendaftar.find(item => item.id === id);
-        if (!p) throw new Error('Data tidak ditemukan di memory');
+        const { data: p, error } = await db.from('pendaftar').select('*').eq('id', id).single();
+        if (error || !p) throw new Error('Data tidak ditemukan');
 
         editState = { id: p.id, status_verifikasi: p.status_verifikasi, status_kelulusan: p.status_kelulusan };
 
@@ -247,7 +246,6 @@ window.viewDetail = async function(id) {
             title: '', width: '1100px', padding: '0', showConfirmButton: false, showCloseButton: true,
             html: `
                 <style>
-                    /* CSS KHUSUS MODAL INI */
                     .file-btn { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; text-decoration: none; color: #475569; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
                     .file-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
                     .detail-section-title { font-size: 1rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin: 30px 0 15px 0; }
@@ -263,15 +261,11 @@ window.viewDetail = async function(id) {
                     .btn-compact:hover { opacity: 0.6; }
                     .btn-compact.active { opacity: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: scale(1.05); }
                     .bg-blue { background-color: #2563eb; } .bg-green { background-color: #16a34a; } .bg-red { background-color: #dc2626; }
-                    
-                    /* LAYOUT GRID RESPONSIVE */
                     .d-wrapper { display: grid; grid-template-columns: 300px 1fr; height: 85vh; overflow: hidden; text-align: left; }
                     .d-left { background: #f8fafc; padding: 30px; border-right: 1px solid #e2e8f0; overflow-y: auto; }
                     .d-right { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
                     .d-header { padding: 20px 30px; border-bottom: 1px solid #e2e8f0; background: white; z-index: 10; }
                     .d-body { padding: 30px; overflow-y: auto; flex: 1; background: #fff; }
-
-                    /* MOBILE OVERRIDES */
                     @media (max-width: 768px) {
                         .d-wrapper { display: flex; flex-direction: column; height: auto; max-height: 80vh; overflow-y: auto; }
                         .d-left { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 20px; }
@@ -281,13 +275,10 @@ window.viewDetail = async function(id) {
                         .compact-row { flex-direction: column; align-items: flex-start; }
                         .status-group { width: 100%; flex-wrap: wrap; gap: 5px; }
                     }
-                    
                     @keyframes pulse-soft { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
                     .pulse-animation { animation: pulse-soft 1s infinite; border: 1px solid white; }
                 </style>
-
                 <div class="d-wrapper">
-                    <!-- KOLOM KIRI -->
                     <div class="d-left">
                         <img src="${p.foto_url || 'https://via.placeholder.com/300x400'}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 25px;">
                         <h5 style="color: #475569; margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">📂 Berkas Lampiran</h5>
@@ -299,8 +290,6 @@ window.viewDetail = async function(id) {
                             ${p.scan_sertifikat_prestasi_url ? `<a href="${p.scan_sertifikat_prestasi_url}" target="_blank" class="file-btn" style="border-color: #fbbf24; background: #fffbeb;"><i class="ph ph-trophy" style="color: #d97706;"></i> Sertifikat</a>` : ''}
                         </div>
                     </div>
-
-                    <!-- KOLOM KANAN -->
                     <div class="d-right">
                         <div class="d-header">
                             <h2 style="margin: 0 0 5px 0; color: #1e293b; font-size: 1.5rem;">${p.nama_lengkap}</h2>
@@ -328,7 +317,6 @@ window.viewDetail = async function(id) {
                                 </button>
                             </div>
                         </div>
-
                         <div class="d-body">
                             <div class="detail-section-title" style="margin-top: 0;">👤 Data Pribadi</div>
                             <div class="detail-grid-row">
@@ -398,7 +386,6 @@ window.viewDetail = async function(id) {
     }
 }
 
-// ... (KODE BAWAHNYA TETAP SAMA: setEditState, saveDetailChanges, aturJalur) ...
 window.setEditState = function(type, value, btn) {
     if (type === 'verif') editState.status_verifikasi = value;
     if (type === 'lulus') editState.status_kelulusan = value;
@@ -436,14 +423,18 @@ window.saveDetailChanges = async function() {
     }
 }
 
+// 11. Pengaturan Jalur & Tanggal (RESTORED)
 window.aturJalur = async function() {
     try {
         const { data } = await db.from('pengaturan').select('*');
         const config = {};
-        if (data) data.forEach(item => config[item.key] = item.is_active);
+        if (data) data.forEach(item => {
+            if(item.key === 'TANGGAL_PENGUMUMAN') config[item.key] = item.value;
+            else config[item.key] = item.is_active;
+        });
 
         const { value: formValues } = await Swal.fire({
-            title: 'Pengaturan Jalur',
+            title: 'Pengaturan Sistem PPDB',
             html: `
                 <div style="display:flex; flex-direction:column; gap:15px; text-align:left; padding:10px;">
                     <div style="background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
@@ -454,22 +445,30 @@ window.aturJalur = async function() {
                         <div><strong style="color:#991b1b;">Jalur Prestasi</strong><br><small>Non-Akademik</small></div>
                         <input type="checkbox" id="check-prestasi" ${config['JALUR_PRESTASI'] ? 'checked' : ''} style="transform:scale(1.5);">
                     </div>
+                    
+                    <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
+                        <label style="display:block; font-weight:600; color:#1e293b; margin-bottom:5px;">📅 Tanggal Pengumuman Kelulusan</label>
+                        <input type="datetime-local" id="tgl-pengumuman" class="swal2-input" style="margin:0; width:100%;" value="${config['TANGGAL_PENGUMUMAN'] || ''}">
+                        <small style="color:#64748b;">Timer di dashboard siswa akan menghitung mundur ke tanggal ini.</small>
+                    </div>
                 </div>
             `,
             showCancelButton: true,
             confirmButtonText: 'Simpan Perubahan',
             preConfirm: () => [
                 document.getElementById('check-reguler').checked,
-                document.getElementById('check-prestasi').checked
+                document.getElementById('check-prestasi').checked,
+                document.getElementById('tgl-pengumuman').value
             ]
         });
 
         if (formValues) {
             await db.from('pengaturan').upsert([
                 { key: 'JALUR_REGULER', is_active: formValues[0] },
-                { key: 'JALUR_PRESTASI', is_active: formValues[1] }
+                { key: 'JALUR_PRESTASI', is_active: formValues[1] },
+                { key: 'TANGGAL_PENGUMUMAN', value: formValues[2] }
             ]);
-            Swal.fire('Sukses', 'Pengaturan jalur berhasil disimpan', 'success');
+            Swal.fire('Sukses', 'Pengaturan berhasil disimpan', 'success');
         }
     } catch (e) {
         console.error(e);

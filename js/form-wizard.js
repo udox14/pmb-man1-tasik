@@ -1,89 +1,67 @@
 // js/form-wizard.js
 
-// --- PENGAMAN UTAMA ---
-// Cek apakah kita sedang berada di halaman yang memiliki Formulir Pendaftaran (pmbForm)
-if (!document.getElementById('pmbForm')) {
-    // Berhenti di sini jika bukan halaman formulir
-} else {
+/* ===========================================================
+   1. GLOBAL VARIABLES & INIT
+   =========================================================== */
+const API_BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+
+// Cek keberadaan form
+const formElement = document.getElementById('pmbForm');
+if (formElement) {
     initFormPage();
 }
 
+/* ===========================================================
+   2. MAIN INITIALIZATION
+   =========================================================== */
 function initFormPage() {
-    // 1. Cek Sesi (User tidak boleh buka link ini langsung tanpa cek NISN di depan)
+    // A. Cek Sesi
     const urlParams = new URLSearchParams(window.location.search);
     let nisnSesi = localStorage.getItem('pmb_nisn');
     let jalurSesi = localStorage.getItem('pmb_jalur');
 
-    // Fallback: Jika LocalStorage kosong, coba ambil dari URL
     if (!nisnSesi) nisnSesi = urlParams.get('nisn');
     if (!jalurSesi) jalurSesi = urlParams.get('jalur');
 
-    // VALIDASI KETAT: Jika data tidak ada, tendang ke landing page
     if (!nisnSesi || !jalurSesi) {
         alert('Akses ditolak. Silakan masukkan NISN di halaman utama.');
         window.location.href = 'index.html';
-        return; // Stop
-    } else {
-        // Simpan ulang ke storage agar aman saat refresh
-        localStorage.setItem('pmb_nisn', nisnSesi);
-        localStorage.setItem('pmb_jalur', jalurSesi);
+        return;
     }
+    
+    // Simpan ulang sesi
+    localStorage.setItem('pmb_nisn', nisnSesi);
+    localStorage.setItem('pmb_jalur', jalurSesi);
 
-    // Set Info di Header (Hidden Input)
+    // Set Hidden Input
     const nisnField = document.getElementById('nisn');
     if (nisnField) nisnField.value = nisnSesi;
 
-    // Variabel Kontrol Wizard Global
+    // B. Setup Wizard
     window.currentStep = 1;
-    window.totalStep = 4; 
+    window.totalStep = 4;
     
     if (jalurSesi === 'PRESTASI') {
         window.totalStep = 5; 
         const stepIcon5 = document.getElementById('step-icon-5');
         if (stepIcon5) stepIcon5.style.display = 'flex';
-        // Init UI Prestasi jika jalur prestasi
+        // Delay init UI Prestasi agar elemen siap
         setTimeout(initPrestasiUI, 500); 
     }
 
-    // Load Data Wilayah & Restore Draft
-    initWilayah();
-    setupAutoSave();
-
-    // --- LOGIKA TOMBOL KELUAR (KONFIRMASI HAPUS DATA) ---
-    const btnBack = document.querySelector('header .nav-actions .btn-secondary');
-    if(btnBack) {
-        btnBack.addEventListener('click', (e) => {
-            e.preventDefault(); // Jangan langsung pindah halaman
-            
-            Swal.fire({
-                title: 'Batalkan Pendaftaran?',
-                text: "PERHATIAN: Jika Anda keluar sekarang, seluruh data yang sudah Anda ketik akan DIHAPUS. (Jika hanya refresh browser, data aman).",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Keluar & Hapus Data',
-                cancelButtonText: 'Lanjut Mengisi',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Hapus Draft & Sesi
-                    clearDraftData();
-                    localStorage.removeItem('pmb_jalur');
-                    localStorage.removeItem('pmb_nisn');
-                    // Kembali ke Landing Page
-                    window.location.href = 'index.html';
-                }
-            });
-        });
-    }
+    // C. Setup Features
+    initWilayah();      
+    setupAutoSave();    
+    setupBackButton();
 }
 
-// --- FUNGSI API WILAYAH (DENGAN AUTO-RESTORE DRAFT) ---
-const API_BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
-
+/* ===========================================================
+   3. API WILAYAH (ROBUST FUNCTIONS)
+   =========================================================== */
 async function fetchWilayah(endpoint) {
     try {
         const response = await fetch(`${API_BASE}/${endpoint}.json`);
+        if (!response.ok) throw new Error('API Error');
         return await response.json();
     } catch (error) {
         console.error('Gagal ambil wilayah:', error);
@@ -91,104 +69,133 @@ async function fetchWilayah(endpoint) {
     }
 }
 
+// -- Load Provinsi --
 async function initWilayah() {
-    const provinces = await fetchWilayah('provinces');
     const select = document.getElementById('provinsi');
     if(!select) return;
+    
+    select.innerHTML = '<option value="">Loading...</option>';
+    const provinces = await fetchWilayah('provinces');
     
     select.innerHTML = '<option value="">- Pilih Provinsi -</option>';
     provinces.forEach(p => {
         select.innerHTML += `<option value="${p.id}" data-name="${p.name}">${p.name}</option>`;
     });
 
-    // RESTORE PROVINSI
+    // Restore Draft
     const savedProv = localStorage.getItem('draft_provinsi');
     if (savedProv) {
         select.value = savedProv;
-        loadKabupaten(); 
+        // Panggil loadKabupaten hanya jika valuenya valid
+        if (select.value) loadKabupaten(); 
     }
 }
 
-// (Fungsi loadKabupaten harus ada di window scope agar bisa dipanggil onchange HTML)
-window.loadKabupaten = async function() {
+// -- Load Kabupaten --
+async function loadKabupaten() {
     const provId = document.getElementById('provinsi').value;
     const select = document.getElementById('kabupaten');
-    select.innerHTML = '<option value="">Loading...</option>'; select.disabled = true;
+    if(!select) return;
+
+    select.innerHTML = '<option value="">Loading...</option>'; 
+    select.disabled = true;
     
-    // Simpan Draft
     localStorage.setItem('draft_provinsi', provId);
 
     if (provId) {
         const data = await fetchWilayah(`regencies/${provId}`);
         select.innerHTML = '<option value="">- Pilih Kota/Kab -</option>';
-        data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
-        select.disabled = false;
+        
+        if (data.length > 0) {
+            data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
+            select.disabled = false;
 
-        // RESTORE KABUPATEN
-        const savedKab = localStorage.getItem('draft_kabupaten');
-        if (savedKab && select.querySelector(`option[value="${savedKab}"]`)) {
-            select.value = savedKab;
-            loadKecamatan();
+            const savedKab = localStorage.getItem('draft_kabupaten');
+            if (savedKab && select.querySelector(`option[value="${savedKab}"]`)) {
+                select.value = savedKab;
+                loadKecamatan();
+            }
+        } else {
+            select.innerHTML = '<option value="">- Data Tidak Ditemukan -</option>';
         }
+    } else {
+        select.innerHTML = '<option value="">Pilih Provinsi Dulu</option>';
     }
 }
 
-window.loadKecamatan = async function() {
+// -- Load Kecamatan --
+async function loadKecamatan() {
     const kabId = document.getElementById('kabupaten').value;
     const select = document.getElementById('kecamatan');
-    select.innerHTML = '<option value="">Loading...</option>'; select.disabled = true;
+    if(!select) return;
+
+    select.innerHTML = '<option value="">Loading...</option>'; 
+    select.disabled = true;
     
-    // Simpan Draft
     localStorage.setItem('draft_kabupaten', kabId);
 
     if (kabId) {
         const data = await fetchWilayah(`districts/${kabId}`);
         select.innerHTML = '<option value="">- Pilih Kecamatan -</option>';
-        data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
-        select.disabled = false;
+        
+        if (data.length > 0) {
+            data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
+            select.disabled = false;
 
-        // RESTORE KECAMATAN
-        const savedKec = localStorage.getItem('draft_kecamatan');
-        if (savedKec && select.querySelector(`option[value="${savedKec}"]`)) {
-            select.value = savedKec;
-            loadDesa();
+            const savedKec = localStorage.getItem('draft_kecamatan');
+            if (savedKec && select.querySelector(`option[value="${savedKec}"]`)) {
+                select.value = savedKec;
+                loadDesa();
+            }
         }
+    } else {
+        select.innerHTML = '<option value="">Pilih Kota/Kab Dulu</option>';
     }
 }
 
-window.loadDesa = async function() {
+// -- Load Desa --
+async function loadDesa() {
     const kecId = document.getElementById('kecamatan').value;
     const select = document.getElementById('desa');
-    select.innerHTML = '<option value="">Loading...</option>'; select.disabled = true;
+    if(!select) return;
+
+    select.innerHTML = '<option value="">Loading...</option>'; 
+    select.disabled = true;
     
-    // Simpan Draft
     localStorage.setItem('draft_kecamatan', kecId);
 
     if (kecId) {
         const data = await fetchWilayah(`villages/${kecId}`);
         select.innerHTML = '<option value="">- Pilih Desa/Kel -</option>';
-        data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
-        select.disabled = false;
+        
+        if (data.length > 0) {
+            data.forEach(d => select.innerHTML += `<option value="${d.id}" data-name="${d.name}">${d.name}</option>`);
+            select.disabled = false;
 
-        // RESTORE DESA
-        const savedDesa = localStorage.getItem('draft_desa');
-        if (savedDesa && select.querySelector(`option[value="${savedDesa}"]`)) {
-            select.value = savedDesa;
+            const savedDesa = localStorage.getItem('draft_desa');
+            if (savedDesa && select.querySelector(`option[value="${savedDesa}"]`)) {
+                select.value = savedDesa;
+            }
         }
+    } else {
+        select.innerHTML = '<option value="">Pilih Kecamatan Dulu</option>';
     }
 }
 
-// Handler khusus untuk menyimpan Desa saat dipilih
+// -- Listener Desa --
 document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'desa') {
         localStorage.setItem('draft_desa', e.target.value);
     }
 });
 
-// --- LOGIKA WIZARD ---
-window.showStep = function(step) {
+/* ===========================================================
+   4. LOGIKA WIZARD & VALIDASI
+   =========================================================== */
+function showStep(step) {
     document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
-    document.getElementById(`section-${step}`).classList.add('active');
+    const section = document.getElementById(`section-${step}`);
+    if (section) section.classList.add('active');
     
     document.querySelectorAll('.wizard-step').forEach((el, index) => {
         if (index + 1 === step) el.classList.add('active');
@@ -211,65 +218,65 @@ window.showStep = function(step) {
     }
 }
 
-// --- VALIDASI VISUAL (BORDER MERAH, BACKGROUND PUTIH) ---
 function validateSection(step) {
     const section = document.getElementById(`section-${step}`);
+    if (!section) return true;
+
     const inputs = section.querySelectorAll('input[required], select[required], textarea[required]');
     let isValid = true;
 
     inputs.forEach(input => {
         let isEmpty = !input.value;
-        if (input.type === 'file') {
-            isEmpty = input.files.length === 0;
-        }
-
-        const errorBorder = '#ef4444';
-        const errorBg = '#fff5f5';
-        const normalBorder = '#cbd5e1';
-        const normalBg = '#ffffff';
-        const fileBg = '#f0fdfa';
+        if (input.type === 'file') isEmpty = input.files.length === 0;
 
         if (isEmpty) {
             isValid = false;
-            
-            // JIKA INPUT FILE: Beri BORDER MERAH pada parent card
-            if (input.type === 'file' && input.parentElement.classList.contains('upload-card-item')) {
-                input.parentElement.style.borderColor = errorBorder;
-                input.parentElement.style.backgroundColor = normalBg; 
-                
-                const statusSpan = input.parentElement.querySelector('.upload-status-text');
-                if (statusSpan) { 
-                    statusSpan.innerText = "Wajib diisi!"; 
-                    statusSpan.style.color = errorBorder; 
-                    statusSpan.style.fontWeight = 'bold';
-                }
-            } else {
-                // INPUT BIASA
-                input.style.borderColor = errorBorder;
-                input.style.backgroundColor = errorBg;
-            }
+            setErrorStyle(input, true);
         } else {
-            // RESET STYLE JIKA VALID
-            if (input.type === 'file' && input.parentElement.classList.contains('upload-card-item')) {
-                // Reset border merah ke normal/hijau
-                if(input.parentElement.style.borderColor === 'rgb(239, 68, 68)' || input.parentElement.style.borderColor === '#ef4444') {
-                     input.parentElement.style.borderColor = 'var(--primary)'; 
-                     input.parentElement.style.backgroundColor = fileBg; 
-                }
-            } else {
-                input.style.borderColor = normalBorder;
-                input.style.backgroundColor = normalBg;
-            }
+            setErrorStyle(input, false);
         }
     });
 
     if (!isValid) {
-        Swal.fire('Data Belum Lengkap', 'Mohon isi semua kolom yang bertanda garis merah.', 'warning');
+        Swal.fire('Data Belum Lengkap', 'Mohon lengkapi kolom yang berwarna merah.', 'warning');
     }
     return isValid;
 }
 
-window.nextStep = function() {
+function setErrorStyle(input, isError) {
+    const errorBorder = '#ef4444';
+    const errorBg = '#fff5f5';
+    const normalBorder = '#cbd5e1';
+    const normalBg = '#ffffff';
+    const fileBg = '#f0fdfa';
+    const primaryColor = 'var(--primary)';
+
+    const isUploadCard = input.type === 'file' && input.parentElement.classList.contains('upload-card-item');
+
+    if (isError) {
+        if (isUploadCard) {
+            input.parentElement.style.borderColor = errorBorder;
+            input.parentElement.style.backgroundColor = normalBg;
+            const statusSpan = input.parentElement.querySelector('.upload-status-text');
+            if (statusSpan) { statusSpan.innerText = "Wajib diisi!"; statusSpan.style.color = errorBorder; statusSpan.style.fontWeight = 'bold'; }
+        } else {
+            input.style.borderColor = errorBorder;
+            input.style.backgroundColor = errorBg;
+        }
+    } else {
+        if (isUploadCard) {
+            if (input.parentElement.style.borderColor === 'rgb(239, 68, 68)' || input.parentElement.style.borderColor === '#ef4444') {
+                input.parentElement.style.borderColor = primaryColor;
+                input.parentElement.style.backgroundColor = fileBg;
+            }
+        } else {
+            input.style.borderColor = normalBorder;
+            input.style.backgroundColor = normalBg;
+        }
+    }
+}
+
+function nextStep() {
     if (validateSection(window.currentStep)) {
         window.currentStep++;
         showStep(window.currentStep);
@@ -277,38 +284,43 @@ window.nextStep = function() {
     }
 }
 
-window.prevStep = function() {
+function prevStep() {
     window.currentStep--;
     showStep(window.currentStep);
     window.scrollTo(0,0);
 }
 
-// --- LOGIKA PRESTASI (4 KATEGORI) ---
-window.initPrestasiUI = function() {
+/* ===========================================================
+   5. LOGIKA PRESTASI
+   =========================================================== */
+function initPrestasiUI() {
     const container = document.getElementById('container-prestasi');
     if (!container) return;
     
     const oldBtn = document.querySelector('button[onclick="tambahPrestasi()"]');
     if(oldBtn) oldBtn.style.display = 'none';
 
-    // Inject CSS
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .pres-category-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .pres-cat-header { font-weight: 800; color: var(--primary); font-size: 1.1rem; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .pres-row { display: grid; grid-template-columns: 1fr; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; position: relative; border: 1px dashed #cbd5e1; }
-        .pres-row-tahfidz { display: grid; grid-template-columns: 1fr; gap: 10px; background: #f0fdfa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ccfbf1; }
-        @media(min-width: 900px) {
-            .pres-row { grid-template-columns: 2fr 2fr 1.2fr 0.8fr 40px; align-items: end; }
-            .pres-row-tahfidz { grid-template-columns: 1.5fr 1fr 1fr; align-items: end; }
-        }
-        .pres-label { font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block; text-transform: uppercase; }
-        .btn-add-pres { background: #f1f5f9; color: var(--primary); border: 1px dashed var(--primary); width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-add-pres:hover { background: #e0f2f1; }
-        .btn-del-pres { color: #ef4444; background: white; border: 1px solid #fecaca; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-del-pres:hover { background: #fef2f2; }
-    `;
-    document.head.appendChild(style);
+    // Inject CSS Internal (Hanya jika belum ada)
+    if (!document.getElementById('prestasi-style')) {
+        const style = document.createElement('style');
+        style.id = 'prestasi-style';
+        style.innerHTML = `
+            .pres-category-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+            .pres-cat-header { font-weight: 800; color: var(--primary); font-size: 1.1rem; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+            .pres-row { display: grid; grid-template-columns: 1fr; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; position: relative; border: 1px dashed #cbd5e1; }
+            .pres-row-tahfidz { display: grid; grid-template-columns: 1fr; gap: 10px; background: #f0fdfa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ccfbf1; }
+            @media(min-width: 900px) {
+                .pres-row { grid-template-columns: 2fr 2fr 1.2fr 0.8fr 40px; align-items: end; }
+                .pres-row-tahfidz { grid-template-columns: 1.5fr 1fr 1fr; align-items: end; }
+            }
+            .pres-label { font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block; text-transform: uppercase; }
+            .btn-add-pres { background: #f1f5f9; color: var(--primary); border: 1px dashed var(--primary); width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+            .btn-add-pres:hover { background: #e0f2f1; }
+            .btn-del-pres { color: #ef4444; background: white; border: 1px solid #fecaca; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+            .btn-del-pres:hover { background: #fef2f2; }
+        `;
+        document.head.appendChild(style);
+    }
 
     container.innerHTML = `
         <div class="pres-category-box">
@@ -339,7 +351,7 @@ window.initPrestasiUI = function() {
         
         <div class="upload-grid-modern" style="margin-top: 30px;">
             <div class="upload-card-item" style="border-color: var(--accent); background: #fffbeb; grid-column: 1 / -1;">
-                <input type="file" id="file_sertifikat" accept=".pdf" onchange="updateFileName(this)">
+                <input type="file" id="file_sertifikat" accept=".pdf" onchange="validateSimpleUpload(this, 300)">
                 <div class="upload-icon-box" style="color: #d97706;"><i class="ph ph-trophy"></i></div>
                 <span class="upload-label-text" style="color: #92400e;">Upload Sertifikat Prestasi (Gabung 1 PDF) *</span>
                 <span class="upload-status-text" id="lbl-file_sertifikat">Max 300KB (PDF Only)</span>
@@ -347,11 +359,14 @@ window.initPrestasiUI = function() {
         </div>
     `;
     
+    // Sembunyikan elemen lama
     const oldFile = document.querySelector('#section-5 .input-modern-form[type="file"]');
-    if(oldFile && oldFile.parentElement) oldFile.parentElement.style.display = 'none';
+    if(oldFile && oldFile.parentElement && !oldFile.parentElement.classList.contains('upload-card-item')) {
+        oldFile.parentElement.style.display = 'none';
+    }
 }
 
-window.addPrestasiRow = function(category) {
+function addPrestasiRow(category) {
     const listId = `list-${category}`;
     const container = document.getElementById(listId);
     if (container.children.length >= 3) {
@@ -369,9 +384,56 @@ window.addPrestasiRow = function(category) {
         <button class="btn-del-pres" onclick="this.parentElement.remove()" title="Hapus"><i class="ph ph-trash"></i></button>
     `;
     container.appendChild(row);
-};
+}
 
-// --- UTILS: COMPRESS ---
+/* ===========================================================
+   6. UTILS (SAVE, COMPRESS, BACK)
+   =========================================================== */
+function setupAutoSave() {
+    const inputs = document.querySelectorAll('#pmbForm input:not([type="file"]), #pmbForm select, #pmbForm textarea');
+    inputs.forEach(input => {
+        if (input.id === 'nisn' || input.id === 'provinsi' || input.id === 'kabupaten' || input.id === 'kecamatan' || input.id === 'desa') return;
+        const savedValue = localStorage.getItem('draft_' + input.id);
+        if (savedValue) input.value = savedValue;
+        input.addEventListener('input', function() { localStorage.setItem('draft_' + this.id, this.value); });
+        input.addEventListener('change', function() { localStorage.setItem('draft_' + this.id, this.value); });
+    });
+}
+
+function setupBackButton() {
+    const btnBack = document.querySelector('header .nav-actions .btn-secondary');
+    if(btnBack) {
+        btnBack.addEventListener('click', (e) => {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Batalkan Pendaftaran?',
+                text: "Data yang sudah Anda ketik akan DIHAPUS. Yakin ingin keluar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Keluar & Hapus Data',
+                cancelButtonText: 'Lanjut Mengisi',
+                confirmButtonColor: '#d33',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    clearDraftData();
+                    localStorage.removeItem('pmb_jalur');
+                    localStorage.removeItem('pmb_nisn');
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    }
+}
+
+function clearDraftData() {
+    const inputs = document.querySelectorAll('#pmbForm input, #pmbForm select, #pmbForm textarea');
+    inputs.forEach(input => { localStorage.removeItem('draft_' + input.id); });
+    localStorage.removeItem('draft_provinsi');
+    localStorage.removeItem('draft_kabupaten');
+    localStorage.removeItem('draft_kecamatan');
+    localStorage.removeItem('draft_desa');
+}
+
 function compressImage(file, quality) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -396,52 +458,38 @@ function compressImage(file, quality) {
     });
 }
 
-// --- SYSTEM: AUTO SAVE TEXT ONLY ---
-function setupAutoSave() {
-    const inputs = document.querySelectorAll('#pmbForm input:not([type="file"]), #pmbForm select, #pmbForm textarea');
-    inputs.forEach(input => {
-        if (input.id === 'nisn' || input.id === 'provinsi' || input.id === 'kabupaten' || input.id === 'kecamatan' || input.id === 'desa') return;
-        const savedValue = localStorage.getItem('draft_' + input.id);
-        if (savedValue) input.value = savedValue;
-        input.addEventListener('input', function() { localStorage.setItem('draft_' + this.id, this.value); });
-        input.addEventListener('change', function() { localStorage.setItem('draft_' + this.id, this.value); });
-    });
-}
-
-function clearDraftData() {
-    const inputs = document.querySelectorAll('#pmbForm input, #pmbForm select, #pmbForm textarea');
-    inputs.forEach(input => { localStorage.removeItem('draft_' + input.id); });
-    localStorage.removeItem('draft_provinsi');
-    localStorage.removeItem('draft_kabupaten');
-    localStorage.removeItem('draft_kecamatan');
-    localStorage.removeItem('draft_desa');
-}
-
-// --- SUBMIT ---
-window.submitForm = async function() {
+/* ===========================================================
+   7. SUBMIT FORM
+   =========================================================== */
+async function submitForm() {
     if (!validateSection(window.currentStep)) return;
+    const jalur = localStorage.getItem('pmb_jalur');
 
     // VALIDASI KETAT JALUR PRESTASI
-    if (localStorage.getItem('pmb_jalur') === 'PRESTASI') {
+    if (jalur === 'PRESTASI') {
         const certFile = document.getElementById('file_sertifikat');
-        if (certFile.files.length === 0) {
-            Swal.fire('Berkas Kurang', 'Wajib upload file sertifikat prestasi.', 'warning');
-            certFile.parentElement.style.borderColor = '#ef4444';
-            certFile.parentElement.style.backgroundColor = '#fff5f5';
+        if (!certFile || certFile.files.length === 0) {
+            Swal.fire({icon: 'warning', title: 'Berkas Kurang', text: 'Wajib upload sertifikat prestasi.'});
+            if(certFile) {
+                certFile.parentElement.style.borderColor = '#ef4444';
+                certFile.parentElement.style.backgroundColor = '#fff5f5';
+            }
             return;
         }
+
         const rows = document.querySelectorAll('.pres-row');
         const tahfidzJuz = document.querySelector('.tahfidz-juz');
         const isTahfidzFilled = tahfidzJuz && tahfidzJuz.value && parseInt(tahfidzJuz.value) >= 10;
+        
         if (rows.length === 0 && !isTahfidzFilled) {
-            Swal.fire('Data Kurang', 'Wajib mengisi minimal satu data prestasi atau Tahfidz (Min. 10 Juz).', 'warning');
+            Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Wajib isi minimal 1 prestasi atau Tahfidz (Min. 10 Juz).'});
             return;
         }
     }
 
     const confirm = await Swal.fire({
         title: 'Kirim Pendaftaran?',
-        text: "Pastikan data sudah benar. Data tidak bisa diubah setelah dikirim.",
+        text: "Pastikan data benar. Data tidak bisa diubah setelah dikirim.",
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Ya, Kirim!',
@@ -492,13 +540,13 @@ window.submitForm = async function() {
             uploadFile('file_akta', 'AKTA', 200),
             uploadFile('file_skb', 'SKB', 200),
             uploadFile('file_ktp_ortu', 'KTP_ORTU', 200),
-            (localStorage.getItem('pmb_jalur') === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 300) : Promise.resolve(null)
+            (jalur === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 300) : Promise.resolve(null)
         ]);
 
         const getSelectText = (id) => { const el = document.getElementById(id); return el.options[el.selectedIndex]?.text || ''; };
 
         const formData = {
-            jalur: localStorage.getItem('pmb_jalur'),
+            jalur: jalur,
             nisn: nisn,
             nik: document.getElementById('nik').value,
             nama_lengkap: document.getElementById('nama_lengkap').value.toUpperCase(),
@@ -551,10 +599,9 @@ window.submitForm = async function() {
         const { data: pendaftarData, error: dbError } = await db.from('pendaftar').insert([formData]).select().single();
         if (dbError) throw dbError;
 
-        if (localStorage.getItem('pmb_jalur') === 'PRESTASI') {
+        if (jalur === 'PRESTASI') {
             const pendaftarId = pendaftarData.id;
             const prestasiList = [];
-
             const rows = document.querySelectorAll('.pres-row');
             rows.forEach(row => {
                 const nama = row.querySelector('.pres-nama').value;
@@ -563,7 +610,6 @@ window.submitForm = async function() {
                     if (row.dataset.cat === 'akademik') kat = 'Akademik';
                     if (row.dataset.cat === 'nonakademik') kat = 'Non-Akademik';
                     if (row.dataset.cat === 'keagamaan') kat = 'Keagamaan';
-
                     prestasiList.push({
                         pendaftar_id: pendaftarId,
                         nama_lomba: nama.toUpperCase(),
@@ -574,7 +620,6 @@ window.submitForm = async function() {
                     });
                 }
             });
-
             const juz = document.querySelector('.tahfidz-juz').value;
             if (juz && parseInt(juz) >= 10) {
                 prestasiList.push({
@@ -586,7 +631,6 @@ window.submitForm = async function() {
                     tahun_perolehan: document.querySelector('.tahfidz-tahun').value || '-'
                 });
             }
-
             if (prestasiList.length > 0) {
                 await db.from('prestasi').insert(prestasiList);
             }
@@ -610,3 +654,35 @@ window.submitForm = async function() {
         Swal.fire('Gagal Mengirim', 'Terjadi kesalahan: ' + err.message, 'error');
     }
 }
+
+// BIND GLOBAL FUNCTIONS TO WINDOW (AGAR BISA DIPANGGIL HTML)
+window.loadKabupaten = loadKabupaten;
+window.loadKecamatan = loadKecamatan;
+window.loadDesa = loadDesa;
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.tambahPrestasi = tambahPrestasi;
+window.addPrestasiRow = addPrestasiRow;
+window.submitForm = submitForm;
+window.validateSimpleUpload = function(input, limitKB) {
+    const label = document.getElementById('lbl-' + input.id);
+    const file = input.files[0];
+    if (file) {
+        if (file.type !== 'application/pdf') {
+            Swal.fire('Format Salah', 'File harus berupa PDF.', 'error');
+            input.value = '';
+            if(label) { label.innerText = 'Format salah! Harus PDF'; label.style.color = '#dc2626'; }
+            return;
+        }
+        const sizeKB = file.size / 1024;
+        if (sizeKB > limitKB) {
+            Swal.fire('File Terlalu Besar', `Maksimal ${limitKB}KB.`, 'error');
+            input.value = '';
+            if(label) { label.innerText = 'Terlalu Besar!'; label.style.color = '#dc2626'; }
+            return;
+        }
+        if(label) { label.innerText = file.name; label.style.color = 'var(--primary)'; }
+        input.parentElement.style.borderColor = 'var(--primary)';
+        input.parentElement.style.backgroundColor = '#f0fdfa';
+    }
+};
