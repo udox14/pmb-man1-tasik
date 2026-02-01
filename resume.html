@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bukti Pendaftaran - MAN 1 Tasikmalaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .resume-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 50px auto;
+            border-top: 5px solid var(--primary);
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .data-label { color: #6b7280; }
+        .data-value { font-weight: 600; color: #1f2937; text-align: right; }
+        .credentials-box {
+            background: #ecfdf5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid var(--primary);
+        }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .resume-card { box-shadow: none; border: 1px solid #000; margin: 0; max-width: 100%; }
+            .no-print { display: none !important; }
+            .btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="resume-card">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: var(--primary);">PENDAFTARAN BERHASIL!</h2>
+                <p>Data Anda telah tersimpan di sistem PPDB MAN 1 Tasikmalaya.</p>
+            </div>
+
+            <div class="credentials-box">
+                <h4>🔑 AKUN SISWA ANDA</h4>
+                <p style="margin: 5px 0; font-size: 0.9rem;">Gunakan data ini untuk Login ke Dashboard:</p>
+                <div style="margin-top: 10px; font-size: 1.1rem;">
+                    Username (NISN): <strong id="res-nisn">-</strong><br>
+                    Password (No. Daftar): <strong id="res-no-daftar">-</strong>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 15px;">Ringkasan Data</h3>
+            <div class="data-row">
+                <span class="data-label">Nama Lengkap</span>
+                <span class="data-value" id="res-nama">-</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Jalur Pendaftaran</span>
+                <span class="data-value" id="res-jalur">-</span>
+            </div>
+            <div class="data-row" id="row-ruangan">
+                <span class="data-label">Ruangan Tes</span>
+                <span class="data-value" id="res-ruang">-</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Asal Sekolah</span>
+                <span class="data-value" id="res-sekolah">-</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Waktu Daftar</span>
+                <span class="data-value" id="res-waktu">-</span>
+            </div>
+
+            <div class="no-print" style="margin-top: 40px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="window.print()" class="btn btn-secondary">🖨️ Cetak Bukti</button>
+                <a href="login.html" class="btn btn-primary">Login Dashboard ➔</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ambil data dari LocalStorage yang disimpan form-wizard.js
+        const dataRaw = localStorage.getItem('resume_data');
+        
+        if (!dataRaw) {
+            alert('Data tidak ditemukan. Anda akan diarahkan ke halaman utama.');
+            window.location.href = 'index.html';
+        }
+
+        const data = JSON.parse(dataRaw);
+
+        // Isi Data ke HTML
+        document.getElementById('res-nisn').textContent = data.nisn;
+        document.getElementById('res-no-daftar').textContent = data.no_pendaftaran;
+        document.getElementById('res-nama').textContent = data.nama_lengkap;
+        document.getElementById('res-jalur').textContent = data.jalur;
+        document.getElementById('res-sekolah').textContent = data.asal_sekolah;
+        document.getElementById('res-waktu').textContent = new Date(data.created_at).toLocaleString('id-ID');
+
+        // Logic Ruangan (Hanya Reguler)
+        if (data.jalur === 'REGULER') {
+            document.getElementById('res-ruang').textContent = 'Ruang ' + data.ruang_tes;
+        } else {
+            document.getElementById('row-ruangan').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMB MAN 1 Tasikmalaya 2026/2027</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Phosphor Icons (Minimalist Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="brand-wrapper">
+                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
+                    <div class="brand-text">
+                        <div class="brand-title">MAN 1 TASIKMALAYA</div>
+                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <a href="login.html" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;">
+                        <i class="ph ph-sign-in"></i> LOGIN
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MODERN HERO SECTION -->
+    <section class="hero-modern">
+        <div class="container">
+            <div class="hero-grid">
+                
+                <!-- KIRI: Text & Actions -->
+                <div class="hero-content">
+                    <h1 class="hero-title-custom">
+                        <span class="line-1">Penerimaan Murid</span>
+                        <span class="line-2">Baru (PMB)</span>
+                        <span class="line-3">MAN 1 Tasikmalaya</span>
+                    </h1>
+                    <span class="hero-subtitle-ta">Tahun Ajaran 2026/2027</span>
+
+                    <p class="hero-desc">
+                        Ayo bergabung di MAN 1 Tasikmalaya, menjadi pribadi berprestasi, berakhlak, dan mandiri!
+                    </p>
+
+                    <div class="jalur-tabs">
+                        <div class="jalur-tab active" onclick="selectTab('REGULER')" id="tab-reguler">
+                            <i class="ph ph-student"></i> Jalur Reguler
+                        </div>
+                        <div class="jalur-tab" onclick="selectTab('PRESTASI')" id="tab-prestasi">
+                            <i class="ph ph-trophy"></i> Jalur Prestasi
+                        </div>
+                    </div>
+
+                    <div class="compact-action">
+                        <input type="number" id="input-nisn" class="input-modern" placeholder="Masukkan 10 Digit NISN">
+                        <button class="btn btn-primary" onclick="cekNisnDanDaftar()">
+                            Cek & Daftar <i class="ph ph-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="login-link-container">
+                        Sudah mendaftar? <a href="login.html">Login Siswa di Sini</a>
+                    </div>
+                </div>
+
+                <!-- KANAN: Slideshow Foto Sekolah -->
+                <div class="hero-visual">
+                    <div class="slideshow-container" id="slideshow">
+                        
+                        <!-- Slide 1 (Langsung Load) -->
+                        <img src="images/slide1.jpg" class="slide active" onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'">
+                        
+                        <!-- Slide 2-5 (Lazy Load: Gunakan data-src) -->
+                        <img data-src="images/slide2.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide3.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide4.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop'">
+                        <img data-src="images/slide5.jpg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=1000&auto=format&fit=crop'">
+                        
+                        <!-- Tombol Navigasi Manual -->
+                        <div class="slider-nav">
+                            <button class="nav-btn" onclick="moveSlide(-1)"><i class="ph ph-caret-left"></i></button>
+                            <button class="nav-btn" onclick="moveSlide(1)"><i class="ph ph-caret-right"></i></button>
+                        </div>
+
+                        <!-- Overlay Gradient -->
+                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- INFO PMB SECTION -->
+    <section class="info-section-new">
+        <div class="container">
+            <div class="section-header">
+                <h2>Informasi PMB</h2>
+                <p>Jadwal Penting & Dokumen</p>
+                <!-- Tombol Brosur -->
+                <a href="https://drive.google.com/drive/folders/YOUR_BROSUR_ID" target="_blank" class="btn btn-primary" style="margin-top: 15px; box-shadow: 0 5px 15px rgba(0,121,107,0.3);">
+                    <i class="ph ph-file-pdf"></i> Download Brosur PMB
+                </a>
+            </div>
+
+            <div class="info-cards-grid">
+                <!-- Card Jalur Prestasi -->
+                <div class="info-card-modern">
+                    <h3><i class="ph ph-trophy" style="color: var(--accent);"></i> Jalur Prestasi</h3>
+                    <ul class="timeline-list">
+                        <li><span class="timeline-date">6 - 16 April 2026</span> Pendaftaran Online</li>
+                        <li><span class="timeline-date">18 April 2026</span> Verifikasi Prestasi & Cek Berkas Asli</li>
+                        <li><span class="timeline-date">18 April 2026</span> Pengumuman Kelulusan</li>
+                        <li><span class="timeline-date">20 - 25 April 2026</span> Lapor Diri / Daftar Ulang</li>
+                    </ul>
+                </div>
+
+                <!-- Card Jalur Reguler -->
+                <div class="info-card-modern" style="border-top-color: var(--primary-dark);">
+                    <h3><i class="ph ph-student"></i> Jalur Reguler</h3>
+                    <ul class="timeline-list">
+                        <li><span class="timeline-date">20 April - 20 Mei 2026</span> Pendaftaran Online</li>
+                        <li><span class="timeline-date">21 - 23 Mei 2026</span> Tes Seleksi (CBT)</li>
+                        <li><span class="timeline-date">25 Mei 2026</span> Pengumuman Kelulusan</li>
+                        <li><span class="timeline-date">6 - 13 Juni 2026</span> Lapor Diri / Daftar Ulang</li>
+                    </ul>
+                </div>
+
+                <!-- Card Agenda -->
+                <div class="info-card-modern" style="border-top-color: var(--accent);">
+                    <h3><i class="ph ph-users-three"></i> Agenda Orang Tua</h3>
+                    <ul class="timeline-list">
+                        <li><span class="timeline-date" style="color: var(--primary);">6 Juni 2026</span> Rapat Orang Tua / Wali Murid Baru</li>
+                    </ul>
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center;">
+                        <p style="font-size: 0.9rem; margin-bottom: 10px; color: var(--text-muted);">Butuh bantuan teknis?</p>
+                        <button onclick="toggleHelp()" class="btn btn-secondary" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+                            <i class="ph ph-whatsapp-logo"></i> Chat Panitia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container footer-flex">
+            <div class="footer-brand">
+                <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo">
+                <div>
+                    <strong style="color: white; letter-spacing: 0.5px;">MAN 1 TASIKMALAYA</strong><br>
+                    <small style="opacity: 0.7;">Sukamanah, Tasikmalaya</small>
+                </div>
+            </div>
+            
+            <div class="footer-info">
+                <p>Jalan Pahlawan KH.Z Musthafa, Sukamanah, Kec. Sukarame</p>
+                <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 5px;">&copy; 2026 Panitia PMB. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WIDGET CONTACT (Fixed: List Names Added) -->
+    <div class="help-widget">
+        <div class="help-popup" id="helpPopup">
+            <div class="help-header">
+                <h4>Hubungi Panitia</h4>
+                <p>Klik nama untuk chat via WhatsApp</p>
+            </div>
+            <div class="help-list">
+                <!-- List Panitia sesuai request -->
+                <a href="https://wa.me/6281323325771" target="_blank" class="help-item">
+                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                    <div class="contact-info"><span class="contact-name">Dede Fathul Umam</span><span class="contact-role">Panitia PMB</span></div>
+                </a>
+                <a href="https://wa.me/6281220338298" target="_blank" class="help-item">
+                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                    <div class="contact-info"><span class="contact-name">H. Undang Kurniawan</span><span class="contact-role">Panitia PMB</span></div>
+                </a>
+                <a href="https://wa.me/6281287722857" target="_blank" class="help-item">
+                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                    <div class="contact-info"><span class="contact-name">M. Ropik Nazib</span><span class="contact-role">Panitia PMB</span></div>
+                </a>
+                <a href="https://wa.me/6282218943383" target="_blank" class="help-item">
+                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                    <div class="contact-info"><span class="contact-name">M. Iqbal Abdul Wakil</span><span class="contact-role">Panitia PMB</span></div>
+                </a>
+            </div>
+        </div>
+        <button class="help-toggle" id="helpBtn" onclick="toggleHelp()">
+            <i class="ph ph-chat-teardrop-text"></i><span>Butuh Bantuan?</span>
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

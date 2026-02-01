@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Pendaftaran - MAN 1 Tasikmalaya</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* FIX NAVIGASI: Pastikan tombol menyebar Kiri-Kanan */
+        .nav-buttons {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            gap: 10px;
+        }
+        
+        /* Spacer fleksibel untuk mendorong tombol Next ke kanan */
+        .nav-spacer {
+            flex-grow: 1 !important;
+        }
+
+        /* Warna Section Khusus (Inline style dipindahkan ke sini agar lebih rapi) */
+        .section-box {
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid;
+        }
+        .box-ayah { background: #f0fdf4; border-color: #bbf7d0; }
+        .box-ibu { background: #fff1f2; border-color: #fecdd3; }
+        .box-alamat { background: #f8fafc; border-color: #e2e8f0; margin-top: 30px; }
+        
+        .box-title {
+            margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="brand-wrapper">
+                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
+                    <div class="brand-text">
+                        <div class="brand-title">MAN 1 TASIKMALAYA</div>
+                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <span class="page-context">Formulir Online</span>
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="ph ph-arrow-left"></i> KEMBALI
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container" style="margin-bottom: 80px;">
+        
+        <!-- CARD FORM -->
+        <div class="info-card" style="padding: 50px 40px; border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
+            
+            <div class="wizard-header">
+                <h2 class="wizard-title">FORMULIR PENDAFTARAN</h2>
+                <!-- Instruksi dipindah ke POPUP -->
+            </div>
+
+            <!-- STEPPER ICON -->
+            <div class="wizard-progress">
+                <div class="wizard-step active" id="step-icon-1"><i class="ph ph-user"></i></div>
+                <div class="wizard-step" id="step-icon-2"><i class="ph ph-users-three"></i></div>
+                <div class="wizard-step" id="step-icon-3"><i class="ph ph-graduation-cap"></i></div>
+                <div class="wizard-step" id="step-icon-4"><i class="ph ph-upload-simple"></i></div>
+                <div class="wizard-step" id="step-icon-5" style="display:none;"><i class="ph ph-trophy"></i></div>
+            </div>
+
+            <form id="pmbForm" onsubmit="return false;">
+                
+                <!-- SECTION 1: DATA PESERTA DIDIK -->
+                <div class="form-section active" id="section-1">
+                    <h3 class="form-section-title">A. Data Peserta Didik</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>NISN (Otomatis)</label>
+                            <input type="text" id="nisn" readonly class="input-modern-form" style="background: #e2e8f0; cursor: not-allowed;">
+                        </div>
+                        <div class="form-group"><label>NIK Siswa *</label><input type="number" id="nik" required class="input-modern-form" placeholder="16 digit NIK"></div>
+                        <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="nama_lengkap" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                        <div class="form-group"><label>Jenis Kelamin *</label>
+                            <select id="jenis_kelamin" required class="input-modern-form"><option value="">- Pilih -</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select>
+                        </div>
+                        <div class="form-group"><label>Tempat Lahir *</label><input type="text" id="tempat_lahir" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                        <div class="form-group"><label>Tanggal Lahir *</label><input type="date" id="tanggal_lahir" required class="input-modern-form"></div>
+                        <div class="form-group"><label>Ukuran Baju *</label>
+                            <select id="ukuran_baju" required class="input-modern-form"><option value="">- Pilih -</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="XXL">XXL</option></select>
+                        </div>
+                        <div class="form-group"><label>Jumlah Saudara *</label><input type="number" id="jumlah_saudara" required class="input-modern-form"></div>
+                        <div class="form-group"><label>Anak Ke- *</label><input type="number" id="anak_ke" required class="input-modern-form"></div>
+                        <div class="form-group"><label>Status Anak *</label>
+                            <select id="status_anak" required class="input-modern-form"><option value="Kandung">Kandung</option><option value="Angkat">Angkat</option></select>
+                        </div>
+                    </div>
+
+                    <!-- BOX ALAMAT (Style Khusus) -->
+                    <div class="section-box box-alamat">
+                        <h4 class="box-title" style="color: var(--text-main);">
+                            <i class="ph ph-map-pin" style="color: var(--primary);"></i> Alamat Tempat Tinggal
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Provinsi *</label><select id="provinsi" onchange="loadKabupaten()" required class="input-modern-form"><option value="">Loading...</option></select></div>
+                            <div class="form-group"><label>Kabupaten/Kota *</label><select id="kabupaten" onchange="loadKecamatan()" required disabled class="input-modern-form"><option value="">Pilih Provinsi Dulu</option></select></div>
+                            <div class="form-group"><label>Kecamatan *</label><select id="kecamatan" onchange="loadDesa()" required disabled class="input-modern-form"><option value="">Pilih Kabupaten Dulu</option></select></div>
+                            <div class="form-group"><label>Desa/Kelurahan *</label><select id="desa" required disabled class="input-modern-form"><option value="">Pilih Kecamatan Dulu</option></select></div>
+                            <div class="form-group"><label>RT *</label><input type="number" id="rt" required class="input-modern-form"></div>
+                            <div class="form-group"><label>RW *</label><input type="number" id="rw" required class="input-modern-form"></div>
+                            <div class="form-group"><label>Kode Pos *</label><input type="number" id="kode_pos" required class="input-modern-form"></div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;"><label>Alamat Lengkap (Jalan/Kampung) *</label><textarea id="alamat_lengkap" rows="2" required class="input-modern-form" style="text-transform: uppercase;"></textarea></div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: DATA KELUARGA -->
+                <div class="form-section" id="section-2">
+                    <h3 class="form-section-title">B. Data Keluarga</h3>
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label>Nomor Kartu Keluarga (KK) *</label>
+                        <input type="number" id="no_kk" required class="input-modern-form" placeholder="Masukkan 16 digit No. KK" style="font-size: 1.1rem; letter-spacing: 1px;">
+                    </div>
+
+                    <!-- DATA AYAH (HIJAU) -->
+                    <div class="section-box box-ayah">
+                        <h4 class="box-title" style="color: #15803d;">
+                            <i class="ph ph-user"></i> Data Ayah
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Nama Ayah *</label><input type="text" id="nama_ayah" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                            <div class="form-group"><label>NIK Ayah *</label><input type="number" id="nik_ayah" required class="input-modern-form"></div>
+                            <div class="form-group"><label>Pendidikan Ayah *</label>
+                                <select id="pendidikan_ayah" required class="input-modern-form">
+                                    <option value="" selected disabled>- Pilih Pendidikan -</option>
+                                    <option value="TIDAK SEKOLAH">TIDAK SEKOLAH</option>
+                                    <option value="SD">SD</option><option value="SLTP">SLTP</option><option value="SLTA">SLTA</option>
+                                    <option value="D3">D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Pekerjaan Ayah *</label><input type="text" id="pekerjaan_ayah" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                            <div class="form-group"><label>Penghasilan Ayah (Rp) *</label><input type="number" id="penghasilan_ayah" required class="input-modern-form" placeholder="Contoh: 2000000"></div>
+                        </div>
+                    </div>
+
+                    <!-- DATA IBU (PINK) -->
+                    <div class="section-box box-ibu">
+                        <h4 class="box-title" style="color: #be123c;">
+                            <i class="ph ph-user-circle"></i> Data Ibu
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Nama Ibu *</label><input type="text" id="nama_ibu" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                            <div class="form-group"><label>NIK Ibu *</label><input type="number" id="nik_ibu" required class="input-modern-form"></div>
+                            <div class="form-group"><label>Pendidikan Ibu *</label>
+                                <select id="pendidikan_ibu" required class="input-modern-form">
+                                    <option value="" selected disabled>- Pilih Pendidikan -</option>
+                                    <option value="TIDAK SEKOLAH">TIDAK SEKOLAH</option>
+                                    <option value="SD">SD</option><option value="SLTP">SLTP</option><option value="SLTA">SLTA</option>
+                                    <option value="D3">D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Pekerjaan Ibu *</label><input type="text" id="pekerjaan_ibu" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                            <div class="form-group"><label>Penghasilan Ibu (Rp) *</label><input type="number" id="penghasilan_ibu" required class="input-modern-form" placeholder="Contoh: 0"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="color: var(--primary); font-weight: 700;">No. Telepon Orang Tua/WA (Aktif) *</label>
+                        <input type="number" id="no_telepon_ortu" required class="input-modern-form" placeholder="08xxxxx" style="font-size: 1.1rem; border-color: var(--primary);">
+                    </div>
+                </div>
+
+                <!-- SECTION 3: ASAL SEKOLAH -->
+                <div class="form-section" id="section-3">
+                    <h3 class="form-section-title">C. Asal Sekolah & Pesantren</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nama Sekolah Asal *</label><input type="text" id="asal_sekolah" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                        <div class="form-group"><label>NPSN *</label><input type="number" id="npsn_sekolah" required class="input-modern-form"></div>
+                        <div class="form-group"><label>Status Sekolah *</label>
+                            <select id="status_sekolah" required class="input-modern-form"><option value="Negeri">Negeri</option><option value="Swasta">Swasta</option></select>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Alamat Sekolah *</label><textarea id="alamat_sekolah" rows="2" required class="input-modern-form" style="text-transform: uppercase;"></textarea></div>
+
+                    <div class="form-group" style="background: #f0fdfa; padding: 25px; border-radius: 12px; border: 1px solid var(--primary); margin-top: 30px;">
+                        <label style="color: var(--primary-dark); font-weight:800; font-size:1.1rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="ph ph-house-line"></i> Pilihan Tempat Tinggal (Pesantren/ Warga Sekitar) *
+                        </label>
+                        <select id="pilihan_pesantren" required class="input-modern-form" style="border-color: var(--primary); margin-top:15px; font-weight: 600;">
+                            <option value="">- Silakan Pilih -</option>
+                            <option value="Pesantren Sukahideng">Pesantren Sukahideng</option>
+                            <option value="Pesantren Sukamanah">Pesantren Sukamanah</option>
+                            <option value="Pesantren Rancabolang">Pesantren Rancabolang</option>
+                            <option value="Pesantren Sukaguru">Pesantren Sukaguru</option>
+                            <option value="Penduduk Desa Sukarapih">Penduduk Desa Sukarapih</option>
+                            <option value="Penduduk Desa Wargekerta">Penduduk Desa Wargekerta</option>
+                        </select>
+                        <small style="display:block; margin-top:10px; color: var(--primary); background: white; padding: 8px 12px; border-radius: 6px; display: inline-block;">
+                            <i class="ph ph-info"></i> Calon murid dari luar Desa Sukarapih/Wargakerta <b>WAJIB</b> memilih Pesantren.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: UPLOAD BERKAS (MODERN GRID) -->
+                <div class="form-section" id="section-4">
+                    <h3 class="form-section-title">D. Upload Berkas</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem;">
+                        <i class="ph ph-warning-circle"></i> <b>Format:</b> 
+                        <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">PDF</span> untuk dokumen, 
+                        <span style="background: #fce7f3; color: #be185d; padding: 2px 6px; border-radius: 4px; font-weight: bold;">JPG/PNG</span> untuk Foto.<br>
+                        <b>Maksimal Ukuran:</b> 100KB (Foto), 200KB (Dokumen).
+                    </p>
+                    
+                    <div class="upload-grid-modern">
+                        <!-- Card 1: Foto -->
+                        <div class="upload-card-item">
+                            <input type="file" id="file_foto" accept="image/png, image/jpeg, image/jpg" required onchange="updateFileName(this)">
+                            <div class="upload-icon-box"><i class="ph ph-user-focus"></i></div>
+                            <span class="upload-label-text">Pas Foto (Latar Biru)</span>
+                            <span class="upload-status-text" id="lbl-file_foto">Max 100KB (JPG/PNG)</span>
+                        </div>
+
+                        <!-- Card 2: KK -->
+                        <div class="upload-card-item">
+                            <input type="file" id="file_kk" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-icon-box"><i class="ph ph-users-three"></i></div>
+                            <span class="upload-label-text">Kartu Keluarga (KK)</span>
+                            <span class="upload-status-text" id="lbl-file_kk">Max 200KB (PDF Only)</span>
+                        </div>
+
+                        <!-- Card 3: Akta -->
+                        <div class="upload-card-item">
+                            <input type="file" id="file_akta" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-icon-box"><i class="ph ph-scroll"></i></div>
+                            <span class="upload-label-text">Akta Kelahiran</span>
+                            <span class="upload-status-text" id="lbl-file_akta">Max 200KB (PDF Only)</span>
+                        </div>
+
+                        <!-- Card 4: SKB -->
+                        <div class="upload-card-item">
+                            <input type="file" id="file_skb" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-icon-box"><i class="ph ph-certificate"></i></div>
+                            <span class="upload-label-text">Surat Kelakuan Baik</span>
+                            <span class="upload-status-text" id="lbl-file_skb">Max 200KB (PDF Only)</span>
+                        </div>
+
+                        <!-- Card 5: KTP -->
+                        <div class="upload-card-item">
+                            <input type="file" id="file_ktp_ortu" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-icon-box"><i class="ph ph-identification-card"></i></div>
+                            <span class="upload-label-text">KTP Orang Tua (Gabung Ayah & Ibu)</span>
+                            <span class="upload-status-text" id="lbl-file_ktp_ortu">Max 200KB (PDF Only)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: DATA PRESTASI (KHUSUS JALUR PRESTASI) -->
+                <div class="form-section" id="section-5">
+                    <h3 class="form-section-title">E. Data Prestasi</h3>
+                    <p style="margin-bottom:20px;">Masukkan maksimal 5 prestasi terbaik (Akademik/Non-Akademik). Wajib upload sertifikat.</p>
+                    
+                    <div id="container-prestasi"></div>
+
+                    <button type="button" class="btn btn-secondary" onclick="tambahPrestasi()" style="margin-top:10px; width:100%; border-style:dashed;">
+                        <i class="ph ph-plus-circle"></i> Tambah Prestasi Baru
+                    </button>
+
+                    <div style="margin-top: 30px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fcd34d;">
+                        <label style="font-weight:700; color:#b45309; display:block; margin-bottom:10px;">Upload Bukti Sertifikat (Gabung 1 PDF, Max 300KB) *</label>
+                        <input type="file" id="file_sertifikat" accept=".pdf" class="input-modern-form" style="background:white;">
+                    </div>
+                </div>
+
+                <!-- TOMBOL NAVIGASI FIXED -->
+                <div class="nav-buttons">
+                    <!-- Tombol Prev (Kiri) -->
+                    <button type="button" class="btn btn-secondary" id="btn-prev" onclick="prevStep()" style="display:none;">
+                        <i class="ph ph-caret-left"></i> KEMBALI
+                    </button>
+                    
+                    <!-- Spacer (Tengah) -->
+                    <div class="nav-spacer"></div>
+                    
+                    <!-- Tombol Next (Kanan) -->
+                    <button type="button" class="btn btn-primary" id="btn-next" onclick="nextStep()">
+                        SELANJUTNYA <i class="ph ph-caret-right"></i>
+                    </button>
+                    
+                    <!-- Tombol Submit (Kanan, Hidden Default) -->
+                    <button type="button" class="btn btn-primary" id="btn-submit" onclick="submitForm()" style="display:none; background-color: var(--accent); color: #000;">
+                        KIRIM FORMULIR <i class="ph ph-paper-plane-right"></i>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP INSTRUKSI -->
+    <div class="instruction-overlay" id="instructionModal">
+        <div class="instruction-box-popup">
+            <h3><i class="ph ph-info"></i> PETUNJUK PENGISIAN</h3>
+            <div class="instruction-list">
+                <ol>
+                    <li>GUNAKAN <strong>HURUF KAPITAL</strong> UNTUK SEMUA ISIAN TEKS.</li>
+                    <li>Isi data dengan jujur dan sesuai dokumen asli (KK/Akta/Ijazah).</li>
+                    <li>Kolom bertanda bintang (<strong>*</strong>) wajib diisi.</li>
+                    <li>Siapkan scan file berikut sebelum melanjutkan pendaftaran:</li>
+                </ol>
+                <div class="instruction-file-list">
+                    <li><i class="ph ph-image"></i> Foto Latar Biru (JPG/PNG - Max 100KB)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Kartu Keluarga (PDF - Max 200KB)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Akta Kelahiran (PDF - Max 200KB)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik (PDF - Max 200KB)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua Gabung (PDF - Max 200KB)</li>
+                    <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (Khusus Jalur Prestasi - PDF Max 300KB)</li>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="closeInstruction()" style="width: 100%; margin-top: 20px;">
+                SAYA MENGERTI <i class="ph ph-check"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Script update nama file -->
+    <script>
+        function updateFileName(input) {
+            const label = document.getElementById('lbl-' + input.id);
+            if (input.files && input.files.length > 0) {
+                label.innerText = input.files[0].name;
+                label.style.color = 'var(--primary)';
+                label.style.fontWeight = 'bold';
+                input.parentElement.style.borderColor = 'var(--primary)';
+                input.parentElement.style.background = '#f0fdfa';
+            }
+        }
+
+        // Logic Modal Instruksi
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tampilkan modal saat halaman dimuat
+            document.getElementById('instructionModal').style.display = 'flex';
+        });
+
+        function closeInstruction() {
+            const modal = document.getElementById('instructionModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    </script>
+
+    <script src="js/config.js"></script>
+    <script src="js/form-wizard.js"></script>
+</body>
+</html>

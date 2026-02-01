@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Siswa - MAN 1 Tasikmalaya</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        body { padding-top: var(--header-height); background-color: #f8fafc; }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .profile-img-box {
+            width: 100%;
+            aspect-ratio: 3/4;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .profile-img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .profile-info { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; }
+        .p-name { font-weight: 800; font-size: 1.2rem; color: var(--text-main); margin-bottom: 5px; line-height: 1.2; }
+        .p-nisn { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Menu Sidebar */
+        .sidebar-section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; margin-bottom: 10px; display: block; }
+        .menu-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 30px; }
+        
+        .menu-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 15px; border-radius: 10px;
+            background: white; border: 1px solid #e2e8f0;
+            color: #475569; font-size: 0.9rem; font-weight: 600;
+            text-decoration: none; transition: 0.2s; cursor: pointer;
+        }
+        .menu-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; transform: translateX(5px); }
+        .menu-btn i { font-size: 1.2rem; }
+        .btn-edit-data { background: #fffbeb; border-color: #fcd34d; color: #b45309; }
+        .btn-download { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+        .btn-print { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+
+        /* File List */
+        .file-list-small { display: flex; flex-direction: column; gap: 8px; }
+        .file-btn-small {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px; border-radius: 8px;
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            color: #475569; font-size: 0.85rem; font-weight: 600;
+            text-decoration: none; transition: 0.2s;
+        }
+        .file-btn-small:hover { border-color: var(--primary); color: var(--primary); background: white; }
+        .file-btn-small i { font-size: 1.2rem; color: var(--primary); }
+
+        /* --- MAIN CONTENT --- */
+        .timer-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 20px; padding: 30px; color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+        }
+        .timer-grid { display: flex; gap: 15px; text-align: center; }
+        .t-box { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; min-width: 60px; backdrop-filter: blur(4px); }
+        .t-val { font-size: 1.6rem; font-weight: 800; display: block; line-height: 1; font-variant-numeric: tabular-nums; }
+        .t-lbl { font-size: 0.7rem; opacity: 0.7; text-transform: uppercase; }
+
+        .status-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .status-card-lg {
+            background: white; padding: 25px; border-radius: 16px;
+            border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px;
+            transition: 0.3s;
+        }
+        .status-card-lg label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; }
+        .status-value-lg { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
+        .st-yellow { border-left: 5px solid #eab308; } .st-yellow .status-value-lg { color: #a16207; }
+        .st-green { border-left: 5px solid #16a34a; } .st-green .status-value-lg { color: #15803d; }
+        .st-red { border-left: 5px solid #dc2626; } .st-red .status-value-lg { color: #b91c1c; }
+        .st-blue { border-left: 5px solid #2563eb; } .st-blue .status-value-lg { color: #1e40af; }
+
+        /* Tab & Data */
+        .biodata-wrapper { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .tab-nav { display: flex; background: #f1f5f9; padding: 10px 10px 0 10px; border-bottom: 1px solid #e2e8f0; gap: 5px; overflow-x: auto; }
+        .tab-btn { padding: 12px 20px; border-radius: 10px 10px 0 0; background: transparent; border: none; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; white-space: nowrap; font-size: 0.9rem; }
+        .tab-btn:hover { background: #e2e8f0; color: var(--text-main); }
+        .tab-btn.active { background: white; color: var(--primary); font-weight: 800; box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.02); }
+        .tab-content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .d-item label { font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .d-item div { font-size: 1rem; font-weight: 600; color: #1e293b; padding-bottom: 5px; border-bottom: 1px solid #f1f5f9; }
+
+        /* Prestasi Table */
+        .prestasi-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .prestasi-table th { text-align: left; font-size: 0.8rem; color: #64748b; text-transform: uppercase; background: white; padding: 15px; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+        .prestasi-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; color: #1e293b; font-weight: 500; background: white; }
+        .prestasi-table tr:last-child td { border-bottom: none; }
+        .pres-badge { padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
+
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .sidebar-card { position: static; margin-bottom: 30px; }
+            .timer-banner { flex-direction: column; text-align: center; gap: 20px; }
+            .status-main-grid, .data-grid { grid-template-columns: 1fr; }
+        }
+
+        /* --- CSS KHUSUS PRINT (FIX HALAMAN KOSONG) --- */
+        @media print {
+            /* Sembunyikan semua elemen direct child body kecuali kartu */
+            body > *:not(#kartu-peserta) { 
+                display: none !important; 
+            }
+            
+            /* Reset body */
+            body { 
+                background: white !important; 
+                padding: 0 !important; 
+                margin: 0 !important;
+                height: auto !important;
+            }
+
+            /* Style Kartu agar tampil penuh dan pas 1 halaman */
+            #kartu-peserta {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                visibility: visible !important;
+            }
+            
+            #kartu-peserta * {
+                visibility: visible !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 1cm; /* Margin aman */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <div class="brand-wrapper">
+                    <img src="../images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo" class="kemenag-logo">
+                    <div class="brand-text">
+                        <div class="brand-title">MAN 1 TASIKMALAYA</div>
+                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button onclick="logout()" class="btn btn-danger" style="padding: 8px 20px; font-size: 0.85rem;">
+                        <i class="ph ph-sign-out"></i> LOGOUT
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            
+            <!-- LEFT: SIDEBAR -->
+            <aside>
+                <div class="sidebar-card">
+                    <!-- FOTO -->
+                    <div class="profile-img-box">
+                        <img src="" id="profile-pic" alt="Foto Siswa" onerror="this.src='https://via.placeholder.com/300x400?text=FOTO'">
+                    </div>
+                    
+                    <div class="profile-info">
+                        <div class="p-name" id="nama-siswa">Memuat...</div>
+                        <span class="p-nisn" id="nisn-siswa">...</span>
+                        
+                        <div style="margin-top:15px;">
+                            <span id="badge-jalur" style="font-size:0.9rem; font-weight:800; padding:8px 20px; border-radius:8px; background:#f1f5f9; display:inline-block; border:1px solid #e2e8f0;">...</span>
+                        </div>
+                    </div>
+
+                    <!-- MENU SAYA -->
+                    <span class="sidebar-section-label">Menu Saya</span>
+                    <div class="menu-list">
+                        <div onclick="editData()" class="menu-btn btn-edit-data">
+                            <i class="ph ph-pencil-simple-line"></i><span>Edit Biodata</span>
+                        </div>
+                        
+                        <!-- Link Google Drive -->
+                        <a href="https://drive.google.com/drive/folders/YOUR_FOLDER_ID" target="_blank" class="menu-btn btn-download">
+                            <i class="ph ph-download-simple"></i><span>Unduh Berkas Pendukung</span>
+                        </a>
+
+                        <div id="btn-sidebar-cetak" onclick="cetakKartu()" class="menu-btn btn-print" style="display:none;">
+                            <i class="ph ph-printer"></i><span>Cetak Kartu Tes</span>
+                        </div>
+                    </div>
+
+                    <!-- BERKAS SIDEBAR -->
+                    <span class="sidebar-section-label">Berkas Terupload</span>
+                    <div class="file-list-small" id="sidebar-file-list"></div>
+                </div>
+            </aside>
+
+            <!-- RIGHT: MAIN CONTENT -->
+            <main>
+                <!-- COUNTDOWN -->
+                <div class="timer-banner">
+                    <div>
+                        <h2 style="margin:0 0 5px 0;">Menuju Pengumuman</h2>
+                        <p style="margin:0; opacity:0.8; font-size:0.9rem;">Hasil Seleksi PPDB 2026/2027</p>
+                    </div>
+                    <div class="timer-grid" id="timer"></div>
+                </div>
+
+                <!-- STATUS GRID -->
+                <div class="status-main-grid">
+                    <div class="status-card-lg" id="card-verif">
+                        <label>Status Verifikasi Berkas</label>
+                        <div class="status-value-lg" id="val-verif"><i class="ph ph-hourglass"></i> MENUNGGU</div>
+                    </div>
+                    <div class="status-card-lg" id="card-lulus">
+                        <label>Status Kelulusan Akhir</label>
+                        <div class="status-value-lg" id="val-lulus"><i class="ph ph-info"></i> BELUM ADA</div>
+                    </div>
+                </div>
+
+                <!-- DATA LENGKAP (TAB SYSTEM) -->
+                <h3 style="margin-bottom:15px; color:var(--text-main);">Data Pendaftar</h3>
+                <div class="biodata-wrapper">
+                    
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchTab('tab-diri')">Data Diri</button>
+                        <button class="tab-btn" onclick="switchTab('tab-alamat')">Alamat</button>
+                        <button class="tab-btn" onclick="switchTab('tab-keluarga')">Keluarga</button>
+                        <button class="tab-btn" onclick="switchTab('tab-sekolah')">Sekolah</button>
+                        <button class="tab-btn" onclick="switchTab('tab-prestasi')" id="btn-tab-prestasi" style="display:none;">Prestasi</button>
+                    </div>
+
+                    <!-- TAB 1: DATA DIRI -->
+                    <div id="tab-diri" class="tab-content active">
+                        <div class="data-grid">
+                            <div class="d-item"><label>Nomor Pendaftaran</label><div id="no-daftar">-</div></div>
+                            <div class="d-item"><label>NIK</label><div id="d-nik">-</div></div>
+                            <div class="d-item"><label>Tempat, Tgl Lahir</label><div id="d-ttl">-</div></div>
+                            <div class="d-item"><label>Jenis Kelamin</label><div id="d-jk">-</div></div>
+                            <div class="d-item"><label>Agama</label><div>Islam</div></div>
+                            <div class="d-item"><label>Anak Ke-</label><div id="d-anak">-</div></div>
+                            <div class="d-item"><label>Jumlah Saudara</label><div id="d-saudara">-</div></div>
+                            <div class="d-item"><label>Status Anak</label><div id="d-status-anak">-</div></div>
+                            <div class="d-item"><label>Ukuran Baju</label><div id="d-baju">-</div></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ALAMAT -->
+                    <div id="tab-alamat" class="tab-content">
+                        <div class="data-grid">
+                            <div class="d-item" style="grid-column:span 2;"><label>Alamat Lengkap</label><div id="d-alamat">-</div></div>
+                            <div class="d-item"><label>RT / RW</label><div id="d-rtrw">-</div></div>
+                            <div class="d-item"><label>Desa / Kelurahan</label><div id="d-desa">-</div></div>
+                            <div class="d-item"><label>Kecamatan</label><div id="d-kec">-</div></div>
+                            <div class="d-item"><label>Kabupaten / Kota</label><div id="d-kab">-</div></div>
+                            <div class="d-item"><label>Provinsi</label><div id="d-prov">-</div></div>
+                            <div class="d-item"><label>Kode Pos</label><div id="d-pos">-</div></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: KELUARGA -->
+                    <div id="tab-keluarga" class="tab-content">
+                        <div class="data-grid">
+                            <div class="d-item" style="grid-column:span 2;"><label>Nomor Kartu Keluarga (KK)</label><div id="d-kk">-</div></div>
+                            <!-- Ayah -->
+                            <div style="grid-column:span 2; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:10px; font-weight:700; color:var(--primary);">DATA AYAH</div>
+                            <div class="d-item"><label>Nama Ayah</label><div id="d-ayah">-</div></div>
+                            <div class="d-item"><label>NIK Ayah</label><div id="d-ayah-nik">-</div></div>
+                            <div class="d-item"><label>Pendidikan</label><div id="d-ayah-pend">-</div></div>
+                            <div class="d-item"><label>Pekerjaan</label><div id="d-ayah-job">-</div></div>
+                            <div class="d-item"><label>Penghasilan</label><div id="d-ayah-hasil">-</div></div>
+                            <div class="d-item"></div>
+                            <!-- Ibu -->
+                            <div style="grid-column:span 2; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:20px; font-weight:700; color:var(--primary);">DATA IBU</div>
+                            <div class="d-item"><label>Nama Ibu</label><div id="d-ibu">-</div></div>
+                            <div class="d-item"><label>NIK Ibu</label><div id="d-ibu-nik">-</div></div>
+                            <div class="d-item"><label>Pendidikan</label><div id="d-ibu-pend">-</div></div>
+                            <div class="d-item"><label>Pekerjaan</label><div id="d-ibu-job">-</div></div>
+                            <div class="d-item"><label>Penghasilan</label><div id="d-ibu-hasil">-</div></div>
+
+                            <div class="d-item" style="grid-column:span 2; margin-top:20px;">
+                                <label style="color:var(--primary);">Nomor HP Orang Tua (WA)</label>
+                                <div id="d-hp" style="font-weight:800; font-size:1.1rem;">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: SEKOLAH -->
+                    <div id="tab-sekolah" class="tab-content">
+                        <div class="data-grid">
+                            <div class="d-item"><label>Asal Sekolah</label><div id="d-sekolah">-</div></div>
+                            <div class="d-item"><label>NPSN</label><div id="d-npsn">-</div></div>
+                            <div class="d-item"><label>Status</label><div id="d-status-sek">-</div></div>
+                            <div class="d-item"><label>Alamat Sekolah</label><div id="d-alamat-sek">-</div></div>
+                            <div class="d-item" style="grid-column:span 2; background:#fffbeb; padding:20px; border-radius:12px; border:1px solid #fcd34d;">
+                                <label style="color:#b45309; font-size:0.9rem;">Rencana Tempat Tinggal</label>
+                                <div id="d-pesantren" style="border:none; color:#92400e; font-size:1.5rem; font-weight:800; padding-top:10px; line-height:1.2;">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: PRESTASI -->
+                    <div id="tab-prestasi" class="tab-content">
+                        <div id="prestasi-list-container"></div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- UPDATE: TEMPLATE KARTU PESERTA (REDESIGNED) -->
+    <div id="kartu-peserta" style="display:none; font-family: 'Times New Roman', serif; background: white; width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; padding: 0;">
+        
+        <div style="border: 2px solid #000; padding: 25px; position: relative;">
+            
+            <!-- 1. KOP MADRASAH -->
+            <div style="border-bottom: 4px double black; padding-bottom: 15px; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 20px;">
+                <img src="../images/logo.png" style="width: 100px; height: auto;">
+                <div style="text-align: center; line-height: 1.15; color: #000;">
+                    <h5 style="margin: 0; font-size: 16px; font-weight: normal; letter-spacing: 1px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
+                    <h5 style="margin: 0; font-size: 16px; font-weight: normal; letter-spacing: 1px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
+                    <h3 style="margin: 5px 0; font-size: 22px; font-weight: bold; font-family: Arial, sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                    <p style="margin: 0; font-size: 12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                    <p style="margin: 0; font-size: 12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
+                    <p style="margin: 0; font-size: 12px; font-weight: bold;"><i>website : www.manegeri1tasikmalaya.sch.id &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
+                </div>
+            </div>
+
+            <!-- JUDUL KARTU -->
+            <div style="text-align: center; margin-bottom: 30px; background: #eee; border: 1px solid #000; padding: 8px 0; border-radius: 4px;">
+                <h3 style="margin: 0; font-size: 18px; font-weight: bold; font-family: Arial, sans-serif;">KARTU PESERTA UJIAN SELEKSI (CBT)</h3>
+                <p style="margin: 2px 0 0 0; font-size: 14px;">PENERIMAAN MURID BARU (PMB) TAHUN AJARAN 2026/2027</p>
+            </div>
+
+            <!-- 2. CONTENT UTAMA -->
+            <div style="display: flex; gap: 30px; align-items: flex-start; margin-bottom: 20px;">
+                <!-- FOTO -->
+                <div style="width: 4cm; flex-shrink: 0; text-align: center;">
+                    <img id="print-foto" src="" style="width: 4cm; height: 6cm; object-fit: cover; border: 2px solid #000; padding: 2px; display: block;">
+                </div>
+                <!-- DATA -->
+                <div style="flex: 1;">
+                    <table style="width: 100%; font-size: 15px; border-collapse: separate; border-spacing: 0 8px;">
+                        <tr><td style="width: 150px; font-weight: bold;">NOMOR PESERTA</td><td>: <span id="print-no" style="font-weight: bold; font-size: 18px;"></span></td></tr>
+                        <tr><td>NAMA LENGKAP</td><td>: <span id="print-nama" style="text-transform: uppercase;"></span></td></tr>
+                        <tr><td>NISN</td><td>: <span id="print-nisn"></span></td></tr>
+                        <tr><td>JENIS KELAMIN</td><td>: <span id="print-jk"></span></td></tr>
+                        <tr><td>ASAL SEKOLAH</td><td>: <span id="print-sekolah"></span></td></tr>
+                    </table>
+                    <!-- INFO TES -->
+                    <div style="margin-top: 20px; border: 2px solid #000; padding: 10px 15px;">
+                        <table style="width: 100%; font-size: 15px; font-weight: bold;">
+                            <tr><td style="width: 150px;">RUANG UJIAN</td><td>: <span id="print-ruang"></span></td></tr>
+                            <tr><td>WAKTU TES</td><td>: 21 MEI 2026, 07.30 WIB</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. PERATURAN -->
+            <div style="margin-top: 20px; font-size: 12px; border-top: 2px dashed #000; padding-top: 15px;">
+                <b style="text-decoration: underline;">TATA TERTIB PESERTA:</b>
+                <ol style="margin: 5px 0 0 0; padding-left: 20px; line-height: 1.5;">
+                    <li>Peserta wajib hadir 30 menit sebelum ujian dimulai.</li>
+                    <li>Wajib membawa <b>Kartu Peserta</b> ini dan alat tulis (Pensil 2B, Penghapus).</li>
+                    <li>Berpakaian seragam sekolah asal, rapi, dan bersepatu.</li>
+                    <li>Dilarang membawa alat komunikasi ke dalam ruang ujian.</li>
+                    <li>Keterlambatan lebih dari 15 menit dianggap gugur.</li>
+                </ol>
+            </div>
+
+            <!-- 4. FOOTER & TTD -->
+            <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div style="font-size: 11px; font-style: italic;">
+                    <i>Dicetak otomatis oleh sistem pada: <span id="print-date"></span></i>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; min-width: 250px;">
+                    <p style="margin: 0; font-size: 14px;">Tasikmalaya, 20 April 2026</p>
+                    <p style="margin: 0; font-size: 14px;">Mengetahui,</p>
+                    <p style="margin: 0; font-size: 14px;">Ketua PMBM T.A. 2026/2027</p>
+                    <div style="height: 70px;"></div>
+                    <p style="margin: 0; font-weight: bold; text-decoration: underline; font-size: 14px;">Dede Fathul Umam, S.Pd.I.</p>
+                    <p style="margin: 0; font-size: 14px;">NIP. 197809132009011011</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/siswa.js"></script>
+</body>
+</html>
