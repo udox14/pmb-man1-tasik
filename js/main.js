@@ -158,7 +158,7 @@ async function cekNisnDanDaftar() {
             
             Swal.fire({
                 icon: 'success',
-                title: 'Jalur Tersedia',
+                title: 'NISN Tersedia',
                 text: 'Mengarahkan ke formulir...',
                 timer: 1000,
                 showConfirmButton: false

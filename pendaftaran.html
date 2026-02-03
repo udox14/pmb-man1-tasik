@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Pendaftaran - MAN 1 Tasikmalaya</title>
+    <!-- Favicon -->
+    <link rel="icon" href="images/logo.png" type="image/png">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
+    
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        /* FIX NAVIGASI FORMULIR: Pastikan tombol menyebar Kiri-Kanan */
+        /* FIX NAVIGASI FORMULIR */
         .nav-buttons {
             display: flex !important;
             justify-content: space-between !important;
@@ -24,10 +28,7 @@
             gap: 10px;
         }
         
-        /* Spacer fleksibel untuk mendorong tombol Next ke kanan */
-        .nav-spacer {
-            flex-grow: 1 !important;
-        }
+        .nav-spacer { flex-grow: 1 !important; }
 
         /* Warna Section Khusus */
         .section-box {
@@ -44,19 +45,14 @@
             margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;
         }
 
-        /* --- OPTIMASI HEADER KHUSUS FORMULIR (MOBILE) --- */
+        /* Responsive Mobile Header */
         @media (max-width: 768px) {
-            /* Kecilkan padding container header */
             header .container { padding: 0 15px !important; }
-            
-            /* Logo & Judul: Lebih Ringkas */
             .brand-wrapper { gap: 10px !important; }
             .kemenag-logo { width: 35px !important; }
             .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
-            .brand-subtitle { display: none !important; } /* Sembunyikan alamat */
-            
-            /* Tombol Kembali: Hanya Icon */
-            .nav-actions .btn span { display: none; } /* Sembunyikan teks "Batal / Kembali" */
+            .brand-subtitle { display: none !important; } 
+            .nav-actions .btn span { display: none; } 
             .nav-actions .btn { padding: 8px !important; width: 36px; height: 36px; justify-content: center; border-radius: 50%; }
             .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
             .page-context { display: none !important; }
@@ -78,7 +74,6 @@
                 </div>
                 <div class="nav-actions">
                     <span class="page-context">Formulir Online</span>
-                    <!-- Tombol Kembali (Dioptimalkan di CSS Mobile di atas) -->
                     <a href="index.html" class="btn btn-secondary" title="Kembali ke Beranda">
                         <i class="ph ph-arrow-left"></i> <span>Batal / Kembali</span>
                     </a>
@@ -94,7 +89,6 @@
             
             <div class="wizard-header">
                 <h2 class="wizard-title">FORMULIR PENDAFTARAN</h2>
-                <!-- Instruksi dipindah ke POPUP -->
             </div>
 
             <!-- STEPPER -->
@@ -124,9 +118,19 @@
                         </div>
                         <div class="form-group"><label>Tempat Lahir *</label><input type="text" id="tempat_lahir" required class="input-modern-form" style="text-transform: uppercase;"></div>
                         <div class="form-group"><label>Tanggal Lahir *</label><input type="date" id="tanggal_lahir" required class="input-modern-form"></div>
+                        
                         <div class="form-group"><label>Ukuran Baju *</label>
-                            <select id="ukuran_baju" required class="input-modern-form"><option value="">- Pilih -</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="XXL">XXL</option></select>
+                            <select id="ukuran_baju" required class="input-modern-form">
+                                <option value="">- Pilih -</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="XXXL">XXXL</option>
+                            </select>
                         </div>
+                        
                         <div class="form-group"><label>Jumlah Saudara *</label><input type="number" id="jumlah_saudara" required class="input-modern-form"></div>
                         <div class="form-group"><label>Anak Ke- *</label><input type="number" id="anak_ke" required class="input-modern-form"></div>
                         <div class="form-group"><label>Status Anak *</label>
@@ -176,7 +180,31 @@
                                     <option value="D3">D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
                                 </select>
                             </div>
-                            <div class="form-group"><label>Pekerjaan Ayah *</label><input type="text" id="pekerjaan_ayah" required class="input-modern-form" style="text-transform: uppercase;"></div>
+                            
+                            <div class="form-group"><label>Pekerjaan Ayah *</label>
+                                <select id="pekerjaan_ayah" required class="input-modern-form">
+                                    <option value="" selected disabled>- Pilih Pekerjaan -</option>
+                                    <option value="TIDAK BEKERJA">TIDAK BEKERJA</option>
+                                    <option value="PENSIUNAN">PENSIUNAN</option>
+                                    <option value="PNS">PNS</option>
+                                    <option value="TNI/POLISI">TNI/POLISI</option>
+                                    <option value="GURU/DOSEN">GURU/DOSEN</option>
+                                    <option value="PEGAWAI SWASTA">PEGAWAI SWASTA</option>
+                                    <option value="WIRASWASTA">WIRASWASTA</option>
+                                    <option value="PENGACARA/JAKSA/HAKIM/NOTARIS">PENGACARA/JAKSA/HAKIM/NOTARIS</option>
+                                    <option value="SENIMAN/PELUKIS/ARTIS/SEJENIS">SENIMAN/PELUKIS/ARTIS/SEJENIS</option>
+                                    <option value="DOKTER/BIDAN/PERAWAT">DOKTER/BIDAN/PERAWAT</option>
+                                    <option value="PILOT/PRAMUGARA">PILOT/PRAMUGARA</option>
+                                    <option value="PEDAGANG">PEDAGANG</option>
+                                    <option value="PETANI/PETERNAK">PETANI/PETERNAK</option>
+                                    <option value="NELAYAN">NELAYAN</option>
+                                    <option value="BURUH (TANI/PABRIK/BANGUNAN)">BURUH (TANI/PABRIK/BANGUNAN)</option>
+                                    <option value="SOPIR/MASINIS/KONDEKTUR">SOPIR/MASINIS/KONDEKTUR</option>
+                                    <option value="POLITIKUS">POLITIKUS</option>
+                                    <option value="LAINNYA">LAINNYA</option>
+                                </select>
+                            </div>
+                            
                             <div class="form-group"><label>Penghasilan Ayah (Rp) *</label><input type="number" id="penghasilan_ayah" required class="input-modern-form" placeholder="Contoh: 2000000"></div>
                         </div>
                     </div>
@@ -197,7 +225,31 @@
                                     <option value="D3">D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
                                 </select>
                             </div>
-                            <div class="form-group"><label>Pekerjaan Ibu *</label><input type="text" id="pekerjaan_ibu" required class="input-modern-form" style="text-transform: uppercase;"></div>
+
+                            <div class="form-group"><label>Pekerjaan Ibu *</label>
+                                <select id="pekerjaan_ibu" required class="input-modern-form">
+                                    <option value="" selected disabled>- Pilih Pekerjaan -</option>
+                                    <option value="TIDAK BEKERJA">TIDAK BEKERJA</option>
+                                    <option value="PENSIUNAN">PENSIUNAN</option>
+                                    <option value="PNS">PNS</option>
+                                    <option value="TNI/POLISI">TNI/POLISI</option>
+                                    <option value="GURU/DOSEN">GURU/DOSEN</option>
+                                    <option value="PEGAWAI SWASTA">PEGAWAI SWASTA</option>
+                                    <option value="WIRASWASTA">WIRASWASTA</option>
+                                    <option value="PENGACARA/JAKSA/HAKIM/NOTARIS">PENGACARA/JAKSA/HAKIM/NOTARIS</option>
+                                    <option value="SENIMAN/PELUKIS/ARTIS/SEJENIS">SENIMAN/PELUKIS/ARTIS/SEJENIS</option>
+                                    <option value="DOKTER/BIDAN/PERAWAT">DOKTER/BIDAN/PERAWAT</option>
+                                    <option value="PILOT/PRAMUGARA">PILOT/PRAMUGARA</option>
+                                    <option value="PEDAGANG">PEDAGANG</option>
+                                    <option value="PETANI/PETERNAK">PETANI/PETERNAK</option>
+                                    <option value="NELAYAN">NELAYAN</option>
+                                    <option value="BURUH (TANI/PABRIK/BANGUNAN)">BURUH (TANI/PABRIK/BANGUNAN)</option>
+                                    <option value="SOPIR/MASINIS/KONDEKTUR">SOPIR/MASINIS/KONDEKTUR</option>
+                                    <option value="POLITIKUS">POLITIKUS</option>
+                                    <option value="LAINNYA">LAINNYA</option>
+                                </select>
+                            </div>
+
                             <div class="form-group"><label>Penghasilan Ibu (Rp) *</label><input type="number" id="penghasilan_ibu" required class="input-modern-form" placeholder="Contoh: 0"></div>
                         </div>
                     </div>
@@ -246,7 +298,7 @@
                         <i class="ph ph-warning-circle"></i> <b>Format:</b> 
                         <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">PDF</span> untuk dokumen, 
                         <span style="background: #fce7f3; color: #be185d; padding: 2px 6px; border-radius: 4px; font-weight: bold;">JPG/PNG</span> untuk Foto.<br>
-                        <b>Maksimal Ukuran:</b> 100KB (Foto), 200KB (Dokumen).
+                        <b>Maksimal Ukuran:</b> <span style="color: #dc2626; font-weight: bold;">100KB</span> (Semua Berkas), kecuali <span style="color: #16a34a; font-weight: bold;">300KB</span> (Scan Rapor).
                     </p>
                     
                     <div class="upload-grid-modern">
@@ -263,7 +315,7 @@
                             <input type="file" id="file_kk" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-icon-box"><i class="ph ph-users-three"></i></div>
                             <span class="upload-label-text">Kartu Keluarga (KK)</span>
-                            <span class="upload-status-text" id="lbl-file_kk">Max 200KB (PDF Only)</span>
+                            <span class="upload-status-text" id="lbl-file_kk">Max 100KB (PDF Only)</span>
                         </div>
 
                         <!-- Card 3: Akta -->
@@ -271,7 +323,7 @@
                             <input type="file" id="file_akta" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-icon-box"><i class="ph ph-scroll"></i></div>
                             <span class="upload-label-text">Akta Kelahiran</span>
-                            <span class="upload-status-text" id="lbl-file_akta">Max 200KB (PDF Only)</span>
+                            <span class="upload-status-text" id="lbl-file_akta">Max 100KB (PDF Only)</span>
                         </div>
 
                         <!-- Card 4: SKB -->
@@ -279,15 +331,23 @@
                             <input type="file" id="file_skb" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-icon-box"><i class="ph ph-certificate"></i></div>
                             <span class="upload-label-text">Surat Kelakuan Baik</span>
-                            <span class="upload-status-text" id="lbl-file_skb">Max 200KB (PDF Only)</span>
+                            <span class="upload-status-text" id="lbl-file_skb">Max 100KB (PDF Only)</span>
                         </div>
 
                         <!-- Card 5: KTP -->
                         <div class="upload-card-item">
                             <input type="file" id="file_ktp_ortu" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-icon-box"><i class="ph ph-identification-card"></i></div>
-                            <span class="upload-label-text">KTP Orang Tua (Gabung Ayah & Ibu)</span>
-                            <span class="upload-status-text" id="lbl-file_ktp_ortu">Max 200KB (PDF Only)</span>
+                            <span class="upload-label-text">KTP Orang Tua (Gabung)</span>
+                            <span class="upload-status-text" id="lbl-file_ktp_ortu">Max 100KB (PDF Only)</span>
+                        </div>
+
+                        <!-- Card 6: Rapor (NEW) -->
+                        <div class="upload-card-item">
+                            <input type="file" id="file_rapor" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-icon-box"><i class="ph ph-book-open-text"></i></div>
+                            <span class="upload-label-text">Scan Rapor (5 Semester)</span>
+                            <span class="upload-status-text" id="lbl-file_rapor" style="color: var(--primary); font-weight: 700;">Max 300KB (PDF Only)</span>
                         </div>
                     </div>
                 </div>
@@ -305,7 +365,6 @@
 
                     <div style="margin-top: 30px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fcd34d;">
                         <label style="font-weight:700; color:#b45309; display:block; margin-bottom:10px;">Upload Bukti Sertifikat (Gabung 1 PDF, Max 300KB) *</label>
-                        <!-- ADDED onchange validation -->
                         <input type="file" id="file_sertifikat" accept=".pdf" class="input-modern-form" style="background:white;" onchange="validateSimpleUpload(this, 300)">
                         <small id="lbl-file_sertifikat" style="display:block; margin-top:5px; color:#b45309;">Belum ada file dipilih</small>
                     </div>
@@ -349,10 +408,11 @@
                 </ol>
                 <div class="instruction-file-list">
                     <li><i class="ph ph-image"></i> Foto Latar Biru (JPG/PNG - Max 100KB)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan Kartu Keluarga (PDF - Max 200KB)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan Akta Kelahiran (PDF - Max 200KB)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik (PDF - Max 200KB)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua Gabung (PDF - Max 200KB)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Kartu Keluarga (PDF - <strong>Max 100KB</strong>)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Akta Kelahiran (PDF - <strong>Max 100KB</strong>)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik (PDF - <strong>Max 100KB</strong>)</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua Gabung (PDF - <strong>Max 100KB</strong>)</li>
+                    <li><i class="ph ph-book-open-text"></i> Scan Rapor 5 Semester (PDF - <strong>Max 300KB</strong>)</li>
                     <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (Khusus Jalur Prestasi - PDF Max 300KB)</li>
                 </div>
             </div>
@@ -371,12 +431,15 @@
             
             if (file) {
                 // Tentukan Limit
-                let limit = 200; // Default PDF
+                let limit = 100; // Default PDF
                 let typeMsg = 'PDF';
                 
                 if (input.id === 'file_foto') {
                     limit = 100;
                     typeMsg = 'JPG/PNG';
+                } else if (input.id === 'file_rapor') {
+                    // PENGECUALIAN: Rapor 300KB
+                    limit = 300;
                 }
 
                 // Cek Tipe
@@ -463,6 +526,7 @@
 
         // Logic Modal Instruksi
         document.addEventListener('DOMContentLoaded', () => {
+            // Tampilkan modal saat halaman dimuat
             document.getElementById('instructionModal').style.display = 'flex';
         });
 
