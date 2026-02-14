@@ -5,38 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PMB MAN 1 Tasikmalaya 2026/2027</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Phosphor Icons (Minimalist Icons) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <style>
-        /* --- OPTIMASI HEADER KHUSUS LANDING PAGE (MOBILE) --- */
-        @media (max-width: 768px) {
-            /* Kecilkan padding container header */
-            header .container { padding: 0 15px !important; }
-            
-            /* Logo & Judul: Lebih Ringkas */
-            .brand-wrapper { gap: 10px !important; }
-            .kemenag-logo { width: 35px !important; }
-            .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
-            .brand-subtitle { display: none !important; } /* Sembunyikan alamat */
-            
-            /* Tombol Login: Hanya Icon */
-            .nav-actions .btn span { display: none; } /* Sembunyikan teks "LOGIN" */
-            .nav-actions .btn { 
-                padding: 8px !important; 
-                width: 36px; 
-                height: 36px; 
-                justify-content: center; 
-                border-radius: 50%; 
-            }
-            .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
-        }
-    </style>
 </head>
 <body>
 
@@ -45,7 +17,6 @@
         <div class="container">
             <nav>
                 <div class="brand-wrapper">
-                    <!-- Logo menggunakan file lokal images/logo.png -->
                     <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
@@ -53,9 +24,8 @@
                     </div>
                 </div>
                 <div class="nav-actions">
-                    <!-- Tombol Login Siswa (DIBUNGKUS SPAN AGAR BISA DI-HIDE DI HP) -->
                     <a href="login.html" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;">
-                        <i class="ph ph-sign-in"></i> <span>LOGIN</span>
+                        <i class="ph ph-sign-in"></i> LOGIN
                     </a>
                 </div>
             </nav>
@@ -69,8 +39,6 @@
                 
                 <!-- KIRI: Text & Actions -->
                 <div class="hero-content">
-                    
-                    <!-- NEW TITLE STRUCTURE -->
                     <h1 class="hero-title-custom">
                         <span class="line-1">Penerimaan Murid</span>
                         <span class="line-2">Baru (PMB)</span>
@@ -82,7 +50,6 @@
                         Ayo bergabung di MAN 1 Tasikmalaya, menjadi pribadi berprestasi, berakhlak, dan mandiri!
                     </p>
 
-                    <!-- Pilihan Jalur (Tab Style Colorful) -->
                     <div class="jalur-tabs">
                         <div class="jalur-tab active" onclick="selectTab('REGULER')" id="tab-reguler">
                             <i class="ph ph-student"></i> Jalur Reguler
@@ -92,7 +59,6 @@
                         </div>
                     </div>
 
-                    <!-- Input NISN & Action Compact -->
                     <div class="compact-action">
                         <input type="number" id="input-nisn" class="input-modern" placeholder="Masukkan 10 Digit NISN">
                         <button class="btn btn-primary" onclick="cekNisnDanDaftar()">
@@ -100,7 +66,6 @@
                         </button>
                     </div>
 
-                    <!-- Opsi Login -->
                     <div class="login-link-container">
                         Sudah mendaftar? <a href="login.html">Login Siswa Disini</a>
                     </div>
@@ -115,10 +80,8 @@
                         <img data-src="images/slide4.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop'">
                         <img data-src="images/slide5.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=1000&auto=format&fit=crop'">
                         
-                        <!-- Overlay Gradient -->
                         <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
                         
-                        <!-- Navigasi Slider -->
                         <div class="slider-nav">
                             <button class="nav-btn" onclick="moveSlide(-1)"><i class="ph ph-caret-left"></i></button>
                             <button class="nav-btn" onclick="moveSlide(1)"><i class="ph ph-caret-right"></i></button>
@@ -136,40 +99,53 @@
             <div class="section-header">
                 <h2>Informasi PMB</h2>
                 <p>Jadwal Penting & Dokumen</p>
-                <!-- Tombol Brosur -->
                 <a href="https://drive.google.com/drive/folders/YOUR_BROSUR_ID" target="_blank" class="btn btn-primary" style="margin-top: 15px; box-shadow: 0 5px 15px rgba(0,121,107,0.3);">
                     <i class="ph ph-file-pdf"></i> Download Brosur PMB
                 </a>
             </div>
 
             <div class="info-cards-grid">
-                <!-- Card Jalur Prestasi -->
+                <!-- Card 1: Jalur Prestasi (UPDATED) -->
                 <div class="info-card-modern">
                     <h3><i class="ph ph-trophy" style="color: var(--accent);"></i> Jalur Prestasi</h3>
                     <ul class="timeline-list">
-                        <li><span class="timeline-date">6 - 16 April 2026</span> Pendaftaran Online</li>
-                        <li><span class="timeline-date">18 April 2026</span> Verifikasi Prestasi & Cek Berkas Asli</li>
+                        <li><span class="timeline-date">6 - 14 April 2026</span> Pendaftaran Online</li>
+                        <li><span class="timeline-date">16 April 2026</span> Pelaksanaan Tes Pembuktian Prestasi</li>
                         <li><span class="timeline-date">18 April 2026</span> Pengumuman Kelulusan</li>
                         <li><span class="timeline-date">20 - 25 April 2026</span> Lapor Diri / Daftar Ulang</li>
                     </ul>
                 </div>
 
-                <!-- Card Jalur Reguler -->
+                <!-- Card 2: Jalur Reguler (UPDATED) -->
                 <div class="info-card-modern" style="border-top-color: var(--primary-dark);">
                     <h3><i class="ph ph-student"></i> Jalur Reguler</h3>
                     <ul class="timeline-list">
                         <li><span class="timeline-date">20 April - 20 Mei 2026</span> Pendaftaran Online</li>
-                        <li><span class="timeline-date">21 - 23 Mei 2026</span> Tes Seleksi (CBT)</li>
+                        <li><span class="timeline-date">21 - 23 Mei 2026</span> Tes Seleksi CBT (Computer Based Test)</li>
                         <li><span class="timeline-date">25 Mei 2026</span> Pengumuman Kelulusan</li>
-                        <li><span class="timeline-date">6 - 13 Juni 2026</span> Lapor Diri / Daftar Ulang</li>
+                        <li><span class="timeline-date">13 - 20 Juni 2026</span> Lapor Diri / Daftar Ulang</li>
                     </ul>
                 </div>
 
-                <!-- Card Agenda -->
+                <!-- Card 3: Syarat Berkas -->
+                <div class="info-card-modern" style="border-top-color: #2563eb;">
+                    <h3><i class="ph ph-folder-notch-open" style="color: #2563eb;"></i> Syarat Berkas</h3>
+                    <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted);">Siapkan file scan berikut:</p>
+                    <ul class="timeline-list">
+                        <li><span class="timeline-date" style="color: #334155;">Foto Latar Biru</span> Format JPG/PNG (Max 100KB)</li>
+                        <li><span class="timeline-date" style="color: #334155;">Kartu Keluarga (KK)</span> Format PDF (Max 100KB)</li>
+                        <li><span class="timeline-date" style="color: #334155;">Akta Kelahiran</span> Format PDF (Max 100KB)</li>
+                        <li><span class="timeline-date" style="color: #334155;">Surat Kelakuan Baik</span> Format PDF (Max 100KB)</li>
+                        <li><span class="timeline-date" style="color: #334155;">KTP Orang Tua (Ayah+Ibu)</span> Format PDF (Max 100KB)</li>
+                        <li><span class="timeline-date" style="color: #334155;">Rapor (5 Semester)</span> Format PDF (Max 300KB)</li>
+                    </ul>
+                </div>
+
+                <!-- Card 4: Agenda Orang Tua -->
                 <div class="info-card-modern" style="border-top-color: var(--accent);">
                     <h3><i class="ph ph-users-three"></i> Agenda Orang Tua</h3>
                     <ul class="timeline-list">
-                        <li><span class="timeline-date" style="color: var(--primary);">6 Juni 2026</span> Rapat Orang Tua / Wali Murid Baru</li>
+                        <li><span class="timeline-date" style="color: var(--primary);">13 Juni 2026</span> Rapat Orang Tua / Wali Murid Baru</li>
                     </ul>
                     <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center;">
                         <p style="font-size: 0.9rem; margin-bottom: 10px; color: var(--text-muted);">Butuh bantuan teknis?</p>
@@ -192,7 +168,6 @@
                     <small style="opacity: 0.7;">Sukamanah, Tasikmalaya</small>
                 </div>
             </div>
-            
             <div class="footer-info">
                 <p>Jalan Pahlawan KH.Z Musthafa, Sukamanah, Kec. Sukarame</p>
                 <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 5px;">&copy; 2026 Panitia PMB. All Rights Reserved.</p>
