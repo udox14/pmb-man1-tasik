@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PMB MAN 1 Tasikmalaya</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="brand-wrapper">
+                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
+                    <div class="brand-text">
+                        <div class="brand-title">MAN 1 TASIKMALAYA</div>
+                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <span class="page-context" style="display: none;">Login Portal</span>
+                    <!-- Tombol Kembali (REVISI TEKS) -->
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="ph ph-house"></i> KEMBALI
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- LOGIN SECTION MODERN -->
+    <section class="login-section">
+        <div class="login-box">
+            
+            <!-- Sisi Kiri: Visual & Branding -->
+            <div class="login-visual">
+                <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Besar" style="width: 120px; margin: 0 auto 30px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));">
+                <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 10px;">Portal PMB</h2>
+                <p style="font-size: 1.1rem; opacity: 0.9;">Tahun Ajaran 2026/2027</p>
+                <div style="margin-top: 40px; font-size: 0.9rem; opacity: 0.8;">
+                    "Menjadi pribadi berprestasi,<br>berakhlak, dan mandiri."
+                </div>
+            </div>
+
+            <!-- Sisi Kanan: Form -->
+            <div class="login-form-side">
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: var(--primary); font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">Selamat Datang</h2>
+                    <p style="color: var(--text-muted);">Silakan masuk ke dashboard Anda.</p>
+                </div>
+
+                <form id="loginForm" onsubmit="return false;">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Username / NISN</label>
+                        <div style="position: relative;">
+                            <i class="ph ph-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
+                            <input type="text" id="username" class="input-modern" placeholder="Masukkan NISN" style="width: 100%; padding-left: 45px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Password / No. Daftar</label>
+                        <div style="position: relative;">
+                            <i class="ph ph-lock-key" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
+                            <input type="password" id="password" class="input-modern" placeholder="Masukkan Nomor Pendaftaran" style="width: 100%; padding-left: 45px;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px;" onclick="handleLogin()">
+                        MASUK DASHBOARD <i class="ph ph-sign-in" style="margin-left: 5px;"></i>
+                    </button>
+
+                </form>
+
+                <div style="margin-top: 30px; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+                    Belum punya akun? <a href="index.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Daftar Sekarang</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

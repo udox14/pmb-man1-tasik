@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - PMB MAN 1 Tasikmalaya</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center;">
+                    <i class="ph ph-shield-check" style="font-size: 1.8rem; color: var(--accent);"></i>
+                    <span class="sidebar-brand-text">ADMIN PMB</span>
+                </div>
+                <!-- Tombol Close Khusus Mobile -->
+                <button class="mobile-close-btn" onclick="toggleSidebar()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" onclick="loadPendaftar()">
+                    <i class="ph ph-users"></i><span>Data Pendaftar</span>
+                </a>
+                <a href="#" class="menu-item" onclick="aturJalur()">
+                    <i class="ph ph-gear"></i><span>Pengaturan Sistem</span>
+                </a>
+                <a href="#" class="menu-item" onclick="logout()" style="margin-top: 30px; color: #f87171;">
+                    <i class="ph ph-sign-out"></i><span>Keluar</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-main" id="mainContent">
+            
+            <!-- TOPBAR -->
+            <div class="admin-topbar">
+                <button class="toggle-btn" onclick="toggleSidebar()">
+                    <i class="ph ph-list"></i>
+                </button>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span style="font-size: 0.9rem; font-weight: 600;">Administrator</span>
+                    <div style="width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">A</div>
+                </div>
+            </div>
+
+            <!-- ... (SISA KONTEN TABLE TETAP SAMA) ... -->
+            <div class="admin-content-pad">
+                
+                <!-- STATS CARDS -->
+                <div class="stats-grid-modern">
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box bg-blue"><i class="ph ph-users-three"></i></div>
+                        <div><h2 id="count-total" style="margin:0;">0</h2><small style="color:var(--text-muted);">Total Pendaftar</small></div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box bg-yellow"><i class="ph ph-clock"></i></div>
+                        <div><h2 id="count-pending" style="margin:0;">0</h2><small style="color:var(--text-muted);">Perlu Verifikasi</small></div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box bg-green"><i class="ph ph-check-circle"></i></div>
+                        <div><h2 id="count-lulus" style="margin:0;">0</h2><small style="color:var(--text-muted);">Siswa Diterima</small></div>
+                    </div>
+                </div>
+
+                <!-- BULK ACTIONS BAR -->
+                <div class="bulk-actions-bar" id="bulkActions">
+                    <div>
+                        <i class="ph ph-check-square"></i> <b id="selectedCount">0</b> Siswa dipilih
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('VERIFY')">
+                            ✅ Verifikasi
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('GRADUATE')">
+                            🎓 Luluskan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DATA TABLE CARD -->
+                <div class="admin-card">
+                    <div class="table-controls">
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <select id="rowsPerPage" onchange="changeLimit()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white;">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <select id="filterVerif" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
+                                <option value="">Semua Status Berkas</option>
+                                <option value="true">✅ Terverifikasi</option>
+                                <option value="false">⏳ Pending / Ditolak</option>
+                            </select>
+                            <select id="filterLulus" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
+                                <option value="">Semua Status Kelulusan</option>
+                                <option value="PENDING">⏳ Menunggu</option>
+                                <option value="DITERIMA">🎉 Diterima</option>
+                                <option value="TIDAK DITERIMA">🚫 Tidak Diterima</option>
+                            </select>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Cari Nama / NISN..." onkeyup="filterTable()" 
+                                   style="padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; width: 250px; outline: none;">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                                    <th style="cursor: pointer;" onclick="sortTable('nama_lengkap')" title="Urutkan Nama">Nama Lengkap <i class="ph ph-caret-up-down"></i></th>
+                                    <th style="cursor: pointer;" onclick="sortTable('jalur')" title="Urutkan Jalur">Jalur <i class="ph ph-caret-up-down"></i></th>
+                                    <th style="cursor: pointer;" onclick="sortTable('asal_sekolah')" title="Urutkan Sekolah">Asal Sekolah <i class="ph ph-caret-up-down"></i></th>
+                                    <th style="cursor: pointer;" onclick="sortTable('status_verifikasi')" title="Urutkan Verifikasi">Status Berkas <i class="ph ph-caret-up-down"></i></th>
+                                    <th style="cursor: pointer;" onclick="sortTable('status_kelulusan')" title="Urutkan Kelulusan">Kelulusan <i class="ph ph-caret-up-down"></i></th>
+                                    <th style="text-align: right;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Data render here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container" id="pagination"></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>
