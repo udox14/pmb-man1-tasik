@@ -202,6 +202,50 @@ function validateSection(step) {
     const section = document.getElementById(`section-${step}`);
     if (!section) return true;
 
+    // Validasi digit khusus per section
+    if (step === 1) {
+        const nikInput = document.getElementById('nik');
+        if (nikInput && nikInput.value.length !== 16) {
+            Swal.fire('NIK Tidak Valid', 'NIK Siswa harus tepat 16 digit.', 'warning');
+            nikInput.style.borderColor = '#ef4444';
+            nikInput.style.backgroundColor = '#fff5f5';
+            const errorEl = document.getElementById('nik-error');
+            if (errorEl) errorEl.style.display = 'block';
+            return false;
+        }
+    }
+
+    if (step === 2) {
+        const checks = [
+            { id: 'no_kk',   digits: 16, label: 'Nomor KK',  errorId: 'no_kk-error' },
+            { id: 'nik_ayah', digits: 16, label: 'NIK Ayah', errorId: 'nik_ayah-error' },
+            { id: 'nik_ibu',  digits: 16, label: 'NIK Ibu',  errorId: 'nik_ibu-error' },
+        ];
+        for (const c of checks) {
+            const el = document.getElementById(c.id);
+            if (el && el.value.length !== c.digits) {
+                Swal.fire(`${c.label} Tidak Valid`, `${c.label} harus tepat ${c.digits} digit.`, 'warning');
+                el.style.borderColor = '#ef4444';
+                el.style.backgroundColor = '#fff5f5';
+                const errorEl = document.getElementById(c.errorId);
+                if (errorEl) errorEl.style.display = 'block';
+                return false;
+            }
+        }
+    }
+
+    if (step === 3) {
+        const npsn = document.getElementById('npsn_sekolah');
+        if (npsn && npsn.value.length !== 8) {
+            Swal.fire('NPSN Tidak Valid', 'NPSN harus tepat 8 digit.', 'warning');
+            npsn.style.borderColor = '#ef4444';
+            npsn.style.backgroundColor = '#fff5f5';
+            const errorEl = document.getElementById('npsn-error');
+            if (errorEl) errorEl.style.display = 'block';
+            return false;
+        }
+    }
+
     const inputs = section.querySelectorAll('input[required]:not(:disabled), select[required]:not(:disabled), textarea[required]:not(:disabled)');
     let isValid = true;
 
@@ -234,7 +278,6 @@ function validateSection(step) {
         } else {
             // STYLE NORMAL
             if (input.type === 'file' && input.parentElement.classList.contains('upload-card-item')) {
-                // Reset jika sebelumnya error
                 if(input.parentElement.style.borderColor === 'rgb(239, 68, 68)' || input.parentElement.style.borderColor === '#ef4444') {
                      input.parentElement.style.borderColor = 'var(--primary)'; 
                      input.parentElement.style.backgroundColor = fileBg; 
@@ -300,7 +343,7 @@ function initPrestasiUI() {
         document.head.appendChild(style);
     }
 
-    // INJECT HTML (TERMASUK TOMBOL UPLOAD)
+    // INJECT HTML
     container.innerHTML = `
         <div class="pres-category-box">
             <div class="pres-cat-header"><span>📚 Prestasi Akademik</span><small style="font-weight:400; color:#64748b;">(OSN, OMI, Debat, dll)</small></div>
@@ -328,13 +371,13 @@ function initPrestasiUI() {
             </div>
         </div>
         
-        <!-- TOMBOL UPLOAD DIKEMBALIKAN DISINI -->
+        <!-- UPLOAD SERTIFIKAT: 2MB -->
         <div class="upload-grid-modern" style="margin-top: 30px;">
             <div class="upload-card-item" style="border-color: var(--accent); background: #fffbeb; grid-column: 1 / -1;">
-                <input type="file" id="file_sertifikat" accept=".pdf" onchange="validateSimpleUpload(this, 300)">
+                <input type="file" id="file_sertifikat" accept=".pdf" onchange="validateSimpleUpload(this, 2048)">
                 <div class="upload-icon-box" style="color: #d97706;"><i class="ph ph-trophy"></i></div>
                 <span class="upload-label-text" style="color: #92400e;">Upload Sertifikat Prestasi (Gabung 1 PDF) *</span>
-                <span class="upload-status-text" id="lbl-file_sertifikat">Max 300KB (PDF Only)</span>
+                <span class="upload-status-text" id="lbl-file_sertifikat">Max 2MB (PDF Only)</span>
             </div>
         </div>
     `;
@@ -376,7 +419,7 @@ function compressImage(file, quality) {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                const MAX_WIDTH = 1000;
+                const MAX_WIDTH = 1800;
                 if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
@@ -449,10 +492,24 @@ window.submitForm = async function() {
         }
         const rows = document.querySelectorAll('.pres-row');
         const tahfidzJuz = document.querySelector('.tahfidz-juz');
-        const isTahfidzFilled = tahfidzJuz && tahfidzJuz.value && parseInt(tahfidzJuz.value) >= 10;
-        
-        if (rows.length === 0 && !isTahfidzFilled) {
-            Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Wajib isi minimal 1 prestasi atau Tahfidz (Min. 10 Juz).'});
+        const tahfidzVal = tahfidzJuz ? tahfidzJuz.value : '';
+
+        // Cek apakah ada minimal 1 baris prestasi yang namanya terisi
+        const hasFilledPrestasi = Array.from(rows).some(row => row.querySelector('.pres-nama')?.value.trim() !== '');
+
+        // Cek tahfidz
+        const isTahfidzFilled = tahfidzVal !== '' && parseInt(tahfidzVal) >= 10;
+        const isTahfidzBelowMin = tahfidzVal !== '' && parseInt(tahfidzVal) < 10;
+
+        if (isTahfidzBelowMin) {
+            Swal.fire({icon: 'warning', title: 'Tahfidz Tidak Memenuhi Syarat', text: 'Hafalan Tahfidz minimal 10 Juz untuk dapat didaftarkan.'});
+            tahfidzJuz.style.borderColor = '#ef4444';
+            tahfidzJuz.style.backgroundColor = '#fff5f5';
+            return;
+        }
+
+        if (!hasFilledPrestasi && !isTahfidzFilled) {
+            Swal.fire({icon: 'warning', title: 'Data Prestasi Kosong', text: 'Wajib mengisi minimal 1 prestasi (Akademik/Non-Akademik/Keagamaan) atau Tahfidz minimal 10 Juz.'});
             return;
         }
     }
@@ -481,18 +538,19 @@ window.submitForm = async function() {
         const nama = document.getElementById('nama_lengkap').value.replace(/[^a-zA-Z0-9]/g, '_');
         const folderName = `${nisn}_${nama}`;
 
+        // Batas upload semua berkas: 2MB (2048 KB)
         async function uploadFile(fileInputId, docName, maxKB, autoCompress = false) {
             const fileInput = document.getElementById(fileInputId);
             if (fileInput && fileInput.files.length > 0) {
                 let file = fileInput.files[0];
                 if (autoCompress && file.type.startsWith('image/')) {
                     try {
-                        const compressedBlob = await compressImage(file, 0.7);
+                        const compressedBlob = await compressImage(file, 0.92);
                         if (compressedBlob.size < file.size) file = compressedBlob;
                     } catch (e) { console.warn("Compress fail", e); }
                 }
                 const fileSizeKB = file.size / 1024;
-                if (fileSizeKB > maxKB) throw new Error(`File ${docName} terlalu besar. Max ${maxKB} KB.`);
+                if (fileSizeKB > maxKB) throw new Error(`File ${docName} terlalu besar. Max ${maxKB >= 1024 ? (maxKB/1024) + ' MB' : maxKB + ' KB'}.`);
                 const ext = file.name ? file.name.split('.').pop() : 'jpg';
                 const fileName = `${folderName}/${docName}_${timestamp}.${ext}`;
                 
@@ -504,14 +562,15 @@ window.submitForm = async function() {
             return null;
         }
 
+        // Semua berkas batas 2048 KB (2MB)
         const [fotoUrl, kkUrl, aktaUrl, skbUrl, ktpOrtuUrl, raporUrl, sertifUrl] = await Promise.all([
-            uploadFile('file_foto', 'FOTO', 100, true),
-            uploadFile('file_kk', 'KK', 100),
-            uploadFile('file_akta', 'AKTA', 100),
-            uploadFile('file_skb', 'SKB', 100),
-            uploadFile('file_ktp_ortu', 'KTP_ORTU', 100),
-            uploadFile('file_rapor', 'RAPOR', 300),
-            (jalur === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 300) : Promise.resolve(null)
+            uploadFile('file_foto', 'FOTO', 2048, true),
+            uploadFile('file_kk', 'KK', 2048),
+            uploadFile('file_akta', 'AKTA', 2048),
+            uploadFile('file_skb', 'SKB', 2048),
+            uploadFile('file_ktp_ortu', 'KTP_ORTU', 2048),
+            uploadFile('file_rapor', 'RAPOR', 2048),
+            (jalur === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 2048) : Promise.resolve(null)
         ]);
 
         const getSelectText = (id) => { const el = document.getElementById(id); return el.options[el.selectedIndex]?.text || ''; };

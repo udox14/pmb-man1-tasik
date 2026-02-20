@@ -12,7 +12,7 @@ let allPendaftar = [];
 let currentPage = 1;
 let rowsPerPage = 10;
 let selectedIds = new Set(); 
-let editState = {};
+let editState = {}; 
 let currentSort = { column: 'created_at', direction: 'desc' };
 
 // 2. Sidebar Toggle
@@ -43,10 +43,10 @@ async function loadPendaftar() {
     }
 }
 
-// 4. Update Statistik Cards
+// 4. Update Statistik
 function updateStats(data) {
     document.getElementById('count-total').innerText = data.length;
-    document.getElementById('count-pending').innerText = data.filter(p => !p.status_verifikasi).length;
+    document.getElementById('count-pending').innerText = data.filter(p => p.status_verifikasi === null).length;
     document.getElementById('count-lulus').innerText = data.filter(p => p.status_kelulusan === 'DITERIMA').length;
 }
 
@@ -57,19 +57,23 @@ function renderTable() {
     const filterVerif = document.getElementById('filterVerif').value;
     const filterLulus = document.getElementById('filterLulus').value;
     
-    // Filtering
     let filteredData = allPendaftar.filter(p => {
         const matchSearch = p.nama_lengkap.toLowerCase().includes(searchVal) || 
                             p.nisn.includes(searchVal) ||
                             p.no_pendaftaran.toLowerCase().includes(searchVal);
+        
         let matchVerif = true;
-        if (filterVerif !== "") matchVerif = String(p.status_verifikasi) === filterVerif;
+        if (filterVerif !== "") {
+            const statusStr = String(p.status_verifikasi); 
+            matchVerif = statusStr === filterVerif;
+        }
+        
         let matchLulus = true;
-        if (filterLulus !== "") matchLulus = p.status_kelulusan === filterLulus;
+        if (filterLulus !== "") matchLulus = (p.status_kelulusan || 'PENDING') === filterLulus;
+        
         return matchSearch && matchVerif && matchLulus;
     });
 
-    // Sorting
     filteredData.sort((a, b) => {
         let valA = a[currentSort.column] || "";
         let valB = b[currentSort.column] || "";
@@ -80,7 +84,6 @@ function renderTable() {
         return 0;
     });
 
-    // Pagination
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     if (currentPage > totalPages) currentPage = 1;
     if (currentPage < 1) currentPage = 1;
@@ -89,7 +92,6 @@ function renderTable() {
     const end = start + parseInt(rowsPerPage);
     const pageData = filteredData.slice(start, end);
 
-    // Render Rows
     tbody.innerHTML = '';
     if (pageData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px;">Tidak ada data ditemukan.</td></tr>';
@@ -99,12 +101,15 @@ function renderTable() {
 
     pageData.forEach(p => {
         const photoSrc = p.foto_url ? p.foto_url : 'https://via.placeholder.com/40?text=' + p.nama_lengkap.charAt(0);
-        const badgeVerif = p.status_verifikasi 
-            ? '<span class="badge-modern badge-green">Terverifikasi</span>' 
-            : '<span class="badge-modern badge-yellow">Pending</span>';
+        
+        let badgeVerif = '<span class="badge-modern badge-yellow">Pending</span>'; 
+        if (p.status_verifikasi === true) badgeVerif = '<span class="badge-modern badge-green">Terverifikasi</span>';
+        else if (p.status_verifikasi === false) badgeVerif = '<span class="badge-modern badge-red">Ditolak</span>';
+            
         let badgeLulus = '<span class="badge-modern badge-blue">Menunggu</span>';
         if (p.status_kelulusan === 'DITERIMA') badgeLulus = '<span class="badge-modern badge-green">DITERIMA</span>';
-        if (p.status_kelulusan === 'TIDAK DITERIMA') badgeLulus = '<span class="badge-modern badge-red">TIDAK</span>';
+        if (p.status_kelulusan === 'TIDAK DITERIMA') badgeLulus = '<span class="badge-modern badge-red">TIDAK LULUS</span>';
+
         const isChecked = selectedIds.has(p.id) ? 'checked' : '';
 
         const tr = document.createElement('tr');
@@ -215,25 +220,21 @@ window.bulkAction = async function(action) {
     }
 }
 
-// 10. Detail Siswa
+// 10. Detail Siswa (FIXED STICKY SIDEBAR LAYOUT)
 window.viewDetail = async function(id) {
-    Swal.fire({
-        title: 'Memuat Data...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-    });
+    Swal.fire({ title: 'Memuat Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
         const { data: p, error } = await db.from('pendaftar').select('*').eq('id', id).single();
         if (error || !p) throw new Error('Data tidak ditemukan');
 
-        editState = { id: p.id, status_verifikasi: p.status_verifikasi, status_kelulusan: p.status_kelulusan };
+        editState = { id: p.id, status_verifikasi: p.status_verifikasi, status_kelulusan: p.status_kelulusan || 'PENDING' };
 
         let prestasiHtml = '';
         if (p.jalur === 'PRESTASI') {
             const { data: pres } = await db.from('prestasi').select('*').eq('pendaftar_id', id);
             if (pres && pres.length > 0) {
-                prestasiHtml = '<div style="margin-top:30px; background:#f0fdfa; padding:15px; border-radius:8px; border:1px solid #ccfbf1;"><div class="detail-section-title" style="margin-top:0;">🏅 Data Prestasi</div><ul style="padding-left:20px; margin:5px 0 0 0; font-size:0.9rem;">';
+                prestasiHtml = '<div style="margin-top:20px; background:#f0fdfa; padding:15px; border-radius:8px; border:1px solid #ccfbf1;"><div class="detail-section-title" style="margin-top:0;">🏅 Data Prestasi</div><ul style="padding-left:20px; margin:5px 0 0 0; font-size:0.9rem;">';
                 pres.forEach(x => prestasiHtml += `<li><b>${x.nama_lomba}</b> (${x.tingkat}) - ${x.tahun_perolehan}</li>`);
                 prestasiHtml += '</ul></div>';
             }
@@ -241,138 +242,184 @@ window.viewDetail = async function(id) {
 
         const val = (v) => v ? v : '-';
         const money = (v) => v ? 'Rp ' + parseInt(v).toLocaleString('id-ID') : '-';
+        
+        // Helper Class Active
+        const isVerifTrue = p.status_verifikasi === true ? 'active' : '';
+        const isVerifFalse = p.status_verifikasi === false ? 'active' : '';
+        const isVerifNull = (p.status_verifikasi === null || p.status_verifikasi === undefined) ? 'active' : '';
+
+        const isLulusTrue = p.status_kelulusan === 'DITERIMA' ? 'active' : '';
+        const isLulusFalse = p.status_kelulusan === 'TIDAK DITERIMA' ? 'active' : '';
+        const isLulusPending = (!p.status_kelulusan || p.status_kelulusan === 'PENDING') ? 'active' : '';
 
         Swal.fire({
-            title: '', width: '1100px', padding: '0', showConfirmButton: false, showCloseButton: true,
+            title: '', width: '1000px', padding: '0', showConfirmButton: false, showCloseButton: true,
             html: `
                 <style>
-                    .file-btn { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; text-decoration: none; color: #475569; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
-                    .file-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-                    .detail-section-title { font-size: 1rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin: 30px 0 15px 0; }
-                    .detail-grid-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-                    .detail-grid-row label { display: block; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-                    .detail-grid-row b { display: block; font-size: 0.95rem; color: #1e293b; }
-                    .sub-group { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #f1f5f9; }
-                    .sub-group h6 { margin: 0 0 10px 0; color: #64748b; font-size: 0.9rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
-                    .compact-row { display: flex; gap: 20px; margin-top: 15px; flex-wrap: wrap; align-items: center; }
-                    .status-group { display: flex; align-items: center; background: #f8fafc; padding: 4px; border-radius: 6px; border: 1px solid #e2e8f0; }
-                    .status-label-small { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-right: 8px; padding-left: 8px; }
-                    .btn-compact { border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: white; transition: 0.2s; opacity: 0.3; margin-left: 2px; }
-                    .btn-compact:hover { opacity: 0.6; }
-                    .btn-compact.active { opacity: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: scale(1.05); }
-                    .bg-blue { background-color: #2563eb; } .bg-green { background-color: #16a34a; } .bg-red { background-color: #dc2626; }
-                    .d-wrapper { display: grid; grid-template-columns: 300px 1fr; height: 85vh; overflow: hidden; text-align: left; }
-                    .d-left { background: #f8fafc; padding: 30px; border-right: 1px solid #e2e8f0; overflow-y: auto; }
-                    .d-right { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-                    .d-header { padding: 20px 30px; border-bottom: 1px solid #e2e8f0; background: white; z-index: 10; }
-                    .d-body { padding: 30px; overflow-y: auto; flex: 1; background: #fff; }
+                    /* Layout Reset & Sticky Logic */
+                    .d-wrapper { 
+                        display: grid; 
+                        grid-template-columns: 300px 1fr; 
+                        max-height: 85vh; 
+                        overflow-y: auto; /* Scroll utama di sini */
+                        text-align: left; 
+                        align-items: start; /* Penting agar sticky jalan */
+                    }
+                    .d-left { 
+                        background: #f8fafc; 
+                        padding: 30px; 
+                        border-right: 1px solid #e2e8f0; 
+                        position: sticky; /* Bikin Sidebar Sticky */
+                        top: 0; 
+                        z-index: 5;
+                        height: fit-content; /* Biar tidak stretch, jadi bisa sticky */
+                    }
+                    .d-right { 
+                        display: block; 
+                        height: auto; 
+                        overflow: visible; 
+                    }
+                    .d-header { 
+                        padding: 20px 30px; 
+                        border-bottom: 1px solid #e2e8f0; 
+                        background: white; 
+                        position: sticky; /* Header Kanan juga Sticky */
+                        top: 0; 
+                        z-index: 10; 
+                    }
+                    .d-body { 
+                        padding: 30px; 
+                        background: #fff;
+                    }
+                    
+                    /* Components */
+                    .file-btn { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; text-decoration: none; color: #475569; font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; transition: 0.2s; }
+                    .file-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; }
+                    
+                    .detail-title { font-size: 1rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin: 25px 0 15px 0; }
+                    .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+                    .detail-item label { display: block; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 3px; }
+                    .detail-item b { display: block; font-size: 0.95rem; color: #1e293b; }
+                    
+                    /* Actions Area */
+                    .status-row { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
+                    .status-box { display: flex; align-items: center; background: #f8fafc; padding: 4px; border-radius: 6px; border: 1px solid #e2e8f0; }
+                    .status-label { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin: 0 8px; }
+                    
+                    .btn-act { border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: white; opacity: 0.4; transition: 0.2s; margin-left: 2px; }
+                    .btn-act:hover { opacity: 0.7; }
+                    .btn-act.active { opacity: 1; transform: scale(1.05); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+                    .act-blue { background-color: #2563eb; } 
+                    .act-green { background-color: #16a34a; } 
+                    .act-red { background-color: #dc2626; }
+                    
+                    /* Mobile */
                     @media (max-width: 768px) {
-                        .d-wrapper { display: flex; flex-direction: column; height: auto; max-height: 80vh; overflow-y: auto; }
-                        .d-left { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 20px; }
-                        .d-right { width: 100%; height: auto; overflow: visible; }
-                        .d-header { position: sticky; top: 0; padding: 15px 20px; }
-                        .d-body { padding: 20px; overflow: visible; }
-                        .compact-row { flex-direction: column; align-items: flex-start; }
-                        .status-group { width: 100%; flex-wrap: wrap; gap: 5px; }
+                        .d-wrapper { display: block; height: auto; max-height: 85vh; overflow-y: auto; }
+                        .d-left { position: static; width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; height: auto; }
+                        .d-header { position: static; }
                     }
                     @keyframes pulse-soft { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
                     .pulse-animation { animation: pulse-soft 1s infinite; border: 1px solid white; }
                 </style>
+
                 <div class="d-wrapper">
+                    <!-- SIDEBAR KIRI (STICKY) -->
                     <div class="d-left">
-                        <img src="${p.foto_url || 'https://via.placeholder.com/300x400'}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 25px;">
-                        <h5 style="color: #475569; margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">📂 Berkas Lampiran</h5>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <a href="${p.scan_kk_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf" style="font-size: 1.2rem;"></i> Kartu Keluarga</a>
-                            <a href="${p.scan_akta_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf" style="font-size: 1.2rem;"></i> Akta Lahir</a>
-                            <a href="${p.scan_kelakuan_baik_url || '#'}" target="_blank" class="file-btn"><i class="ph ph-file-pdf" style="font-size: 1.2rem;"></i> SKB</a>
-                            <a href="${p.scan_ktp_ortu_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf" style="font-size: 1.2rem;"></i> KTP Ortu</a>
-                            ${p.scan_sertifikat_prestasi_url ? `<a href="${p.scan_sertifikat_prestasi_url}" target="_blank" class="file-btn" style="border-color: #fbbf24; background: #fffbeb;"><i class="ph ph-trophy" style="color: #d97706;"></i> Sertifikat</a>` : ''}
-                        </div>
+                        <img src="${p.foto_url || 'https://via.placeholder.com/300x400'}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                        
+                        <h5 style="color: #475569; margin-bottom: 10px; font-size: 0.85rem; font-weight: 700;">BERKAS LAMPIRAN</h5>
+                        <a href="${p.scan_kk_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> Kartu Keluarga</a>
+                        <a href="${p.scan_akta_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> Akta Lahir</a>
+                        <a href="${p.scan_skb_url || '#'}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> SKB</a>
+                        <a href="${p.scan_ktp_ortu_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> KTP Ortu</a>
+                        <a href="${p.scan_rapor_url || '#'}" target="_blank" class="file-btn"><i class="ph ph-book-open-text"></i> Rapor</a>
+                        ${p.scan_sertifikat_prestasi_url ? `<a href="${p.scan_sertifikat_prestasi_url}" target="_blank" class="file-btn" style="border-color: #fbbf24; background: #fffbeb;"><i class="ph ph-trophy" style="color: #d97706;"></i> Sertifikat</a>` : ''}
                     </div>
+
+                    <!-- KONTEN KANAN -->
                     <div class="d-right">
+                        <!-- Header (Sticky juga) -->
                         <div class="d-header">
-                            <h2 style="margin: 0 0 5px 0; color: #1e293b; font-size: 1.5rem;">${p.nama_lengkap}</h2>
-                            <div style="display: flex; align-items: center; gap: 15px; color: #64748b; font-size: 0.9rem; flex-wrap: wrap;">
-                                <span><i class="ph ph-identification-card"></i> ${p.nisn}</span>
-                                <span><i class="ph ph-graduation-cap"></i> ${p.asal_sekolah}</span>
-                                <span class="badge-modern ${p.jalur === 'PRESTASI' ? 'badge-blue' : 'badge-green'}">${p.jalur}</span>
+                            <h2 style="margin: 0; color: #1e293b; font-size: 1.5rem;">${p.nama_lengkap}</h2>
+                            <div style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">
+                                ${p.nisn} • ${p.asal_sekolah} • <span style="font-weight:bold; color:var(--primary);">${p.jalur}</span>
                             </div>
-                            <div class="compact-row">
-                                <div class="status-group">
-                                    <span class="status-label-small">Verifikasi</span>
-                                    <button onclick="setEditState('verif', false, this)" class="btn-compact bg-blue ${!p.status_verifikasi ? 'active' : ''}">Menunggu</button>
-                                    <button onclick="setEditState('verif', true, this)" class="btn-compact bg-green ${p.status_verifikasi ? 'active' : ''}">OK</button>
-                                    <button onclick="setEditState('verif', false, this)" class="btn-compact bg-red">Tolak</button>
+
+                            <div class="status-row">
+                                <div class="status-box">
+                                    <span class="status-label">Verifikasi</span>
+                                    <button onclick="setEditState('verif', null, this)" class="btn-act act-blue ${isVerifNull}">Wait</button>
+                                    <button onclick="setEditState('verif', true, this)" class="btn-act act-green ${isVerifTrue}">Valid</button>
+                                    <button onclick="setEditState('verif', false, this)" class="btn-act act-red ${isVerifFalse}">Tolak</button>
                                 </div>
-                                <div class="status-group">
-                                    <span class="status-label-small">Kelulusan</span>
-                                    <button onclick="setEditState('lulus', 'PENDING', this)" class="btn-compact bg-blue ${p.status_kelulusan === 'PENDING' ? 'active' : ''}">Menunggu</button>
-                                    <button onclick="setEditState('lulus', 'DITERIMA', this)" class="btn-compact bg-green ${p.status_kelulusan === 'DITERIMA' ? 'active' : ''}">Diterima</button>
-                                    <button onclick="setEditState('lulus', 'TIDAK DITERIMA', this)" class="btn-compact bg-red ${p.status_kelulusan === 'TIDAK DITERIMA' ? 'active' : ''}">Tidak</button>
+                                <div class="status-box">
+                                    <span class="status-label">Lulus</span>
+                                    <button onclick="setEditState('lulus', 'PENDING', this)" class="btn-act act-blue ${isLulusPending}">Wait</button>
+                                    <button onclick="setEditState('lulus', 'DITERIMA', this)" class="btn-act act-green ${isLulusTrue}">Diterima</button>
+                                    <button onclick="setEditState('lulus', 'TIDAK DITERIMA', this)" class="btn-act act-red ${isLulusFalse}">Gagal</button>
                                 </div>
-                                <button id="btn-save-changes" onclick="saveDetailChanges()" class="btn-compact" 
-                                        style="background: #0f172a; opacity: 1; padding: 10px 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-left: auto;">
-                                    <i class="ph ph-floppy-disk" style="font-size: 1.1rem;"></i> SIMPAN
+                                <button id="btn-save-changes" onclick="saveDetailChanges()" class="btn-act" 
+                                        style="background: #0f172a; opacity: 1; padding: 6px 20px; font-size: 0.8rem; margin-left: auto;">
+                                    <i class="ph ph-floppy-disk"></i> SIMPAN
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Body (Scrollable Content) -->
                         <div class="d-body">
-                            <div class="detail-section-title" style="margin-top: 0;">👤 Data Pribadi</div>
-                            <div class="detail-grid-row">
-                                <div><label>NIK</label><b>${val(p.nik)}</b></div>
-                                <div><label>Tempat, Tgl Lahir</label><b>${val(p.tempat_lahir)}, ${val(p.tanggal_lahir)}</b></div>
-                                <div><label>Jenis Kelamin</label><b>${val(p.jenis_kelamin)}</b></div>
-                                <div><label>Agama</label><b>${val(p.agama)}</b></div>
-                                <div><label>Anak Ke</label><b>${val(p.anak_ke)} dari ${val(p.jumlah_saudara)}</b></div>
-                                <div><label>Status Anak</label><b>${val(p.status_anak)}</b></div>
-                                <div><label>Ukuran Baju</label><b>${val(p.ukuran_baju)}</b></div>
+                            <div class="detail-title" style="margin-top: 0;">👤 Data Pribadi</div>
+                            <div class="detail-grid">
+                                <div class="detail-item"><label>NIK</label><b>${val(p.nik)}</b></div>
+                                <div class="detail-item"><label>TTL</label><b>${val(p.tempat_lahir)}, ${val(p.tanggal_lahir)}</b></div>
+                                <div class="detail-item"><label>JK</label><b>${val(p.jenis_kelamin)}</b></div>
+                                <div class="detail-item"><label>Agama</label><b>${val(p.agama)}</b></div>
+                                <div class="detail-item"><label>Anak Ke</label><b>${val(p.anak_ke)} dari ${val(p.jumlah_saudara)}</b></div>
+                                <div class="detail-item"><label>Status</label><b>${val(p.status_anak)}</b></div>
+                                <div class="detail-item"><label>Baju</label><b>${val(p.ukuran_baju)}</b></div>
                             </div>
-                            <div class="detail-section-title">🏠 Alamat Domisili</div>
-                            <div class="detail-grid-row">
-                                <div style="grid-column: span 2;"><label>Alamat Lengkap</label><b>${val(p.alamat_lengkap)}</b></div>
-                                <div><label>RT / RW</label><b>${val(p.rt)} / ${val(p.rw)}</b></div>
-                                <div><label>Desa/Kelurahan</label><b>${val(p.desa_kelurahan)}</b></div>
-                                <div><label>Kecamatan</label><b>${val(p.kecamatan)}</b></div>
-                                <div><label>Kab/Kota</label><b>${val(p.kabupaten_kota)}</b></div>
-                                <div><label>Provinsi</label><b>${val(p.provinsi)}</b></div>
-                                <div><label>Kode Pos</label><b>${val(p.kode_pos)}</b></div>
+
+                            <div class="detail-title">🏠 Alamat Domisili</div>
+                            <div class="detail-grid">
+                                <div class="detail-item" style="grid-column: span 2;"><label>Alamat</label><b>${val(p.alamat_lengkap)}</b></div>
+                                <div class="detail-item"><label>RT/RW</label><b>${val(p.rt)} / ${val(p.rw)}</b></div>
+                                <div class="detail-item"><label>Desa</label><b>${val(p.desa_kelurahan)}</b></div>
+                                <div class="detail-item"><label>Kecamatan</label><b>${val(p.kecamatan)}</b></div>
+                                <div class="detail-item"><label>Kab/Kota</label><b>${val(p.kabupaten_kota)}</b></div>
+                                <div class="detail-item"><label>Provinsi</label><b>${val(p.provinsi)}</b></div>
                             </div>
-                            <div class="detail-section-title">👨‍👩‍👧 Data Keluarga</div>
-                            <div class="detail-grid-row">
-                                <div style="grid-column: span 3;"><label>No. Kartu Keluarga</label><b>${val(p.no_kk)}</b></div>
-                                <div class="sub-group">
-                                    <h6>Data Ayah</h6>
-                                    <div><label>Nama</label><b>${val(p.nama_ayah)}</b></div>
-                                    <div><label>NIK</label><b>${val(p.nik_ayah)}</b></div>
-                                    <div><label>Pendidikan</label><b>${val(p.pendidikan_ayah)}</b></div>
-                                    <div><label>Pekerjaan</label><b>${val(p.pekerjaan_ayah)}</b></div>
-                                    <div><label>Penghasilan</label><b>${money(p.penghasilan_ayah)}</b></div>
-                                </div>
-                                <div class="sub-group">
-                                    <h6>Data Ibu</h6>
-                                    <div><label>Nama</label><b>${val(p.nama_ibu)}</b></div>
-                                    <div><label>NIK</label><b>${val(p.nik_ibu)}</b></div>
-                                    <div><label>Pendidikan</label><b>${val(p.pendidikan_ibu)}</b></div>
-                                    <div><label>Pekerjaan</label><b>${val(p.pekerjaan_ibu)}</b></div>
-                                    <div><label>Penghasilan</label><b>${money(p.penghasilan_ibu)}</b></div>
-                                </div>
-                                <div style="grid-column: span 3; margin-top: 10px;">
-                                    <label>No. Telepon Orang Tua</label>
-                                    <b style="font-size: 1.1rem; color: var(--primary);"><i class="ph ph-whatsapp-logo"></i> ${val(p.no_telepon_ortu)}</b>
+
+                            <div class="detail-title">DATA ORANG TUA</div>
+                            <div style="background:#f8fafc; padding:15px; border-radius:10px; margin-bottom:15px;">
+                                <h6 style="margin:0 0 10px 0; color:#64748b; font-size:0.8rem; border-bottom:1px solid #e2e8f0;">AYAH</h6>
+                                <div class="detail-grid">
+                                    <div class="detail-item"><label>Nama</label><b>${val(p.nama_ayah)}</b></div>
+                                    <div class="detail-item"><label>NIK</label><b>${val(p.nik_ayah)}</b></div>
+                                    <div class="detail-item"><label>Pekerjaan</label><b>${val(p.pekerjaan_ayah)}</b></div>
+                                    <div class="detail-item"><label>Pend.</label><b>${val(p.pendidikan_ayah)}</b></div>
+                                    <div class="detail-item"><label>Gaji</label><b>${money(p.penghasilan_ayah)}</b></div>
                                 </div>
                             </div>
-                            <div class="detail-section-title">🏫 Data Sekolah Asal</div>
-                            <div class="detail-grid-row">
-                                <div><label>Nama Sekolah</label><b>${val(p.asal_sekolah)}</b></div>
-                                <div><label>NPSN</label><b>${val(p.npsn_sekolah)}</b></div>
-                                <div><label>Status</label><b>${val(p.status_sekolah)}</b></div>
-                                <div style="grid-column: span 2;"><label>Alamat Sekolah</label><b>${val(p.alamat_sekolah)}</b></div>
-                                <div style="grid-column: span 3; background: #fff7ed; padding: 10px; border-radius: 8px; border: 1px solid #ffedd5;">
-                                    <label style="color: #c2410c;">Pilihan Tempat Tinggal</label>
-                                    <b style="color: #9a3412;">${val(p.pilihan_pesantren)}</b>
+                            <div style="background:#f8fafc; padding:15px; border-radius:10px;">
+                                <h6 style="margin:0 0 10px 0; color:#64748b; font-size:0.8rem; border-bottom:1px solid #e2e8f0;">IBU</h6>
+                                <div class="detail-grid">
+                                    <div class="detail-item"><label>Nama</label><b>${val(p.nama_ibu)}</b></div>
+                                    <div class="detail-item"><label>NIK</label><b>${val(p.nik_ibu)}</b></div>
+                                    <div class="detail-item"><label>Pekerjaan</label><b>${val(p.pekerjaan_ibu)}</b></div>
+                                    <div class="detail-item"><label>Pend.</label><b>${val(p.pendidikan_ibu)}</b></div>
+                                    <div class="detail-item"><label>Gaji</label><b>${money(p.penghasilan_ibu)}</b></div>
                                 </div>
                             </div>
+                            <div style="margin-top:15px;"><label style="font-size:0.8rem; color:#64748b;">NO. HP ORTU:</label> <b style="color:var(--primary);">${val(p.no_telepon_ortu)}</b></div>
+
+                            <div class="detail-title">SEKOLAH ASAL</div>
+                            <div class="detail-grid">
+                                <div class="detail-item"><label>Sekolah</label><b>${val(p.asal_sekolah)}</b></div>
+                                <div class="detail-item"><label>NPSN</label><b>${val(p.npsn_sekolah)}</b></div>
+                                <div class="detail-item"><label>Status</label><b>${val(p.status_sekolah)}</b></div>
+                                <div class="detail-item" style="grid-column: span 2;"><label>Alamat</label><b>${val(p.alamat_sekolah)}</b></div>
+                            </div>
+
                             ${prestasiHtml}
                         </div>
                     </div>
@@ -389,41 +436,55 @@ window.viewDetail = async function(id) {
 window.setEditState = function(type, value, btn) {
     if (type === 'verif') editState.status_verifikasi = value;
     if (type === 'lulus') editState.status_kelulusan = value;
+    
+    // Update tampilan tombol aktif
     const parent = btn.parentElement;
-    const siblings = parent.querySelectorAll('.btn-compact');
+    const siblings = parent.querySelectorAll('.btn-act');
     siblings.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    
+    // Animasi tombol simpan
     const saveBtn = document.getElementById('btn-save-changes');
     if(saveBtn) {
-        saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> SIMPAN PERUBAHAN *';
-        saveBtn.classList.add('pulse-animation');
-        saveBtn.style.background = '#e11d48';
+        saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> SIMPAN *';
+        saveBtn.style.background = '#e11d48'; // Merah biar notice
     }
 }
 
 window.saveDetailChanges = async function() {
     const toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
-    toast.fire({ icon: 'info', title: 'Menyimpan perubahan...' });
-    const { error } = await db.from('pendaftar').update({ status_verifikasi: editState.status_verifikasi, status_kelulusan: editState.status_kelulusan }).eq('id', editState.id);
+    toast.fire({ icon: 'info', title: 'Menyimpan...' });
+    
+    const { error } = await db.from('pendaftar')
+        .update({ 
+            status_verifikasi: editState.status_verifikasi, 
+            status_kelulusan: editState.status_kelulusan 
+        })
+        .eq('id', editState.id);
+        
     if (!error) {
+        // Update data lokal
         const index = allPendaftar.findIndex(x => x.id === editState.id);
-        if (index !== -1) { allPendaftar[index].status_verifikasi = editState.status_verifikasi; allPendaftar[index].status_kelulusan = editState.status_kelulusan; }
+        if (index !== -1) { 
+            allPendaftar[index].status_verifikasi = editState.status_verifikasi; 
+            allPendaftar[index].status_kelulusan = editState.status_kelulusan; 
+        }
         updateStats(allPendaftar);
         renderTable(); 
+        
         const saveBtn = document.getElementById('btn-save-changes');
         if(saveBtn) {
-            saveBtn.innerHTML = '<i class="ph ph-check"></i> TERSIMPAN';
-            saveBtn.classList.remove('pulse-animation');
+            saveBtn.innerHTML = '<i class="ph ph-check"></i> OK';
             saveBtn.style.background = '#0f172a';
-            setTimeout(() => { saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> SIMPAN PERUBAHAN'; }, 2000);
+            setTimeout(() => { saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> SIMPAN'; }, 2000);
         }
-        toast.fire({ icon: 'success', title: 'Berhasil disimpan' });
+        toast.fire({ icon: 'success', title: 'Tersimpan' });
     } else {
-        toast.fire({ icon: 'error', title: 'Gagal menyimpan: ' + error.message });
+        toast.fire({ icon: 'error', title: 'Gagal: ' + error.message });
     }
 }
 
-// 11. Pengaturan Jalur & Tanggal (RESTORED)
+// ... (KODE ATUR JALUR & LOAD PENDAFTAR TETAP SAMA) ...
 window.aturJalur = async function() {
     try {
         const { data } = await db.from('pengaturan').select('*');
@@ -445,11 +506,9 @@ window.aturJalur = async function() {
                         <div><strong style="color:#991b1b;">Jalur Prestasi</strong><br><small>Non-Akademik</small></div>
                         <input type="checkbox" id="check-prestasi" ${config['JALUR_PRESTASI'] ? 'checked' : ''} style="transform:scale(1.5);">
                     </div>
-                    
                     <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
                         <label style="display:block; font-weight:600; color:#1e293b; margin-bottom:5px;">📅 Tanggal Pengumuman Kelulusan</label>
                         <input type="datetime-local" id="tgl-pengumuman" class="swal2-input" style="margin:0; width:100%;" value="${config['TANGGAL_PENGUMUMAN'] || ''}">
-                        <small style="color:#64748b;">Timer di dashboard siswa akan menghitung mundur ke tanggal ini.</small>
                     </div>
                 </div>
             `,

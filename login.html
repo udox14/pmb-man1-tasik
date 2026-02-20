@@ -26,7 +26,6 @@
                 </div>
                 <div class="nav-actions">
                     <span class="page-context" style="display: none;">Login Portal</span>
-                    <!-- Tombol Kembali (REVISI TEKS) -->
                     <a href="index.html" class="btn btn-secondary">
                         <i class="ph ph-house"></i> KEMBALI
                     </a>
@@ -53,13 +52,13 @@
             <div class="login-form-side">
                 <div style="margin-bottom: 30px;">
                     <h2 style="color: var(--primary); font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">Selamat Datang</h2>
-                    <p style="color: var(--text-muted);">Silakan masuk ke dashboard Anda.</p>
+                    <p style="color: var(--text-muted);">Silakan masuk menggunakan akun Anda.</p>
                 </div>
 
                 <form id="loginForm" onsubmit="return false;">
                     
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Username / NISN</label>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Username</label>
                         <div style="position: relative;">
                             <i class="ph ph-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
                             <input type="text" id="username" class="input-modern" placeholder="Masukkan NISN" style="width: 100%; padding-left: 45px;">
@@ -67,11 +66,15 @@
                     </div>
 
                     <div style="margin-bottom: 30px;">
-                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Password / No. Daftar</label>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Password</label>
                         <div style="position: relative;">
                             <i class="ph ph-lock-key" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
-                            <input type="password" id="password" class="input-modern" placeholder="Masukkan Nomor Pendaftaran" style="width: 100%; padding-left: 45px;">
+                            <!-- UPDATE: Ubah placeholder agar user paham formatnya -->
+                            <input type="password" id="password" class="input-modern" placeholder="Tanggal Lahir (Cth: 22122008)" style="width: 100%; padding-left: 45px;">
                         </div>
+                        <small style="display: block; margin-top: 5px; color: #64748b; font-size: 0.85rem;">
+                            *Gunakan format TanggalBulanTahun (tanpa spasi/garis).
+                        </small>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px;" onclick="handleLogin()">

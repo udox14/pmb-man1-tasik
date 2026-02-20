@@ -5,157 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bukti Pendaftaran - MAN 1 Tasikmalaya</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <!-- Gunakan CSS Global -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* CSS Tampilan Layar (Web View) */
-        .resume-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .resume-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            border-top: 6px solid var(--primary);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .resume-card::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px; height: 300px;
-            background-image: url('images/logo.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 0.05;
-            pointer-events: none;
-        }
-
-        .success-icon {
-            width: 80px; height: 80px;
-            background: #d1fae5;
-            color: #059669;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 0 10px #ecfdf5;
-        }
-
-        .account-box {
-            background: #f8fafc;
-            border: 2px dashed var(--primary);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: left;
-        }
-
-        .account-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-            font-weight: 700;
-            display: block;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .cred-row {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 10px 0;
-            font-size: 1rem;
-        }
+        /* TAMPILAN WEB */
+        .resume-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .resume-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); text-align: center; position: relative; overflow: hidden; }
+        .resume-card::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background-image: url('images/logo.png'); background-size: contain; background-repeat: no-repeat; opacity: 0.05; pointer-events: none; }
+        .success-icon { width: 80px; height: 80px; background: #d1fae5; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 20px; box-shadow: 0 0 0 10px #ecfdf5; }
+        .account-box { background: #f8fafc; border: 2px dashed var(--primary); border-radius: 12px; padding: 20px; margin: 30px 0; text-align: left; }
+        .account-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; display: block; margin-bottom: 10px; text-align: center; }
+        .cred-row { display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 1rem; }
         .cred-row:last-child { border-bottom: none; }
         .cred-label { color: #64748b; }
         .cred-val { font-weight: 800; color: #1e293b; font-family: monospace; font-size: 1.1rem; }
-
-        .summary-list {
-            text-align: left;
-            margin-top: 30px;
-        }
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
+        .summary-list { text-align: left; margin-top: 30px; }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
         .sum-label { color: #64748b; }
-        .sum-val { font-weight: 600; color: #1e293b; }
+        .sum-val { font-weight: 600; color: #1e293b; text-align: right; }
 
-        /* --- CSS KHUSUS PRINT (LAYOUT RESMI A4) --- */
+        /* TAMPILAN CETAK (PRINT) */
         @media print {
-            /* Sembunyikan tampilan web biasa */
-            body > *:not(#print-layout) { 
-                display: none !important; 
-            }
-            
-            /* Reset body */
-            body { 
-                background: white !important; 
-                margin: 0; padding: 0; 
-                font-family: 'Times New Roman', serif !important;
-                color: black !important;
-            }
-
-            /* Tampilkan Layout Print */
-            #print-layout {
-                display: block !important;
-                position: absolute; left: 0; top: 0; width: 100%;
-                padding: 20px 40px;
-                box-sizing: border-box;
-            }
-            
+            body > *:not(#print-layout) { display: none !important; }
+            body { background: white !important; margin: 0; padding: 0; font-family: 'Times New Roman', serif !important; color: black !important; }
+            #print-layout { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 20px 40px; box-sizing: border-box; }
             #print-layout * { visibility: visible !important; }
-
-            /* Helper Classes Print */
             .print-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; }
             .print-label { font-weight: bold; width: 180px; }
             .print-val { flex: 1; }
-            
-            .print-kop {
-                border-bottom: 3px double black; 
-                padding-bottom: 15px; 
-                margin-bottom: 20px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                gap: 20px;
-                text-align: center;
-                line-height: 1.2;
-            }
-
-            .print-account {
-                border: 2px solid black;
-                padding: 15px;
-                margin: 20px 0;
-                background: #f0f0f0 !important; /* Force background print if enabled */
-                -webkit-print-color-adjust: exact; 
-            }
-            
+            .print-kop { border-bottom: 3px double black; padding-bottom: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 20px; text-align: center; line-height: 1.2; }
+            .print-account { border: 2px solid black; padding: 15px; margin: 20px 0; }
             @page { size: A4; margin: 1cm; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER (WEB VIEW) -->
+    <!-- HEADER WEB -->
     <header class="no-print">
         <div class="container">
             <nav>
@@ -163,7 +52,7 @@
                     <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
-                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
+                        <div class="brand-subtitle">Sukamanah - Sukarame</div>
                     </div>
                 </div>
                 <div class="nav-actions">
@@ -175,23 +64,24 @@
         </div>
     </header>
 
-    <!-- KONTEN WEB (AKAN HILANG SAAT DI-PRINT) -->
+    <!-- KONTEN WEB -->
     <div class="resume-container no-print">
         <div class="resume-card">
             <div class="success-icon"><i class="ph ph-check"></i></div>
             <h2 style="color: var(--primary); font-weight: 800; margin-bottom: 10px;">Pendaftaran Berhasil!</h2>
-            <p style="color: var(--text-muted);">Data Anda telah tersimpan di sistem PMB.<br>Silakan cetak bukti ini untuk daftar ulang.</p>
+            <p style="color: var(--text-muted);">Data tersimpan. Simpan akun ini untuk login.</p>
 
             <div class="account-box">
                 <span class="account-label">AKUN SISWA</span>
                 <div class="cred-row"><span class="cred-label">Username (NISN)</span><span class="cred-val" id="res-nisn">...</span></div>
-                <div class="cred-row"><span class="cred-label">Password (No. Daftar)</span><span class="cred-val" id="res-no-daftar">...</span></div>
+                <div class="cred-row"><span class="cred-label">Password (Tgl Lahir)</span><span class="cred-val" id="res-pass">...</span></div>
             </div>
 
             <div class="summary-list">
                 <h4 style="border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px;">Ringkasan Data</h4>
+                <div class="summary-item"><span class="sum-label">No. Pendaftaran</span><span class="sum-val" id="res-no-daftar">-</span></div>
                 <div class="summary-item"><span class="sum-label">Nama Lengkap</span><span class="sum-val" id="res-nama">-</span></div>
-                <div class="summary-item"><span class="sum-label">Jalur Pendaftaran</span><span class="sum-val" id="res-jalur">-</span></div>
+                <div class="summary-item"><span class="sum-label">Jalur</span><span class="sum-val" id="res-jalur">-</span></div>
                 <div class="summary-item" id="row-ruangan"><span class="sum-label">Ruangan Tes</span><span class="sum-val" id="res-ruang">-</span></div>
                 <div class="summary-item"><span class="sum-label">Asal Sekolah</span><span class="sum-val" id="res-sekolah">-</span></div>
                 <div class="summary-item"><span class="sum-label">Waktu Daftar</span><span class="sum-val" id="res-waktu">-</span></div>
@@ -204,10 +94,8 @@
         </div>
     </div>
 
-    <!-- === LAYOUT KHUSUS CETAK (HIDDEN DI WEB) === -->
+    <!-- LAYOUT CETAK -->
     <div id="print-layout" style="display: none;">
-        
-        <!-- KOP SURAT -->
         <div class="print-kop">
             <img src="images/logo.png" style="width: 90px; height: auto;">
             <div>
@@ -220,13 +108,11 @@
             </div>
         </div>
 
-        <!-- JUDUL -->
         <div style="text-align: center; margin-bottom: 30px;">
             <h3 style="margin:0; text-decoration: underline; font-size: 18px;">TANDA BUKTI PENDAFTARAN</h3>
             <p style="margin:5px 0 0 0; font-size: 14px;">PENERIMAAN MURID BARU TAHUN AJARAN 2026/2027</p>
         </div>
 
-        <!-- ISI DATA -->
         <div style="font-size: 14px; line-height: 1.6;">
             <div class="print-row"><span class="print-label">NOMOR PENDAFTARAN</span><span class="print-val">: <b id="p-no"></b></span></div>
             <div class="print-row"><span class="print-label">TANGGAL DAFTAR</span><span class="print-val">: <span id="p-tgl"></span></span></div>
@@ -238,19 +124,17 @@
             <div class="print-row" id="row-ruangan-print"><span class="print-label">RUANGAN TES</span><span class="print-val">: <b id="p-ruang"></b></span></div>
         </div>
 
-        <!-- AKUN LOGIN -->
         <div class="print-account">
             <p style="margin:0 0 10px 0; text-align:center; font-weight:bold; border-bottom:1px solid black; padding-bottom:5px;">AKUN LOGIN SISWA</p>
             <table style="width:100%; font-size:14px;">
                 <tr>
                     <td width="50%">Username (NISN) : <b id="p-user" style="font-size:16px;"></b></td>
-                    <td width="50%">Password : <b id="p-pass" style="font-size:16px;"></b></td>
+                    <td width="50%">Password (Tgl Lahir) : <b id="p-pass" style="font-size:16px;"></b></td>
                 </tr>
             </table>
-            <p style="margin:5px 0 0 0; font-size:11px; font-style:italic;">*Simpan bukti ini baik-baik. Akun digunakan untuk cek pengumuman kelulusan.</p>
+            <p style="margin:5px 0 0 0; font-size:11px; font-style:italic;">*Gunakan format DDMMYYYY (Cth: 22122008) untuk password.</p>
         </div>
 
-        <!-- TTD -->
         <div style="margin-top: 50px; display: flex; justify-content: flex-end;">
             <div style="text-align: center; width: 250px;">
                 <p style="margin:0;">Tasikmalaya, <span id="p-cetak-tgl"></span></p>
@@ -259,82 +143,96 @@
                 <p style="margin:0; font-weight:bold; text-decoration:underline;" id="p-ttd-nama"></p>
             </div>
         </div>
-
     </div>
 
-    <!-- FOOTER -->
-    <footer class="no-print">
-        <div class="container footer-flex">
-            <div class="footer-brand">
-                <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo">
-                <div>
-                    <strong style="color: white; letter-spacing: 0.5px;">MAN 1 TASIKMALAYA</strong><br>
-                    <small style="opacity: 0.7;">Sukamanah, Tasikmalaya</small>
-                </div>
-            </div>
-            <div class="footer-info">
-                <p>Jalan Pahlawan KH.Z Musthafa, Sukamanah, Kec. Sukarame</p>
-                <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 5px;">&copy; 2026 Panitia PMB. All Rights Reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- SCRIPT (Load Data to Web & Print Layout) -->
+    <!-- SCRIPT (ROBUST DATA LOADING) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dataRaw = localStorage.getItem('resume_data');
             
             if (!dataRaw) {
+                // Jangan langsung redirect, beri info dulu
                 Swal.fire({
                     icon: 'error',
                     title: 'Data Tidak Ditemukan',
-                    text: 'Anda akan diarahkan kembali ke halaman utama.'
+                    text: 'Tidak ada data pendaftaran yang tersimpan di browser ini. Mohon login untuk melihat data.'
                 }).then(() => {
                     window.location.href = 'index.html';
                 });
                 return;
             }
 
-            const data = JSON.parse(dataRaw);
-            const tglDaftar = new Date(data.created_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+            let data;
+            try {
+                data = JSON.parse(dataRaw);
+            } catch (e) {
+                console.error("Data corrupt");
+                return;
+            }
+
+            // Safe Access Functions (Mencegah error jika data null)
+            const getVal = (key, fallback = '-') => (data[key] !== null && data[key] !== undefined) ? data[key] : fallback;
+            
+            // Format Tanggal
+            let tglDaftar = '-';
+            try {
+                if(data.created_at) tglDaftar = new Date(data.created_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+            } catch(e) {}
+
             const tglCetak = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // 1. ISI TAMPILAN WEB
-            document.getElementById('res-nisn').innerText = data.nisn;
-            document.getElementById('res-no-daftar').innerText = data.no_pendaftaran;
-            document.getElementById('res-nama').innerText = data.nama_lengkap;
-            document.getElementById('res-jalur').innerText = data.jalur;
-            document.getElementById('res-sekolah').innerText = data.asal_sekolah;
-            document.getElementById('res-waktu').innerText = tglDaftar;
+            // Format Password (Tgl Lahir DDMMYYYY)
+            let passDisplay = '******';
+            if (data.tanggal_lahir) {
+                try {
+                    const parts = data.tanggal_lahir.split('-'); // YYYY-MM-DD
+                    if(parts.length === 3) passDisplay = parts[2] + parts[1] + parts[0];
+                } catch(e) {}
+            }
+
+            // --- ISI DATA KE HTML (Safe Mode) ---
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = val;
+            };
+
+            // WEB
+            setText('res-nisn', getVal('nisn'));
+            setText('res-no-daftar', getVal('no_pendaftaran'));
+            setText('res-nama', getVal('nama_lengkap'));
+            setText('res-jalur', getVal('jalur'));
+            setText('res-sekolah', getVal('asal_sekolah'));
+            setText('res-waktu', tglDaftar);
+            setText('res-pass', passDisplay);
 
             const rowRuang = document.getElementById('row-ruangan');
             const elRuang = document.getElementById('res-ruang');
-            
             if (data.jalur === 'REGULER') {
-                elRuang.innerText = 'Ruang ' + (data.ruang_tes || 'Belum Ditentukan');
-                elRuang.style.color = 'var(--primary)';
-                elRuang.style.fontWeight = '800';
+                if(elRuang) {
+                    elRuang.innerText = 'Ruang ' + getVal('ruang_tes', 'Belum Ditentukan');
+                    elRuang.style.color = 'var(--primary)';
+                    elRuang.style.fontWeight = '800';
+                }
             } else {
-                rowRuang.style.display = 'none';
+                if(rowRuang) rowRuang.style.display = 'none';
             }
 
-            // 2. ISI TAMPILAN PRINT (KOP RESMI)
-            document.getElementById('p-no').innerText = data.no_pendaftaran;
-            document.getElementById('p-tgl').innerText = tglDaftar;
-            document.getElementById('p-jalur').innerText = data.jalur;
-            document.getElementById('p-nisn').innerText = data.nisn;
-            document.getElementById('p-nama').innerText = data.nama_lengkap.toUpperCase();
-            document.getElementById('p-sekolah').innerText = data.asal_sekolah;
-            document.getElementById('p-user').innerText = data.nisn;
-            document.getElementById('p-pass').innerText = data.no_pendaftaran;
-            document.getElementById('p-ttd-nama').innerText = data.nama_lengkap.toUpperCase();
-            document.getElementById('p-cetak-tgl').innerText = tglCetak;
+            // PRINT
+            setText('p-no', getVal('no_pendaftaran'));
+            setText('p-tgl', tglDaftar);
+            setText('p-jalur', getVal('jalur'));
+            setText('p-nisn', getVal('nisn'));
+            setText('p-nama', getVal('nama_lengkap').toUpperCase());
+            setText('p-sekolah', getVal('asal_sekolah'));
+            setText('p-user', getVal('nisn'));
+            setText('p-pass', passDisplay);
+            setText('p-ttd-nama', getVal('nama_lengkap').toUpperCase());
+            setText('p-cetak-tgl', tglCetak);
 
             const rowRuangPrint = document.getElementById('row-ruangan-print');
             const elRuangPrint = document.getElementById('p-ruang');
-
             if (data.jalur === 'REGULER') {
-                elRuangPrint.innerText = 'Ruang ' + (data.ruang_tes || '-');
+                if(elRuangPrint) elRuangPrint.innerText = 'Ruang ' + getVal('ruang_tes', '-');
             } else {
                 if(rowRuangPrint) rowRuangPrint.style.display = 'none';
             }

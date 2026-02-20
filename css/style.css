@@ -209,7 +209,7 @@ header nav {
 .jalur-tab:hover { background: #f1f5f9; color: var(--text-main); }
 #tab-reguler.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(0, 121, 107, 0.4); transform: scale(1.02); }
 #tab-prestasi.active { background: var(--yellow-prestasi); color: black; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); transform: scale(1.02); }
-.jalur-tab.disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; filter: grayscale(100%); background: #e2e8f0 !important; color: #94a3b8 !important; box-shadow: none !important; border-color: transparent !important; }
+.jalur-tab.disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; filter: grayscale(100%); background: #e2e8f0 !important; color: #242527 !important; box-shadow: none !important; border-color: transparent !important; }
 
 /* COMPACT ACTION */
 .compact-action { 

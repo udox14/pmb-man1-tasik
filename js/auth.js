@@ -1,74 +1,78 @@
 // js/auth.js
 
+// Fungsi Login
 async function handleLogin() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const usernameInput = document.getElementById('username').value.trim();
+    const passwordInput = document.getElementById('password').value.trim();
 
-    if (!username || !password) {
-        Swal.fire('Error', 'Username dan Password wajib diisi', 'error');
+    if (!usernameInput || !passwordInput) {
+        Swal.fire('Gagal', 'Mohon isi Username dan Password.', 'warning');
         return;
     }
 
     Swal.fire({
-        title: 'Sedang Login...',
+        title: 'Memproses...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
 
     try {
-        // 1. CEK ADMIN DULU
-        // Kita cek apakah username ada di tabel 'admins'
-        const { data: adminData, error: adminError } = await db
-            .from('admins')
-            .select('*')
-            .eq('username', username)
-            .eq('password', password) // Catatan: Di real app password harus di-hash!
-            .maybeSingle();
-
-        if (adminData) {
-            // LOGIN SUKSES SEBAGAI ADMIN
+        // 1. Cek Login ADMIN (Hardcoded sederhana untuk keamanan dasar client-side)
+        if (usernameInput === 'admin' && passwordInput === 'admin123') {
             localStorage.setItem('session_role', 'ADMIN');
-            localStorage.setItem('session_user', JSON.stringify(adminData));
+            localStorage.setItem('session_user', JSON.stringify({ name: 'Administrator' }));
             
             Swal.fire({
                 icon: 'success',
                 title: 'Login Admin Berhasil',
-                showConfirmButton: false,
-                timer: 1500
+                timer: 1000,
+                showConfirmButton: false
             }).then(() => {
-                window.location.href = 'admin/index.html'; // Kita buat nanti
+                window.location.href = 'admin/index.html';
             });
             return;
         }
 
-        // 2. JIKA BUKAN ADMIN, CEK SISWA (PENDAFTAR)
-        // Username = NISN, Password = No. Pendaftaran
-        const { data: siswaData, error: siswaError } = await db
+        // 2. Cek Login SISWA (Database)
+        const { data, error } = await db
             .from('pendaftar')
             .select('*')
-            .eq('nisn', username)
-            .eq('no_pendaftaran', password)
-            .maybeSingle();
+            .eq('nisn', usernameInput)
+            .single();
 
-        if (siswaData) {
-            // LOGIN SUKSES SEBAGAI SISWA
+        if (error || !data) {
+            Swal.fire('Login Gagal', 'NISN tidak ditemukan.', 'error');
+            return;
+        }
+
+        // LOGIKA BARU: Verifikasi Password menggunakan Tanggal Lahir (DDMMYYYY)
+        // Format di Database: YYYY-MM-DD (Contoh: 2008-12-22)
+        const dbDate = data.tanggal_lahir; 
+        const parts = dbDate.split('-'); // [2008, 12, 22]
+        // Gabung jadi 22122008
+        const correctPassword = parts[2] + parts[1] + parts[0];
+
+        if (passwordInput === correctPassword) {
+            // Login Sukses
             localStorage.setItem('session_role', 'SISWA');
-            localStorage.setItem('session_user', JSON.stringify(siswaData));
-            
+            localStorage.setItem('session_user', JSON.stringify({ 
+                id: data.id, 
+                nama: data.nama_lengkap,
+                nisn: data.nisn 
+            }));
+
             Swal.fire({
                 icon: 'success',
                 title: 'Login Berhasil',
-                text: `Selamat datang, ${siswaData.nama_lengkap}`,
-                showConfirmButton: false,
-                timer: 1500
+                text: `Selamat datang, ${data.nama_lengkap}!`,
+                timer: 1500,
+                showConfirmButton: false
             }).then(() => {
-                window.location.href = 'siswa/index.html'; // Kita buat nanti
+                window.location.href = 'siswa/index.html';
             });
-            return;
+        } else {
+            Swal.fire('Password Salah', 'Gunakan Tanggal Lahir (Format: DDMMYYYY) sebagai password.', 'error');
         }
-
-        // 3. JIKA GAGAL KEDUANYA
-        Swal.fire('Login Gagal', 'Username atau Password salah.', 'error');
 
     } catch (err) {
         console.error(err);
@@ -76,18 +80,19 @@ async function handleLogin() {
     }
 }
 
-// Fungsi Logout (Bisa dipanggil dari dashboard nanti)
+// Fungsi Logout
 function logout() {
     Swal.fire({
         title: 'Keluar?',
-        text: "Anda akan mengakhiri sesi.",
+        text: "Anda akan keluar dari sesi ini.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Ya, Keluar'
+        confirmButtonText: 'Ya, Keluar',
+        cancelButtonColor: '#d33'
     }).then((result) => {
         if (result.isConfirmed) {
             localStorage.clear();
-            window.location.href = '../index.html'; // Naik satu folder karena dashboard ada di subfolder
+            window.location.href = '../login.html'; // Sesuaikan path jika perlu
         }
     });
 }
