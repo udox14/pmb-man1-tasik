@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - PMB MAN 1 Tasikmalaya</title>
-    <link rel="icon" href="images/logo.png" type="image/png">
+    <link rel="icon" href="../images/logo.png" type="image/png">
+
+    <!-- Gunakan CSS Global -->
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- LIBRARIES UNTUK EXPORT EXCEL & ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="admin-body">
 
@@ -27,10 +34,19 @@
                 </button>
             </div>
             <nav class="sidebar-menu">
-                <a href="#" class="menu-item active" onclick="loadPendaftar()">
+                <a href="#" id="menu-pendaftar" class="menu-item active" onclick="switchAdminPanel('pendaftar')">
                     <i class="ph ph-users"></i><span>Data Pendaftar</span>
                 </a>
-                <a href="#" class="menu-item" onclick="aturJalur()">
+                <a href="#" id="menu-jadwal" class="menu-item" onclick="switchAdminPanel('jadwal')">
+                    <i class="ph ph-calendar-plus"></i><span>Panel Penjadwalan</span>
+                </a>
+                
+                <!-- MENU BARU: EXPORT DATA -->
+                <a href="#" id="menu-export" class="menu-item" onclick="switchAdminPanel('export')" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                    <i class="ph ph-export"></i><span style="color: var(--accent); font-weight: bold;">Export Data & Berkas</span>
+                </a>
+                
+                <a href="#" class="menu-item" onclick="aturJalur()" style="margin-top: 20px;">
                     <i class="ph ph-gear"></i><span>Pengaturan Sistem</span>
                 </a>
                 <a href="#" class="menu-item" onclick="logout()" style="margin-top: 30px; color: #f87171;">
@@ -53,90 +69,214 @@
                 </div>
             </div>
 
-            <!-- ... (SISA KONTEN TABLE TETAP SAMA) ... -->
             <div class="admin-content-pad">
                 
-                <!-- STATS CARDS -->
-                <div class="stats-grid-modern">
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box bg-blue"><i class="ph ph-users-three"></i></div>
-                        <div><h2 id="count-total" style="margin:0;">0</h2><small style="color:var(--text-muted);">Total Pendaftar</small></div>
+                <!-- PANEL 1: DATA PENDAFTAR -->
+                <div id="panel-pendaftar" class="admin-panel active">
+                    <!-- STATS CARDS -->
+                    <div class="stats-grid-modern">
+                        <div class="stat-card-modern">
+                            <div class="stat-icon-box bg-blue"><i class="ph ph-users-three"></i></div>
+                            <div><h2 id="count-total" style="margin:0;">0</h2><small style="color:var(--text-muted);">Total Pendaftar</small></div>
+                        </div>
+                        <div class="stat-card-modern">
+                            <div class="stat-icon-box bg-yellow"><i class="ph ph-clock"></i></div>
+                            <div><h2 id="count-pending" style="margin:0;">0</h2><small style="color:var(--text-muted);">Perlu Verifikasi</small></div>
+                        </div>
+                        <div class="stat-card-modern">
+                            <div class="stat-icon-box bg-green"><i class="ph ph-check-circle"></i></div>
+                            <div><h2 id="count-lulus" style="margin:0;">0</h2><small style="color:var(--text-muted);">Siswa Diterima</small></div>
+                        </div>
                     </div>
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box bg-yellow"><i class="ph ph-clock"></i></div>
-                        <div><h2 id="count-pending" style="margin:0;">0</h2><small style="color:var(--text-muted);">Perlu Verifikasi</small></div>
-                    </div>
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box bg-green"><i class="ph ph-check-circle"></i></div>
-                        <div><h2 id="count-lulus" style="margin:0;">0</h2><small style="color:var(--text-muted);">Siswa Diterima</small></div>
-                    </div>
-                </div>
 
-                <!-- BULK ACTIONS BAR -->
-                <div class="bulk-actions-bar" id="bulkActions">
-                    <div>
-                        <i class="ph ph-check-square"></i> <b id="selectedCount">0</b> Siswa dipilih
+                    <!-- BULK ACTIONS BAR -->
+                    <div class="bulk-actions-bar" id="bulkActions">
+                        <div>
+                            <i class="ph ph-check-square"></i> <b id="selectedCount">0</b> Siswa dipilih
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('VERIFY')">
+                                ✅ Verifikasi
+                            </button>
+                            <button class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('GRADUATE')">
+                                🎓 Luluskan
+                            </button>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-primary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('VERIFY')">
-                            ✅ Verifikasi
-                        </button>
-                        <button class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('GRADUATE')">
-                            🎓 Luluskan
-                        </button>
-                    </div>
-                </div>
 
-                <!-- DATA TABLE CARD -->
-                <div class="admin-card">
-                    <div class="table-controls">
-                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <select id="rowsPerPage" onchange="changeLimit()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white;">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
+                    <!-- DATA TABLE CARD -->
+                    <div class="admin-card">
+                        <div class="table-controls">
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <select id="rowsPerPage" onchange="changeLimit()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white;">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                                <select id="filterVerif" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
+                                    <option value="">Semua Status Berkas</option>
+                                    <option value="true">✅ Terverifikasi</option>
+                                    <option value="false">⏳ Pending / Ditolak</option>
+                                </select>
+                                <select id="filterLulus" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
+                                    <option value="">Semua Status Kelulusan</option>
+                                    <option value="PENDING">⏳ Menunggu</option>
+                                    <option value="DITERIMA">🎉 Diterima</option>
+                                    <option value="TIDAK DITERIMA">🚫 Tidak Diterima</option>
                                 </select>
                             </div>
-                            <select id="filterVerif" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
-                                <option value="">Semua Status Berkas</option>
-                                <option value="true">✅ Terverifikasi</option>
-                                <option value="false">⏳ Pending / Ditolak</option>
-                            </select>
-                            <select id="filterLulus" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
-                                <option value="">Semua Status Kelulusan</option>
-                                <option value="PENDING">⏳ Menunggu</option>
-                                <option value="DITERIMA">🎉 Diterima</option>
-                                <option value="TIDAK DITERIMA">🚫 Tidak Diterima</option>
-                            </select>
+                            <div class="search-box">
+                                <input type="text" id="searchInput" placeholder="Cari Nama / NISN..." onkeyup="filterTable()" 
+                                       style="padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; width: 250px; outline: none;">
+                            </div>
                         </div>
-                        <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="Cari Nama / NISN..." onkeyup="filterTable()" 
-                                   style="padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; width: 250px; outline: none;">
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                                        <th style="cursor: pointer;" onclick="sortTable('nama_lengkap')">Nama Lengkap <i class="ph ph-caret-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortTable('jalur')">Jalur <i class="ph ph-caret-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortTable('asal_sekolah')">Asal Sekolah <i class="ph ph-caret-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortTable('status_verifikasi')">Status Berkas <i class="ph ph-caret-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortTable('status_kelulusan')">Kelulusan <i class="ph ph-caret-up-down"></i></th>
+                                        <th style="text-align: right;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <!-- Data render here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination-container" id="pagination"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL 2: MANAJEMEN JADWAL -->
+                <div id="panel-jadwal" class="admin-panel" style="display:none;">
+                    
+                    <div class="admin-card" style="padding: 30px;">
+                        <h3 style="margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+                            <i class="ph ph-gear"></i> Pengaturan Master Jadwal
+                        </h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">
+                            Tentukan kapasitas dan ketersediaan waktu sebelum melakukan plotting/pembagian jadwal ke peserta tes Reguler.
+                        </p>
+
+                        <div class="form-grid" style="align-items: start;">
+                            <div class="form-group">
+                                <label style="font-weight: 700;">Tanggal Tes (Satu per baris) *</label>
+                                <textarea id="cfg-dates" class="input-modern-form" rows="4" placeholder="Misal:&#10;Kamis, 21 Mei 2026&#10;Jumat, 22 Mei 2026"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-weight: 700;">Daftar Sesi (Satu per baris) *</label>
+                                <textarea id="cfg-sessions" class="input-modern-form" rows="4" placeholder="Misal:&#10;Sesi 1 (07.30 - 09.30)&#10;Sesi 2 (10.00 - 12.00)"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-weight: 700;">Jumlah Ruangan *</label>
+                                <input type="number" id="cfg-rooms" class="input-modern-form" placeholder="Contoh: 4">
+                                <small style="color: #64748b; font-size: 0.8rem; display:block; margin-top:5px;">Sistem akan membuat Ruang 1 sampai Ruang X.</small>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-weight: 700;">Kapasitas Peserta / Ruangan *</label>
+                                <input type="number" id="cfg-capacity" class="input-modern-form" placeholder="Contoh: 20">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveScheduleConfig()" style="margin-top: 15px;">
+                            <i class="ph ph-floppy-disk"></i> Simpan Pengaturan
+                        </button>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="table-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                            <h3 style="margin: 0; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                                <i class="ph ph-calendar-check"></i> Plotting Jadwal Peserta
+                            </h3>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-primary" id="btn-save-plotting" style="display:none; background:#059669; border:none;" onclick="saveManualPlotting()">
+                                    <i class="ph ph-check-circle"></i> Simpan Perubahan Plotting
+                                </button>
+                                <button class="btn btn-secondary" onclick="autoPlotting()" style="border-color:var(--accent); color:#b45309; background:#fffbeb;">
+                                    <i class="ph ph-magic-wand"></i> Plotting Otomatis
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FILTER JADWAL -->
+                        <div style="padding: 15px 20px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                            <span style="font-weight: 600; color: #475569; font-size: 0.9rem;"><i class="ph ph-funnel"></i> Filter Tampilan:</span>
+                            <select id="filterPlotTgl" class="input-modern-form" style="padding: 8px 15px; font-size: 0.85rem; width: auto; min-width: 150px;" onchange="renderPlottingTable()">
+                                <option value="">Semua Tanggal</option>
+                            </select>
+                            <select id="filterPlotSesi" class="input-modern-form" style="padding: 8px 15px; font-size: 0.85rem; width: auto; min-width: 150px;" onchange="renderPlottingTable()">
+                                <option value="">Semua Sesi</option>
+                            </select>
+                            <select id="filterPlotRuang" class="input-modern-form" style="padding: 8px 15px; font-size: 0.85rem; width: auto; min-width: 150px;" onchange="renderPlottingTable()">
+                                <option value="">Semua Ruangan</option>
+                            </select>
+                            <div style="margin-left: auto; font-size: 0.85rem; color: #64748b;">
+                                Total tampil: <b id="plotCount" style="color: var(--primary); font-size: 1.1rem;">0</b> siswa
+                            </div>
+                        </div>
+
+                        <div style="padding: 10px 20px; background: #f0fdfa; border-bottom: 1px solid #ccfbf1; font-size: 0.85rem; color: #0f766e;">
+                            *Tabel ini <b>HANYA</b> menampilkan peserta <b>REGULER MURNI</b> terverifikasi. <br>
+                            *Peserta limpahan dari jalur Prestasi (Bebas Tes) otomatis <b>disembunyikan</b> agar tidak mendapat ruangan.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Peserta / NISN</th>
+                                        <th>Tanggal Tes</th>
+                                        <th>Sesi / Waktu</th>
+                                        <th>Ruangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plottingTableBody">
+                                    <!-- Plotting rows render here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
-                                    <th style="cursor: pointer;" onclick="sortTable('nama_lengkap')" title="Urutkan Nama">Nama Lengkap <i class="ph ph-caret-up-down"></i></th>
-                                    <th style="cursor: pointer;" onclick="sortTable('jalur')" title="Urutkan Jalur">Jalur <i class="ph ph-caret-up-down"></i></th>
-                                    <th style="cursor: pointer;" onclick="sortTable('asal_sekolah')" title="Urutkan Sekolah">Asal Sekolah <i class="ph ph-caret-up-down"></i></th>
-                                    <th style="cursor: pointer;" onclick="sortTable('status_verifikasi')" title="Urutkan Verifikasi">Status Berkas <i class="ph ph-caret-up-down"></i></th>
-                                    <th style="cursor: pointer;" onclick="sortTable('status_kelulusan')" title="Urutkan Kelulusan">Kelulusan <i class="ph ph-caret-up-down"></i></th>
-                                    <th style="text-align: right;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <!-- Data render here -->
-                            </tbody>
-                        </table>
+                </div>
+
+                <!-- PANEL 3: EXPORT DATA (BARU) -->
+                <div id="panel-export" class="admin-panel" style="display:none;">
+                    
+                    <div class="admin-card" style="padding: 40px; text-align: center;">
+                        <i class="ph ph-microsoft-excel-logo" style="font-size: 4rem; color: #16a34a; margin-bottom: 15px;"></i>
+                        <h2 style="margin: 0 0 10px 0; color: #1e293b;">Export Data Rekapitulasi (Excel)</h2>
+                        <p style="color: #64748b; max-width: 600px; margin: 0 auto 30px;">
+                            Download seluruh data pendaftar dalam format Excel (.xlsx). Laporan ini mencakup biodata lengkap, status verifikasi, jalur pendaftaran, hingga ruangan dan jadwal tes CBT.
+                        </p>
+                        <button class="btn btn-primary" style="background: #16a34a; border: none; font-size: 1.1rem; padding: 15px 30px;" onclick="exportToExcel()">
+                            <i class="ph ph-download-simple"></i> Download Data Excel
+                        </button>
                     </div>
 
-                    <div class="pagination-container" id="pagination"></div>
+                    <div class="admin-card" style="padding: 40px; text-align: center; border-top: 5px solid var(--accent);">
+                        <i class="ph ph-folder-zip" style="font-size: 4rem; color: #d97706; margin-bottom: 15px;"></i>
+                        <h2 style="margin: 0 0 10px 0; color: #1e293b;">Backup Seluruh Berkas Peserta (ZIP)</h2>
+                        <p style="color: #64748b; max-width: 600px; margin: 0 auto 30px;">
+                            Sistem akan mendownload semua berkas (Foto, KK, Akta, dll) dari seluruh peserta dan mengelompokkannya ke dalam folder dengan format <b>NAMA PENDAFTAR_NISN</b>.
+                        </p>
+                        
+                        <div style="background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; padding: 15px; border-radius: 12px; max-width: 600px; margin: 0 auto 25px; text-align: left; font-size: 0.9rem;">
+                            <i class="ph ph-lightbulb" style="font-size: 1.2rem; margin-right: 5px;"></i> 
+                            <b>Tips Pro:</b> Jika Anda hanya ingin mendownload berkas dari <b>beberapa siswa tertentu saja</b>, silakan kembali ke menu <b>Data Pendaftar</b>, centang nama siswa di tabel, lalu klik tombol <b>Download Berkas</b> yang muncul.
+                        </div>
+
+                        <button class="btn btn-primary" style="background: #d97706; border: none; font-size: 1.1rem; padding: 15px 30px;" onclick="downloadAllFilesZip()">
+                            <i class="ph ph-download-simple"></i> Download Semua Berkas (.ZIP)
+                        </button>
+                    </div>
+
                 </div>
 
             </div>

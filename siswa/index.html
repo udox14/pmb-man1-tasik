@@ -13,87 +13,37 @@
     <style>
         body { padding-top: var(--header-height); background-color: #f8fafc; overflow-x: hidden; }
         
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 30px;
-            padding: 40px 0;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr; gap: 30px; padding: 40px 0; }
 
         /* --- SIDEBAR --- */
-        .sidebar-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid #e2e8f0;
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-        }
-
-        .profile-img-box {
-            width: 100%;
-            aspect-ratio: 3/4;
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            position: relative;
-        }
-        
+        .sidebar-card { background: white; border-radius: 20px; padding: 30px; border: 1px solid #e2e8f0; position: sticky; top: 100px; height: fit-content; }
+        .profile-img-box { width: 100%; aspect-ratio: 3/4; border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .profile-img-box img { width: 100%; height: 100%; object-fit: cover; }
-
         .profile-info { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; }
         .p-name { font-weight: 800; font-size: 1.2rem; color: var(--text-main); margin-bottom: 5px; line-height: 1.2; }
         .p-nisn { color: var(--text-muted); font-size: 0.9rem; }
 
         .sidebar-section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; margin-bottom: 10px; display: block; }
         .menu-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 30px; }
-        
-        .menu-btn {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 15px; border-radius: 10px;
-            background: white; border: 1px solid #e2e8f0;
-            color: #475569; font-size: 0.9rem; font-weight: 600;
-            text-decoration: none; transition: 0.2s; cursor: pointer;
-        }
+        .menu-btn { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 10px; background: white; border: 1px solid #e2e8f0; color: #475569; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: 0.2s; cursor: pointer; }
         .menu-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; transform: translateX(5px); }
-        .menu-btn i { font-size: 1.2rem; }
         .btn-edit-data { background: #fffbeb; border-color: #fcd34d; color: #b45309; }
         .btn-download { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
         .btn-print { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
 
         .file-list-small { display: flex; flex-direction: column; gap: 8px; }
-        .file-btn-small {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px; border-radius: 8px;
-            background: #f8fafc; border: 1px solid #e2e8f0;
-            color: #475569; font-size: 0.85rem; font-weight: 600;
-            text-decoration: none; transition: 0.2s;
-        }
+        .file-btn-small { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: 0.2s; }
         .file-btn-small:hover { border-color: var(--primary); color: var(--primary); background: white; }
-        .file-btn-small i { font-size: 1.2rem; color: var(--primary); }
 
         /* --- MAIN CONTENT --- */
-        .timer-banner {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 20px; padding: 30px; color: white;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
-        }
+        .timer-banner { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 30px; color: white; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2); }
         .timer-grid { display: flex; gap: 15px; text-align: center; }
         .t-box { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; min-width: 60px; backdrop-filter: blur(4px); }
         .t-val { font-size: 1.6rem; font-weight: 800; display: block; line-height: 1; font-variant-numeric: tabular-nums; }
         .t-lbl { font-size: 0.7rem; opacity: 0.7; text-transform: uppercase; }
 
         .status-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .status-card-lg {
-            background: white; padding: 25px; border-radius: 16px;
-            border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px;
-            transition: 0.3s;
-        }
+        .status-card-lg { background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
         .status-card-lg label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; }
         .status-value-lg { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
         .st-yellow { border-left: 5px solid #eab308; } .st-yellow .status-value-lg { color: #a16207; }
@@ -121,75 +71,30 @@
         .pres-badge { padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
 
         /* --- NOTIFIKASI KHUSUS PRESTASI --- */
-        .notif-box {
-            padding: 20px; border-radius: 16px; margin-bottom: 30px; text-align: center;
-            display: none; /* Hidden by default */
-            animation: fadeIn 0.5s ease;
-        }
+        .notif-box { padding: 20px; border-radius: 16px; margin-bottom: 30px; text-align: center; display: none; animation: fadeIn 0.5s ease; }
         .notif-success { background: #ecfdf5; border: 1px solid #10b981; }
         .notif-danger { background: #fef2f2; border: 1px solid #ef4444; }
-        
         .notif-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 10px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .notif-body { font-size: 1rem; margin-bottom: 15px; line-height: 1.6; }
         .undangan-card { background: white; padding: 15px; border-radius: 12px; display: inline-block; border: 1px dashed currentColor; text-align: left; margin-bottom: 15px; }
 
         /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 900px) {
-            .dashboard-grid { 
-                grid-template-columns: 100%; /* Ubah jadi 1 Kolom Full */
-                gap: 20px;
-                padding: 20px 0;
-            }
-            .sidebar-card { 
-                position: static; /* Hilangkan sticky di HP */
-                width: 100%;
-                margin-bottom: 20px;
-            }
-            
-            /* Banner Timer Stack Vertikal di HP */
-            .timer-banner { 
-                flex-direction: column; 
-                text-align: center; 
-                gap: 20px; 
-                padding: 25px;
-            }
-            .timer-grid {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            /* Status Card Stack */
-            .status-main-grid { 
-                grid-template-columns: 1fr; 
-                gap: 15px;
-            }
-            
-            /* Data Grid Stack */
-            .data-grid { 
-                grid-template-columns: 1fr; 
-                gap: 15px;
-            }
-            
-            /* Tab Content Padding */
+            .dashboard-grid { grid-template-columns: 100%; gap: 20px; padding: 20px 0; }
+            .sidebar-card { position: static; width: 100%; margin-bottom: 20px; }
+            .timer-banner { flex-direction: column; text-align: center; gap: 20px; padding: 25px; }
+            .timer-grid { flex-wrap: wrap; justify-content: center; }
+            .status-main-grid { grid-template-columns: 1fr; gap: 15px; }
+            .data-grid { grid-template-columns: 1fr; gap: 15px; }
             .tab-content { padding: 20px; }
-            
-            /* Tabel Prestasi Scroll Horizontal */
-            #prestasi-list-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 10px;
-            }
-            .prestasi-table {
-                min-width: 600px; /* Paksa lebar agar scroll muncul jika tabel lebar */
-            }
-
-            /* Header HP */
+            #prestasi-list-container { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
+            .prestasi-table { min-width: 600px; }
             header .container { padding: 0 15px !important; }
-            .brand-subtitle { display: none; } /* Sembunyikan alamat di HP */
+            .brand-subtitle { display: none; }
             .nav-actions .btn { padding: 8px 15px; font-size: 0.8rem; }
         }
 
-        /* CSS PRINT */
+        /* CSS PRINT KARTU TES (UPDATED WAKTU TES) */
         @media print {
             body * { visibility: hidden; }
             #kartu-peserta, #kartu-peserta * { visibility: visible; }
@@ -223,7 +128,6 @@
     <div class="container">
         <div class="dashboard-grid">
             
-            <!-- SIDEBAR -->
             <aside>
                 <div class="sidebar-card">
                     <div class="profile-img-box">
@@ -243,12 +147,9 @@
                         <div onclick="editData()" class="menu-btn btn-edit-data">
                             <i class="ph ph-pencil-simple-line"></i><span>Edit Biodata</span>
                         </div>
-                        
-                        <!-- GANTI LINK GDRIVE ANDA DI SINI -->
                         <a href="https://drive.google.com/drive/folders/YOUR_FOLDER_ID" target="_blank" class="menu-btn btn-download">
                             <i class="ph ph-download-simple"></i><span>Unduh Berkas Pendukung</span>
                         </a>
-
                         <div id="btn-sidebar-cetak" onclick="cetakKartu()" class="menu-btn btn-print" style="display:none;">
                             <i class="ph ph-printer"></i><span>Cetak Kartu Tes</span>
                         </div>
@@ -259,7 +160,6 @@
                 </div>
             </aside>
 
-            <!-- MAIN CONTENT -->
             <main>
                 <div class="timer-banner">
                     <div>
@@ -269,8 +169,6 @@
                     <div class="timer-grid" id="timer"></div>
                 </div>
 
-                <!-- NOTIFIKASI KHUSUS PRESTASI (HIDDEN DEFAULT) -->
-                <!-- 1. LOLOS BERKAS (UNDANGAN TES) -->
                 <div id="alert-undangan-prestasi" class="notif-box notif-success">
                     <h3 class="notif-title" style="color:#047857;"><i class="ph ph-check-circle"></i> Selamat! Lolos Verifikasi Berkas</h3>
                     <p class="notif-body" style="color:#064e3b;">
@@ -283,9 +181,13 @@
                         <div>📍 <strong>Tempat:</strong> Kampus MAN 1 Tasikmalaya</div>
                         <div>👗 <strong>Pakaian:</strong> Seragam Sekolah Asal</div>
                     </div>
+                    <div>
+                        <button onclick="window.print()" class="btn btn-primary" style="background:#059669; border:none;">
+                            <i class="ph ph-printer"></i> Cetak Undangan ini
+                        </button>
+                    </div>
                 </div>
 
-                <!-- 2. GAGAL BERKAS (PINDAH JALUR) -->
                 <div id="alert-gagal-prestasi" class="notif-box notif-danger">
                     <h3 class="notif-title" style="color:#b91c1c;"><i class="ph ph-warning-circle"></i> Mohon Maaf</h3>
                     <p class="notif-body" style="color:#7f1d1d;">
@@ -297,7 +199,6 @@
                     </button>
                 </div>
 
-                <!-- STATUS GRID -->
                 <div class="status-main-grid">
                     <div class="status-card-lg" id="card-verif">
                         <label>Status Verifikasi Berkas</label>
@@ -309,10 +210,8 @@
                     </div>
                 </div>
 
-                <!-- DATA LENGKAP -->
                 <h3 style="margin-bottom:15px; color:var(--text-main);">Data Pendaftar</h3>
                 <div class="biodata-wrapper">
-                    
                     <div class="tab-nav">
                         <button class="tab-btn active" onclick="switchTab('tab-diri')">Data Diri</button>
                         <button class="tab-btn" onclick="switchTab('tab-alamat')">Alamat</button>
@@ -321,7 +220,6 @@
                         <button class="tab-btn" onclick="switchTab('tab-prestasi')" id="btn-tab-prestasi" style="display:none;">Prestasi</button>
                     </div>
 
-                    <!-- TAB 1: DATA DIRI -->
                     <div id="tab-diri" class="tab-content active">
                         <div class="data-grid">
                             <div class="d-item"><label>Nomor Pendaftaran</label><div id="no-daftar">-</div></div>
@@ -336,7 +234,6 @@
                         </div>
                     </div>
 
-                    <!-- TAB 2: ALAMAT -->
                     <div id="tab-alamat" class="tab-content">
                         <div class="data-grid">
                             <div class="d-item" style="grid-column:span 2;"><label>Alamat Lengkap</label><div id="d-alamat">-</div></div>
@@ -349,7 +246,6 @@
                         </div>
                     </div>
 
-                    <!-- TAB 3: KELUARGA -->
                     <div id="tab-keluarga" class="tab-content">
                         <div class="data-grid">
                             <div class="d-item" style="grid-column:span 2;"><label>Nomor Kartu Keluarga (KK)</label><div id="d-kk">-</div></div>
@@ -373,7 +269,6 @@
                         </div>
                     </div>
 
-                    <!-- TAB 4: SEKOLAH -->
                     <div id="tab-sekolah" class="tab-content">
                         <div class="data-grid">
                             <div class="d-item"><label>Asal Sekolah</label><div id="d-sekolah">-</div></div>
@@ -387,17 +282,15 @@
                         </div>
                     </div>
 
-                    <!-- TAB 5: PRESTASI -->
                     <div id="tab-prestasi" class="tab-content">
                         <div id="prestasi-list-container"></div>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
 
-    <!-- KARTU PESERTA (PRINT) -->
+    <!-- KARTU PESERTA (PRINT) UPDATE -->
     <div id="kartu-peserta" style="display:none; font-family: 'Times New Roman', serif; background: white; width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; padding: 0;">
         <div style="border: 2px solid #000; padding: 25px; position: relative;">
             <div style="border-bottom: 4px double black; padding-bottom: 15px; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 20px;">
@@ -430,7 +323,8 @@
                     <div style="margin-top: 20px; border: 2px solid #000; padding: 10px 15px;">
                         <table style="width: 100%; font-size: 15px; font-weight: bold;">
                             <tr><td style="width: 150px;">RUANG UJIAN</td><td>: <span id="print-ruang"></span></td></tr>
-                            <tr><td>WAKTU TES</td><td>: 21 MEI 2026, 07.30 WIB</td></tr>
+                            <!-- DIBUAT DINAMIS -->
+                            <tr><td>WAKTU TES</td><td>: <span id="print-waktu"></span></td></tr>
                         </table>
                     </div>
                 </div>
