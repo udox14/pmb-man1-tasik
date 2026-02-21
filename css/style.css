@@ -209,7 +209,7 @@ header nav {
 .jalur-tab:hover { background: #f1f5f9; color: var(--text-main); }
 #tab-reguler.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(0, 121, 107, 0.4); transform: scale(1.02); }
 #tab-prestasi.active { background: var(--yellow-prestasi); color: black; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); transform: scale(1.02); }
-.jalur-tab.disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; filter: grayscale(100%); background: #e2e8f0 !important; color: #242527 !important; box-shadow: none !important; border-color: transparent !important; }
+.jalur-tab.disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; filter: grayscale(100%); background: #e2e8f0 !important; color: #94a3b8 !important; box-shadow: none !important; border-color: transparent !important; }
 
 /* COMPACT ACTION */
 .compact-action { 
@@ -477,12 +477,82 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
 
     .admin-sidebar { transform: translateX(-100%); width: 260px !important; z-index: 2000; }
     .admin-sidebar.mobile-open { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+    /* Memastikan teks tetap muncul saat menu HP dibuka */
+    .admin-sidebar.mobile-open .sidebar-brand-text { display: block; }
+    .admin-sidebar.mobile-open .menu-item span { display: inline; }
+    
     .admin-main { margin-left: 0 !important; width: 100% !important; z-index: 1; }
     .sidebar-header { justify-content: space-between; }
     .mobile-close-btn { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
     .admin-sidebar .mobile-close-btn { display: block; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    
     .stats-grid-modern { grid-template-columns: 1fr; }
+    
+    /* Tombol Bulk Action menumpuk rapi di HP */
+    .bulk-actions-bar { flex-direction: column; gap: 15px; text-align: center; }
+    .bulk-actions-bar > div:last-child { width: 100%; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bulk-actions-bar > div:last-child button { width: 100%; padding: 10px; font-size: 0.8rem; }
+    #btn-bulk-jadwal, #btn-bulk-zip { grid-column: 1 / -1; }
+
+    /* --- SIHIR UBAH TABEL JADI KARTU DI HP --- */
+    .table-responsive { overflow-x: visible !important; }
+    .admin-table thead { display: none; } /* Sembunyikan header tabel */
+    .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+    
+    .admin-table tr { 
+        margin-bottom: 20px; 
+        background: white; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 12px; 
+        padding: 10px 15px; 
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    
+    .admin-table td { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        text-align: right; 
+        padding: 10px 0; 
+        border-bottom: 1px dashed #e2e8f0; 
+    }
+    
+    /* Ambil Label dari Atribut data-label di JS */
+    .admin-table td::before { 
+        content: attr(data-label); 
+        font-weight: 700; 
+        font-size: 0.8rem; 
+        color: #64748b; 
+        text-transform: uppercase; 
+        margin-right: 15px;
+    }
+    
+    .admin-table td:last-child { border-bottom: none; padding-bottom: 0; }
+    
+    /* Styling Spesifik Sel Data Pribadi (Sel teratas) */
+    .admin-table td[data-label="Peserta"] { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        text-align: left; 
+        background: #f8fafc; 
+        padding: 12px; 
+        border-radius: 8px; 
+        border: 1px solid #e2e8f0; 
+        margin-bottom: 5px;
+    }
+    .admin-table td[data-label="Peserta"]::before { display: none; }
+    
+    /* Checkbox Area */
+    .admin-table td[data-label="Pilih"] { justify-content: flex-start; gap: 15px; border-bottom: none; padding-top: 0; }
+    .admin-table td[data-label="Pilih"]::before { content: "Pilih Siswa"; margin-right: 0; color: var(--primary); }
+    
+    /* Tombol Aksi */
+    .admin-table td[data-label="Aksi"] { margin-top: 10px; }
+    .admin-table td[data-label="Aksi"]::before { display: none; }
+    .admin-table td[data-label="Aksi"] button { width: 100%; justify-content: center; }
+    
+    /* Dropdown di Tabel Jadwal */
+    .admin-table td select.input-modern-form { width: 60%; font-size: 0.8rem; padding: 6px; }
 }
 
 .mobile-close-btn { display: none; }

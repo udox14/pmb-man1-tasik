@@ -31,7 +31,7 @@ async function loadDashboardData() {
         if (!pendaftarData) throw new Error("Data siswa tidak ditemukan.");
 
         let prestasiData = [];
-        if (pendaftarData.jalur === 'PRESTASI') {
+        if (pendaftarData.jalur === 'PRESTASI' || pendaftarData.scan_sertifikat_prestasi_url) {
             const { data: pres, error: errorPres } = await db
                 .from('prestasi')
                 .select('*')
@@ -44,7 +44,9 @@ async function loadDashboardData() {
         renderFullData(pendaftarData);
         renderPrestasiContent(prestasiData);
         renderStatus(pendaftarData);
-        setupCountdown();
+        
+        // PANGGIL SMART COUNTDOWN
+        setupSmartCountdown(pendaftarData);
 
     } catch (err) {
         console.error('Error Dashboard:', err);
@@ -83,7 +85,10 @@ function renderProfile(data) {
             if(tabPrestasiBtn) tabPrestasiBtn.style.display = 'inline-block';
         } else {
             badgeJalur.style.background = '#dcfce7'; badgeJalur.style.color = '#166534'; badgeJalur.style.borderColor = '#bbf7d0';
-            if(tabPrestasiBtn) tabPrestasiBtn.style.display = 'none';
+            // Munculkan tab prestasi jika dia limpahan (punya URL sertifikat)
+            if(tabPrestasiBtn) {
+                tabPrestasiBtn.style.display = data.scan_sertifikat_prestasi_url ? 'inline-block' : 'none';
+            }
         }
     }
 
@@ -152,7 +157,6 @@ function renderFullData(data) {
     setTxt('print-jk', data.jenis_kelamin);
     setTxt('print-sekolah', data.asal_sekolah);
     
-    // Format Jadwal ke HTML
     setTxt('print-ruang', data.ruang_tes || '-');
     const waktuTes = (data.tanggal_tes && data.sesi_tes) ? `${data.tanggal_tes}, ${data.sesi_tes}` : '-';
     setTxt('print-waktu', waktuTes);
@@ -265,33 +269,46 @@ function renderStatus(data) {
                 // TIDAK ADA JADWAL
                 if(btnPrint) btnPrint.style.display = 'none';
 
-                // Cek apakah dia limpahan prestasi yg bebas tes? (Status kelulusan = PENDING & berkas sudah valid sejak lama)
-                // Deteksi limpahan = tidak punya jadwal + sudah divalidasi. 
-                // Asumsi: Panitia HANYA mengosongkan jadwal untuk anak bebas tes.
-                // Jika ingin lebih detail, siswa reguler murni yang belum dijadwal:
+                // CEK APAKAH LIMPAHAN PRESTASI (Bebas Tes) ATAU REGULER MURNI
+                const isBebasTes = data.scan_sertifikat_prestasi_url ? true : false;
+                
                 const infoBox = document.createElement('div');
                 infoBox.style = "padding:20px; border-radius:12px; margin-bottom:20px; text-align:left; animation: fadeIn 0.5s ease;";
                 
-                // Menentukan apakah menunggu panitia ATAU bebas tes
-                // Kita akan pakai pesan umum "Menunggu Jadwal atau Bebas Tes"
-                infoBox.id = 'info-tunggu-jadwal';
-                infoBox.style.background = '#eff6ff';
-                infoBox.style.borderColor = '#bfdbfe';
-                infoBox.style.borderWidth = '1px';
-                infoBox.style.borderStyle = 'solid';
-                infoBox.style.color = '#1e40af';
-                
-                infoBox.innerHTML = `
-                    <h4 style="margin:0 0 8px 0; display:flex; align-items:center; gap:8px; font-size:1.1rem;">
-                        <i class="ph ph-calendar-blank" style="font-size:1.4rem;"></i> Jadwal CBT Belum Tersedia
-                    </h4>
-                    <p style="margin:0; font-size:0.95rem; line-height:1.5;">
-                        Berkas Anda sudah dinyatakan <strong>VALID</strong>. Tombol cetak kartu belum muncul karena:<br>
-                        1. Panitia sedang menyusun jadwal dan ruangan CBT Anda, <strong>ATAU</strong><br>
-                        2. Anda adalah siswa limpahan Prestasi yang <strong>BEBAS TES CBT</strong>.<br><br>
-                        Silakan cek dashboard ini secara berkala.
-                    </p>
-                `;
+                if (isBebasTes) {
+                    infoBox.id = 'info-bebas-tes';
+                    infoBox.style.background = '#eff6ff';
+                    infoBox.style.borderColor = '#bfdbfe';
+                    infoBox.style.borderWidth = '1px';
+                    infoBox.style.borderStyle = 'solid';
+                    infoBox.style.color = '#1e40af';
+                    infoBox.innerHTML = `
+                        <h4 style="margin:0 0 8px 0; display:flex; align-items:center; gap:8px; font-size:1.1rem;">
+                            <i class="ph ph-info" style="font-size:1.4rem;"></i> Informasi Ujian
+                        </h4>
+                        <p style="margin:0; font-size:0.95rem; line-height:1.5;">
+                            Status Anda saat ini: <strong>Jalur Reguler</strong>.<br>
+                            Tombol "Cetak Kartu Tes" tidak tersedia karena Anda dinyatakan <strong>BEBAS TES TULIS (CBT)</strong> sebagai bentuk pengalihan dari Jalur Prestasi (Seleksi menggunakan Nilai Rapor).<br><br>
+                            Silakan pantau terus dashboard ini untuk pengumuman kelulusan.
+                        </p>
+                    `;
+                } else {
+                    infoBox.id = 'info-tunggu-jadwal';
+                    infoBox.style.background = '#fffbeb';
+                    infoBox.style.borderColor = '#fcd34d';
+                    infoBox.style.borderWidth = '1px';
+                    infoBox.style.borderStyle = 'solid';
+                    infoBox.style.color = '#b45309';
+                    infoBox.innerHTML = `
+                        <h4 style="margin:0 0 8px 0; display:flex; align-items:center; gap:8px; font-size:1.1rem;">
+                            <i class="ph ph-calendar-blank" style="font-size:1.4rem;"></i> Jadwal CBT Belum Tersedia
+                        </h4>
+                        <p style="margin:0; font-size:0.95rem; line-height:1.5;">
+                            Berkas Anda sudah dinyatakan <strong>VALID</strong>, namun Panitia belum mengatur Jadwal dan Ruangan Ujian CBT Anda.<br>
+                            Silakan cek halaman ini secara berkala. Tombol Cetak Kartu akan muncul setelah jadwal Anda tersedia.
+                        </p>
+                    `;
+                }
                 if(timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
             }
 
@@ -319,6 +336,7 @@ function renderStatus(data) {
     }
 }
 
+// 7. FUNGSI PENGALIHAN OTOMATIS (Gagal Tes Prestasi -> Bebas Tes)
 window.prosesPengalihanReguler = async function(id) {
     const confirm = await Swal.fire({
         title: 'Lanjut Jalur Reguler?',
@@ -337,7 +355,7 @@ window.prosesPengalihanReguler = async function(id) {
                     jalur: 'REGULER',
                     status_kelulusan: 'PENDING',
                     status_verifikasi: true,
-                    ruang_tes: null, tanggal_tes: null, sesi_tes: null // Pastikan kosong (bebas tes)
+                    ruang_tes: null, tanggal_tes: null, sesi_tes: null
                 })
                 .eq('id', id);
 
@@ -369,7 +387,7 @@ window.pindahKeRegulerTrigger = async function() {
                 .update({ 
                     jalur: 'REGULER',
                     status_verifikasi: null, 
-                    ruang_tes: null, tanggal_tes: null, sesi_tes: null // Reset karena harus lewat panitia
+                    ruang_tes: null, tanggal_tes: null, sesi_tes: null 
                 })
                 .eq('id', userSession.id);
 
@@ -415,31 +433,137 @@ function editData() {
     });
 }
 
-async function setupCountdown() {
-    let targetStr = "2026-05-15T00:00:00"; 
-    try {
-        const { data } = await db.from('pengaturan').select('value').eq('key', 'TANGGAL_PENGUMUMAN').maybeSingle();
-        if (data && data.value) { targetStr = data.value; }
-    } catch (e) { console.warn(e); }
+// ==============================================================
+// 10. SMART COUNTDOWN LOGIC (HITUNG MUNDUR PINTAR)
+// ==============================================================
+let countdownInterval;
 
-    const targetDate = new Date(targetStr).getTime();
-    const timer = setInterval(function() {
-        const now = new Date().getTime();
-        const distance = targetDate - now;
+// Helper Parse Tanggal CBT (Format "Kamis, 21 Mei 2026" & "Sesi 1 (07.30 - 09.30 WIB)")
+function parseExamDate(tglStr, sesiStr) {
+    try {
+        if (!tglStr || !sesiStr) return null;
+        let datePart = tglStr.split(',')[1]?.trim() || tglStr; 
+        const months = {"Januari":"01", "Februari":"02", "Maret":"03", "April":"04", "Mei":"05", "Juni":"06", "Juli":"07", "Agustus":"08", "September":"09", "Oktober":"10", "November":"11", "Desember":"12"};
+        for(let m in months) { datePart = datePart.replace(m, months[m]); }
+        
+        let parts = datePart.split(' '); 
+        let day = parts[0].padStart(2, '0');
+        let month = parts[1];
+        let year = parts[2];
+
+        let timeMatch = sesiStr.match(/(\d{2})\.(\d{2})/);
+        let timePart = timeMatch ? `${timeMatch[1]}:${timeMatch[2]}:00` : "07:00:00";
+
+        return `${year}-${month}-${day}T${timePart}`;
+    } catch(e) {
+        return null;
+    }
+}
+
+async function setupSmartCountdown(pendaftar) {
+    const banner = document.querySelector('.timer-banner');
+    if (!banner) return;
+
+    // Sembunyikan timer jika berkas masih pending/ditolak
+    if (pendaftar.status_verifikasi !== true) {
+        banner.style.display = 'none';
+        return;
+    }
+
+    // Default Pengumuman dari Database
+    let tglPres = "2026-04-18T00:00:00"; 
+    let tglReg = "2026-05-25T00:00:00";
+    try {
+        const { data } = await db.from('pengaturan').select('*').in('key', ['TANGGAL_PENGUMUMAN_PRESTASI', 'TANGGAL_PENGUMUMAN_REGULER']);
+        if (data) {
+            data.forEach(item => {
+                if(item.key === 'TANGGAL_PENGUMUMAN_PRESTASI') tglPres = item.value;
+                if(item.key === 'TANGGAL_PENGUMUMAN_REGULER') tglReg = item.value;
+            });
+        }
+    } catch (e) { console.warn("Gagal load tanggal dari db", e); }
+
+    const now = new Date().getTime();
+    let targetDate = null;
+    let titleText = "";
+    let subText = "";
+
+    const isBebasTes = (pendaftar.jalur === 'REGULER' && pendaftar.scan_sertifikat_prestasi_url);
+
+    // LOGIKA PENENTUAN TARGET TANGGAL
+    if (pendaftar.jalur === 'PRESTASI') {
+        const tesPresDate = new Date("2026-04-16T07:30:00").getTime();
+        if (now < tesPresDate) {
+            targetDate = tesPresDate;
+            titleText = "Menuju Tes Pembuktian Prestasi";
+            subText = "Harap hadir di kampus MAN 1 Tasikmalaya";
+        } else {
+            targetDate = new Date(tglPres).getTime();
+            titleText = "Menuju Pengumuman Hasil Prestasi";
+            subText = "Hasil Seleksi Jalur Prestasi";
+        }
+    } else if (pendaftar.jalur === 'REGULER') {
+        if (isBebasTes) {
+            targetDate = new Date(tglReg).getTime();
+            titleText = "Menuju Pengumuman Kelulusan Akhir";
+            subText = "Seleksi Menggunakan Nilai Rapor (Bebas Tes)";
+        } else {
+            if (pendaftar.tanggal_tes && pendaftar.sesi_tes) {
+                let examDateStr = parseExamDate(pendaftar.tanggal_tes, pendaftar.sesi_tes);
+                let examTime = examDateStr ? new Date(examDateStr).getTime() : 0;
+                
+                if (examTime > now) {
+                    targetDate = examTime;
+                    titleText = "Menuju Ujian CBT Anda";
+                    subText = `${pendaftar.tanggal_tes} - ${pendaftar.sesi_tes.split('(')[0].trim()}`;
+                } else {
+                    targetDate = new Date(tglReg).getTime();
+                    titleText = "Menuju Pengumuman Kelulusan Akhir";
+                    subText = "Hasil Seleksi Jalur Reguler";
+                }
+            } else {
+                targetDate = new Date(tglReg).getTime();
+                titleText = "Menuju Pengumuman Kelulusan Akhir";
+                subText = "Jadwal ujian belum tersedia, pantau terus";
+            }
+        }
+    }
+
+    // UPDATE UI TEKS
+    const titleEl = banner.querySelector('h2');
+    const subEl = banner.querySelector('p');
+    if (titleEl) titleEl.innerText = titleText;
+    if (subEl) subEl.innerText = subText;
+    
+    // START INTERVAL TIMER
+    if (countdownInterval) clearInterval(countdownInterval);
+    
+    countdownInterval = setInterval(function() {
+        const currentNow = new Date().getTime();
+        const distance = targetDate - currentNow;
+        
         if (distance < 0) {
-            clearInterval(timer);
-            if(document.getElementById("timer")) document.getElementById("timer").innerHTML = "<h3>PENGUMUMAN DIBUKA</h3>";
+            clearInterval(countdownInterval);
+            if(document.getElementById("timer")) document.getElementById("timer").innerHTML = `<h3 style="margin:0; padding:10px 20px; background:rgba(255,255,255,0.2); border-radius:10px;">WAKTU TELAH TIBA</h3>`;
             return;
         }
+        
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
         
         if(document.getElementById("timer")) {
-            document.getElementById("timer").innerHTML = `<div class="t-box"><span class="t-val">${days}</span><span class="t-lbl">Hari</span></div><div class="t-box"><span class="t-val">${hours}</span><span class="t-lbl">Jam</span></div><div class="t-box"><span class="t-val">${minutes}</span><span class="t-lbl">Menit</span></div><div class="t-box"><span class="t-val">${seconds}</span><span class="t-lbl">Detik</span></div>`;
+            document.getElementById("timer").innerHTML = `
+                <div class="t-box"><span class="t-val">${days}</span><span class="t-lbl">Hari</span></div>
+                <div class="t-box"><span class="t-val">${hours}</span><span class="t-lbl">Jam</span></div>
+                <div class="t-box"><span class="t-val">${minutes}</span><span class="t-lbl">Menit</span></div>
+                <div class="t-box"><span class="t-val">${seconds}</span><span class="t-lbl">Detik</span></div>
+            `;
         }
     }, 1000);
+    
+    banner.style.display = 'flex'; // Pastikan terlihat jika sudah valid
 }
 
 loadDashboardData();
