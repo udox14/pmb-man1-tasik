@@ -553,6 +553,12 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
     
     /* Dropdown di Tabel Jadwal */
     .admin-table td select.input-modern-form { width: 60%; font-size: 0.8rem; padding: 6px; }
+
+    /* Sembunyikan teks tombol di mobile, sisakan ikon */
+    .nav-actions .btn span.hide-mobile { display: none; } 
+    .nav-actions .btn span { display: none; } 
+    .nav-actions .btn { padding: 8px !important; width: 36px; height: 36px; justify-content: center; border-radius: 50%; }
+    .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
 }
 
 .mobile-close-btn { display: none; }
