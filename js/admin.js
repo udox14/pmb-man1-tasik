@@ -1192,8 +1192,8 @@ window.processZipDownload = async function(pendaftarList, zipFilename) {
             const b = await urlToBlob(p.scan_akta_url); 
             if(b) pFolder.file(`AKTA.pdf`, b); 
         }
-        if(p.scan_skb_url) { 
-            const b = await urlToBlob(p.scan_skb_url); 
+        if(p.scan_kelakuan_baik_url) { 
+            const b = await urlToBlob(p.scan_kelakuan_baik_url); 
             if(b) pFolder.file(`SKB.pdf`, b); 
         }
         if(p.scan_rapor_url) { 
