@@ -57,100 +57,6 @@
             .page-context { display: none !important; }
         }
 
-        /* ===== PMB PROGRESS BAR ===== */
-        .pmb-progress-wrap {
-            margin-bottom: 28px;
-        }
-        .pmb-progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .pmb-progress-label {
-            font-size: 0.82rem;
-            color: #64748b;
-        }
-        .pmb-progress-label b { color: var(--primary); }
-        .pmb-progress-pct {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .pmb-progress-track {
-            height: 7px;
-            background: #e2e8f0;
-            border-radius: 99px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-        .pmb-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), #34d399);
-            border-radius: 99px;
-            transition: width 0.4s cubic-bezier(.4,0,.2,1);
-        }
-        /* Steps row */
-        .pmb-steps-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 4px;
-        }
-        .pmb-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            flex: 1;
-            opacity: 0.4;
-            transition: opacity 0.3s;
-        }
-        .pmb-step.active, .pmb-step.finished { opacity: 1; }
-        .pmb-step-dot {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid #cbd5e1;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            color: #94a3b8;
-            transition: all 0.3s;
-            position: relative;
-        }
-        .pmb-step.active .pmb-step-dot {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0,121,107,0.3);
-            transform: scale(1.1);
-        }
-        .pmb-step.finished .pmb-step-dot {
-            background: #f0fdfa;
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        .pmb-step.finished .pmb-step-dot::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            opacity: 0.3;
-        }
-        .pmb-step span {
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #94a3b8;
-            text-align: center;
-            line-height: 1.2;
-        }
-        .pmb-step.active span { color: var(--primary); font-weight: 700; }
-        .pmb-step.finished span { color: var(--primary); }
-
         /* ===== MOBILE FORM FIX ===== */
         @media (max-width: 600px) {
             /* Form card padding lebih compact */
@@ -229,37 +135,13 @@
                 <h2 class="wizard-title">FORMULIR PENDAFTARAN</h2>
             </div>
 
-            <!-- PROGRESS BAR BARU -->
-            <div class="pmb-progress-wrap">
-                <div class="pmb-progress-header">
-                    <span class="pmb-progress-label" id="pmb-step-label">Langkah 1 dari 4 &nbsp;·&nbsp; <b>Data Peserta Didik</b></span>
-                    <span class="pmb-progress-pct" id="pmb-step-pct">25%</span>
-                </div>
-                <div class="pmb-progress-track">
-                    <div class="pmb-progress-fill" id="pmb-progress-fill" style="width:25%;"></div>
-                </div>
-                <div class="pmb-steps-row" id="pmb-steps-row">
-                    <div class="pmb-step active" id="step-icon-1">
-                        <div class="pmb-step-dot"><i class="ph ph-user"></i></div>
-                        <span>Data Siswa</span>
-                    </div>
-                    <div class="pmb-step" id="step-icon-2">
-                        <div class="pmb-step-dot"><i class="ph ph-users-three"></i></div>
-                        <span>Keluarga</span>
-                    </div>
-                    <div class="pmb-step" id="step-icon-3">
-                        <div class="pmb-step-dot"><i class="ph ph-graduation-cap"></i></div>
-                        <span>Sekolah</span>
-                    </div>
-                    <div class="pmb-step" id="step-icon-4">
-                        <div class="pmb-step-dot"><i class="ph ph-upload-simple"></i></div>
-                        <span>Upload</span>
-                    </div>
-                    <div class="pmb-step" id="step-icon-5" style="display:none;">
-                        <div class="pmb-step-dot"><i class="ph ph-trophy"></i></div>
-                        <span>Prestasi</span>
-                    </div>
-                </div>
+            <!-- STEPPER -->
+            <div class="wizard-progress">
+                <div class="wizard-step active" id="step-icon-1"><i class="ph ph-user"></i></div>
+                <div class="wizard-step" id="step-icon-2"><i class="ph ph-users-three"></i></div>
+                <div class="wizard-step" id="step-icon-3"><i class="ph ph-graduation-cap"></i></div>
+                <div class="wizard-step" id="step-icon-4"><i class="ph ph-upload-simple"></i></div>
+                <div class="wizard-step" id="step-icon-5" style="display:none;"><i class="ph ph-trophy"></i></div>
             </div>
 
             <form id="pmbForm" onsubmit="return false;">
@@ -739,9 +621,9 @@
                 }
 
                 // Valid
-                const shortName = file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name;
+                const shortName = file.name.length > 12 ? file.name.substring(0, 10) + '...' : file.name;
                 const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-                if (label) label.innerHTML = `<i class="ph ph-check-circle"></i> ${shortName} <span style="color:#94a3b8;">(${sizeMB}MB)</span>`;
+                if (label) label.innerHTML = `<i class="ph ph-check-circle"></i> ${shortName}<br><span style="color:#94a3b8;font-size:0.7rem;">${sizeMB}MB</span>`;
                 if (row) { row.classList.remove('error'); row.classList.add('uploaded'); }
                 updateUploadProgress();
             }

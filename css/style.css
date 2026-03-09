@@ -576,11 +576,11 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
 .upload-row-item.uploaded { border-color: #10b981; background: #f0fdf4; border-style: solid; }
 .upload-row-item.error { border-color: #ef4444; background: #fff5f5; border-style: solid; }
 .upload-row-item input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
-.upload-row-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.upload-row-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; overflow: hidden; }
 .upload-row-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-.upload-row-title { font-weight: 700; font-size: 0.88rem; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.upload-row-title { font-weight: 700; font-size: 0.88rem; color: var(--text-main); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .upload-row-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
-.upload-row-status { font-size: 0.78rem; font-weight: 600; color: #94a3b8; white-space: nowrap; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.upload-row-status { font-size: 0.78rem; font-weight: 600; color: #94a3b8; white-space: nowrap; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0; min-width: 70px; max-width: 80px; text-align: right; line-height: 1.3; }
 .upload-row-item.uploaded .upload-row-status { color: #10b981; }
 .upload-row-item.error .upload-row-status { color: #ef4444; }
 .upload-badge-required { font-size: 0.65rem; background: #fee2e2; color: #dc2626; padding: 1px 6px; border-radius: 99px; font-weight: 700; }
@@ -592,41 +592,6 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
     .upload-row-icon { width: 36px; height: 36px; font-size: 1.1rem; flex-shrink: 0; }
     .upload-row-title { font-size: 0.85rem; gap: 5px; }
     .upload-row-hint { display: none; }
-    .upload-row-status { font-size: 0.72rem; max-width: 110px; white-space: normal; text-align: right; line-height: 1.3; }
+    .upload-row-status { font-size: 0.72rem; min-width: 60px; max-width: 75px; text-align: right; }
     .upload-badge-required { display: none; }
-}
-/* ===== GLOBAL MOBILE OVERFLOW FIX ===== */
-@media (max-width: 600px) {
-    /* Cegah semua elemen overflow horizontal */
-    * { max-width: 100%; }
-    input, select, textarea { 
-        box-sizing: border-box !important; 
-        width: 100% !important;
-        /* Cegah iOS zoom saat focus */
-        font-size: 16px !important;
-    }
-    /* Input number — sembunyikan spinner */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type=number] { -moz-appearance: textfield; }
-
-    /* Section box sejajar */
-    .section-box { 
-        margin-left: 0 !important; 
-        margin-right: 0 !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Form card padding compact */
-    .form-card { padding: 16px !important; }
-
-    /* Wizard steps lebih kecil */
-    .wizard-step { width: 32px !important; height: 32px !important; font-size: 0.75rem !important; }
-    .wizard-connector { width: 20px !important; }
-    .wizard-label { font-size: 0.6rem !important; }
-
-    /* Nav buttons */
-    .nav-buttons { padding: 12px 16px !important; gap: 8px !important; }
-    .btn { font-size: 0.82rem !important; padding: 10px 16px !important; }
 }
