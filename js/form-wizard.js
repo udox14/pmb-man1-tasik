@@ -538,7 +538,7 @@ window.submitForm = async function() {
         const nama = document.getElementById('nama_lengkap').value.replace(/[^a-zA-Z0-9]/g, '_');
         const folderName = `${nisn}_${nama}`;
 
-        // Batas upload semua berkas: 2MB (2048 KB)
+        // Batas upload semua berkas: 2MB — upload ke R2 via /api/upload
         async function uploadFile(fileInputId, docName, maxKB, autoCompress = false) {
             const fileInput = document.getElementById(fileInputId);
             if (fileInput && fileInput.files.length > 0) {
@@ -551,13 +551,7 @@ window.submitForm = async function() {
                 }
                 const fileSizeKB = file.size / 1024;
                 if (fileSizeKB > maxKB) throw new Error(`File ${docName} terlalu besar. Max ${maxKB >= 1024 ? (maxKB/1024) + ' MB' : maxKB + ' KB'}.`);
-                const ext = file.name ? file.name.split('.').pop() : 'jpg';
-                const fileName = `${folderName}/${docName}_${timestamp}.${ext}`;
-                
-                const { error } = await db.storage.from('berkas_pmb').upload(fileName, file, { contentType: file.type || 'image/jpeg', upsert: true });
-                if (error) throw error;
-                const { data: urlData } = db.storage.from('berkas_pmb').getPublicUrl(fileName);
-                return urlData.publicUrl;
+                return await apiUpload(file, folderName, docName);
             }
             return null;
         }
@@ -627,8 +621,8 @@ window.submitForm = async function() {
             scan_sertifikat_prestasi_url: sertifUrl
         };
 
-        const { data: pendaftarData, error: dbError } = await db.from('pendaftar').insert([formData]).select().single();
-        if (dbError) throw dbError;
+        const pendaftarData = await apiPost('pendaftar', formData);
+        if (pendaftarData.error) throw new Error(pendaftarData.error);
 
         if (jalur === 'PRESTASI') {
             const pendaftarId = pendaftarData.id;
@@ -667,7 +661,7 @@ window.submitForm = async function() {
             }
 
             if (prestasiList.length > 0) {
-                await db.from('prestasi').insert(prestasiList);
+                await apiPost('prestasi', prestasiList);
             }
         }
 

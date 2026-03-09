@@ -1,0 +1,13 @@
+name = "pmb-man1-tasik"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pmb-man1-tasik"
+database_id = "b28a3f9e-331d-4bd2-9b85-95b12d6f313f"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "pmb-man1-tasik"

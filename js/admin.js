@@ -74,14 +74,15 @@ window.switchAdminPanel = function(panel) {
 // ==========================================
 async function loadPendaftar() {
     try {
-        const { data, error } = await db.from('pendaftar').select('*');
-        if (error) throw error;
+        const data = await apiGet('admin');
+        if (data.error) throw new Error(data.error);
         
         allPendaftar = data;
         updateStats(data);
         renderTable(); 
 
-        const { data: cfgData } = await db.from('pengaturan').select('*').eq('key', 'JADWAL_CONFIG').maybeSingle();
+        const cfgAll = await apiGet('pengaturan', { keys: 'JADWAL_CONFIG' });
+        const cfgData = Array.isArray(cfgAll) ? cfgAll.find(r => r.key === 'JADWAL_CONFIG') : null;
         if (cfgData && cfgData.value) {
             try { 
                 scheduleConfig = JSON.parse(cfgData.value); 
@@ -442,16 +443,16 @@ window.bulkAction = async function(action) {
 
     if (confirm.isConfirmed) {
         Swal.showLoading();
-        const { error } = await db.from('pendaftar').update(updateData).in('id', ids);
+        const result = await apiPost('admin?action=verifikasi', { ids, updateData });
         
-        if (!error) {
+        if (!result.error) {
             selectedIds.clear(); 
             await loadPendaftar(); 
             Swal.fire('Berhasil', 'Data berhasil diperbarui', 'success');
             
             if(action === 'JADWAL') renderPlottingTable();
         } else { 
-            Swal.fire('Gagal', error.message, 'error'); 
+            Swal.fire('Gagal', result.error, 'error'); 
         }
     }
 }
@@ -484,7 +485,7 @@ window.saveScheduleConfig = async function() {
     localStorage.setItem('JADWAL_CONFIG', JSON.stringify(scheduleConfig));
     
     try { 
-        await db.from('pengaturan').upsert([{ key: 'JADWAL_CONFIG', value: JSON.stringify(scheduleConfig) }]); 
+        await apiPost('admin?action=jadwal', { config: scheduleConfig });
     } catch(e) { 
         console.warn('Gagal simpan ke database. Tersimpan di lokal.');
     }
@@ -618,7 +619,7 @@ window.saveManualPlotting = async function() {
 
     Swal.showLoading();
     try {
-        const promises = ids.map(id => db.from('pendaftar').update(plottingChanges[id]).eq('id', id));
+        const promises = ids.map(id => apiPost('admin?action=plotting', { changes: { [id]: plottingChanges[id] } }));
         await Promise.all(promises);
         
         ids.forEach(id => {
@@ -718,11 +719,9 @@ window.autoPlotting = async function() {
     if (updates.length > 0) {
         Swal.showLoading();
         try {
-            const promises = updates.map(u => db.from('pendaftar').update({
-                tanggal_tes: u.tanggal_tes, 
-                sesi_tes: u.sesi_tes, 
-                ruang_tes: u.ruang_tes
-            }).eq('id', u.id));
+            const promises = updates.map(u => apiPost('admin?action=plotting', {
+                changes: { [u.id]: { tanggal_tes: u.tanggal_tes, sesi_tes: u.sesi_tes, ruang_tes: u.ruang_tes } }
+            }));
             
             await Promise.all(promises);
 
@@ -763,8 +762,8 @@ window.viewDetail = async function(id) {
     });
 
     try {
-        const { data: p, error } = await db.from('pendaftar').select('*').eq('id', id).single();
-        if (error || !p) throw new Error('Data tidak ditemukan');
+        const p = await apiGet('pendaftar', { id });
+        if (p.error || !p.id) throw new Error('Data tidak ditemukan');
 
         editState = { 
             id: p.id, 
@@ -774,8 +773,8 @@ window.viewDetail = async function(id) {
 
         let prestasiHtml = '';
         if (p.jalur === 'PRESTASI' || p.scan_sertifikat_prestasi_url) { 
-            const { data: pres } = await db.from('prestasi').select('*').eq('pendaftar_id', id);
-            if (pres && pres.length > 0) {
+            const pres = await apiGet('prestasi', { pendaftar_id: id });
+            if (Array.isArray(pres) && pres.length > 0) {
                 prestasiHtml = `
                 <div style="margin-top:20px; background:#f0fdfa; padding:15px; border-radius:8px; border:1px solid #ccfbf1;">
                     <div class="detail-section-title" style="margin-top:0;">🏅 Data Prestasi</div>
@@ -1015,9 +1014,9 @@ window.saveDetailChanges = async function() {
         payload.ruang_tes = elRuang.value; 
     }
 
-    const { error } = await db.from('pendaftar').update(payload).eq('id', editState.id);
+    const result = await apiPost('admin?action=update-satu', { id: editState.id, payload });
     
-    if (!error) {
+    if (!result.error) {
         const index = allPendaftar.findIndex(x => x.id === editState.id);
         if (index !== -1) { 
             allPendaftar[index].status_verifikasi = payload.status_verifikasi; 
@@ -1047,7 +1046,7 @@ window.saveDetailChanges = async function() {
         }
         toast.fire({ icon: 'success', title: 'Tersimpan' });
     } else { 
-        toast.fire({ icon: 'error', title: 'Gagal: ' + error.message }); 
+        toast.fire({ icon: 'error', title: 'Gagal: ' + result.error }); 
     }
 }
 
@@ -1235,12 +1234,11 @@ window.downloadAllFilesZip = function() {
 // ==========================================
 window.aturJalur = async function() {
     try {
-        const { data } = await db.from('pengaturan').select('*');
+        const data = await apiGet('admin?action=pengaturan');
         const config = {};
         
-        if (data) {
+        if (Array.isArray(data)) {
             data.forEach(item => {
-                // Tangkap semua key yang mengandung kata TANGGAL_PENGUMUMAN
                 if(item.key.includes('TANGGAL_PENGUMUMAN')) {
                     config[item.key] = item.value;
                 } else {
@@ -1293,12 +1291,12 @@ window.aturJalur = async function() {
         });
 
         if (formValues) {
-            await db.from('pengaturan').upsert([
-                { key: 'JALUR_REGULER', is_active: formValues[0] },
-                { key: 'JALUR_PRESTASI', is_active: formValues[1] },
+            await apiPost('admin?action=pengaturan', { items: [
+                { key: 'JALUR_REGULER', value: String(formValues[0]) },
+                { key: 'JALUR_PRESTASI', value: String(formValues[1]) },
                 { key: 'TANGGAL_PENGUMUMAN_PRESTASI', value: formValues[2] },
                 { key: 'TANGGAL_PENGUMUMAN_REGULER', value: formValues[3] }
-            ]);
+            ]});
             Swal.fire('Sukses', 'Pengaturan berhasil disimpan', 'success');
         }
     } catch (e) {
