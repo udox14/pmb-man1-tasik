@@ -31,17 +31,17 @@
 
         /* Warna Section Khusus */
         .section-box {
-            padding: 25px;
-            border-radius: 16px;
-            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
             border: 1px solid;
         }
         .box-ayah { background: #f0fdf4; border-color: #bbf7d0; }
         .box-ibu { background: #fff1f2; border-color: #fecdd3; }
-        .box-alamat { background: #f8fafc; border-color: #e2e8f0; margin-top: 30px; }
-        
+        .box-alamat { background: #f8fafc; border-color: #e2e8f0; margin-top: 20px; }
+
         .box-title {
-            margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;
+            margin-top: 0; margin-bottom: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; font-size: 1rem;
         }
 
         /* Responsive Mobile Header */
@@ -50,11 +50,56 @@
             .brand-wrapper { gap: 10px !important; }
             .kemenag-logo { width: 35px !important; }
             .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
-            .brand-subtitle { display: none !important; } 
-            .nav-actions .btn span { display: none; } 
+            .brand-subtitle { display: none !important; }
+            .nav-actions .btn span { display: none; }
             .nav-actions .btn { padding: 8px !important; width: 36px; height: 36px; justify-content: center; border-radius: 50%; }
             .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
             .page-context { display: none !important; }
+        }
+
+        /* ===== MOBILE FORM FIX ===== */
+        @media (max-width: 600px) {
+            /* Form card padding lebih compact */
+            .form-card { padding: 16px !important; border-radius: 16px !important; }
+            .form-section-title { font-size: 1rem; margin-bottom: 16px; }
+
+            /* Input tidak overflow */
+            .input-modern-form {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                font-size: 0.9rem !important;
+                padding: 10px 12px !important;
+                /* Cegah zoom otomatis di iOS */
+                font-size: 16px !important;
+            }
+            select.input-modern-form { font-size: 16px !important; }
+
+            /* Grid jadi 1 kolom di HP */
+            .form-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+
+            /* Section box margin & padding lebih kecil */
+            .section-box { padding: 14px !important; margin-bottom: 14px !important; border-radius: 12px !important; }
+            .box-title { font-size: 0.9rem !important; margin-bottom: 12px !important; }
+
+            /* Pilihan Tempat Tinggal inline style override */
+            .form-group[style*="background: #f0fdfa"] {
+                padding: 14px !important;
+                border-radius: 10px !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            /* Info bar upload jadi 1 kolom */
+            .upload-info-bar { flex-direction: column !important; }
+            .upload-info-bar > div { min-width: unset !important; width: 100% !important; }
+
+            /* Progress bar upload */
+            #upload-progress-bar { padding: 10px 12px !important; }
+
+            /* Form group spacing */
+            .form-group { margin-bottom: 12px !important; }
+            .form-group label { font-size: 0.82rem !important; margin-bottom: 4px !important; display: block; }
         }
     </style>
 </head>
@@ -84,7 +129,7 @@
     <div class="container" style="margin-bottom: 80px;">
         
         <!-- CARD FORM -->
-        <div class="info-card" style="padding: 50px 40px; border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
+        <div class="info-card form-card" style="padding: 50px 40px; border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
             
             <div class="wizard-header">
                 <h2 class="wizard-title">FORMULIR PENDAFTARAN</h2>
@@ -277,7 +322,7 @@
                     </div>
                     <div class="form-group"><label>Alamat Sekolah *</label><textarea id="alamat_sekolah" rows="2" required class="input-modern-form" style="text-transform: uppercase;"></textarea></div>
 
-                    <div class="form-group" style="background: #f0fdfa; padding: 25px; border-radius: 12px; border: 1px solid var(--primary); margin-top: 30px;">
+                    <div class="form-group" style="background: #f0fdfa; padding: 20px; border-radius: 12px; border: 1px solid var(--primary); margin-top: 20px; box-sizing: border-box; width: 100%;">
                         <label style="color: var(--primary-dark); font-weight:800; font-size:1.1rem; display: flex; align-items: center; gap: 10px;">
                             <i class="ph ph-house-line"></i> Pilihan Tempat Tinggal (Pesantren/ Warga Sekitar) *
                         </label>
@@ -301,7 +346,7 @@
                     <h3 class="form-section-title">D. Upload Berkas</h3>
 
                     <!-- Info Bar -->
-                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div class="upload-info-bar" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                         <div style="flex:1; min-width:200px; background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:10px;">
                             <i class="ph ph-info" style="font-size:1.3rem; color:#0d9488; flex-shrink:0;"></i>
                             <div style="font-size:0.82rem; color:#0f766e; line-height:1.5;">
