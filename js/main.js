@@ -15,10 +15,8 @@ function selectTab(jalur) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Check Jalur Status
     await checkJalurStatus();
 
-    // Fix UI Help
     const helpList = document.querySelector('.help-list');
     if (helpList) {
         helpList.style.maxHeight = 'none';
@@ -34,13 +32,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.head.appendChild(styleFix);
 });
 
-// LOGIKA SLIDESHOW MANUAL & LAZY LOAD
 function moveSlide(n) {
     const slides = document.querySelectorAll('.slide');
     if (slides.length === 0) return;
 
     slides[currentSlideIndex].classList.remove('active');
-
     currentSlideIndex += n;
     if (currentSlideIndex >= slides.length) currentSlideIndex = 0;
     if (currentSlideIndex < 0) currentSlideIndex = slides.length - 1;
@@ -50,21 +46,20 @@ function moveSlide(n) {
         targetSlide.src = targetSlide.getAttribute('data-src');
         targetSlide.removeAttribute('data-src');
     }
-
     targetSlide.classList.add('active');
 }
 
 async function checkJalurStatus() {
     try {
-        const { data, error } = await db.from('pengaturan').select('*');
-        if (error || !data) return;
+        const data = await apiGet('pengaturan');
+        if (!Array.isArray(data)) return;
 
         let regOpen = true;
         let presOpen = true;
 
         data.forEach(item => {
-            if (item.key === 'JALUR_REGULER') regOpen = item.is_active;
-            if (item.key === 'JALUR_PRESTASI') presOpen = item.is_active;
+            if (item.key === 'JALUR_REGULER') regOpen = item.value !== 'false';
+            if (item.key === 'JALUR_PRESTASI') presOpen = item.value !== 'false';
         });
 
         const tabReg = document.getElementById('tab-reguler');
@@ -72,7 +67,6 @@ async function checkJalurStatus() {
 
         tabReg.classList.remove('disabled');
         tabPres.classList.remove('disabled');
-        // REVISI: Teks tidak diubah, hanya status disabled/enabled yang main
 
         if (!regOpen) {
             tabReg.classList.add('disabled');
@@ -83,7 +77,7 @@ async function checkJalurStatus() {
             tabPres.classList.add('disabled');
             if (selectedJalur === 'PRESTASI' && regOpen) selectTab('REGULER');
         }
-        
+
         if (!regOpen && !presOpen) {
             const btnDaftar = document.querySelector('.compact-action button');
             const inputNisn = document.querySelector('#input-nisn');
@@ -118,44 +112,39 @@ async function cekNisnDanDaftar() {
     });
 
     try {
+        // Cek status jalur
         const settingKey = selectedJalur === 'REGULER' ? 'JALUR_REGULER' : 'JALUR_PRESTASI';
-        const { data: setting } = await db.from('pengaturan').select('is_active').eq('key', settingKey).maybeSingle();
+        const settings = await apiGet('pengaturan', { keys: settingKey });
+        const setting = Array.isArray(settings) ? settings.find(s => s.key === settingKey) : null;
 
-        if (setting && setting.is_active === false) {
+        if (setting && setting.value === 'false') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Pendaftaran Ditutup',
                 text: `Mohon maaf, Pendaftaran ${selectedJalur} saat ini sedang ditutup.`,
                 confirmButtonText: 'Oke'
             });
-            return; 
+            return;
         }
 
-        const { data, error } = await db
-            .from('pendaftar')
-            .select('nisn, nama_lengkap')
-            .eq('nisn', nisnInput)
-            .maybeSingle();
+        // Cek apakah NISN sudah terdaftar
+        const result = await apiGet('pendaftar/cek-nisn', { nisn: nisnInput });
 
-        if (error) throw error;
-
-        if (data) {
+        if (result.exists) {
             Swal.fire({
                 icon: 'info',
                 title: 'Sudah Terdaftar!',
-                text: `NISN ${nisnInput} atas nama ${data.nama_lengkap} sudah terdaftar.`,
+                text: `NISN ${nisnInput} atas nama ${result.nama_lengkap} sudah terdaftar.`,
                 showCancelButton: true,
                 confirmButtonText: 'Login Sekarang',
                 cancelButtonText: 'Tutup'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'login.html';
-                }
+            }).then((res) => {
+                if (res.isConfirmed) window.location.href = 'login.html';
             });
         } else {
             localStorage.setItem('pmb_jalur', selectedJalur);
             localStorage.setItem('pmb_nisn', nisnInput);
-            
+
             Swal.fire({
                 icon: 'success',
                 title: 'NISN Tersedia',
@@ -178,15 +167,15 @@ function toggleHelp() {
     const btn = document.getElementById('helpBtn');
     const icon = btn.querySelector('i');
     const textSpan = btn.querySelector('span');
-    
+
     popup.classList.toggle('active');
     btn.classList.toggle('opened');
-    
+
     if (popup.classList.contains('active')) {
         icon.classList.replace('ph-chat-teardrop-text', 'ph-x');
-        if(textSpan) textSpan.style.display = 'none';
+        if (textSpan) textSpan.style.display = 'none';
     } else {
         icon.classList.replace('ph-x', 'ph-chat-teardrop-text');
-        if(textSpan) textSpan.style.display = 'inline';
+        if (textSpan) textSpan.style.display = 'inline';
     }
 }

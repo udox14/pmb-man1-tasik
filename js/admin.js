@@ -1239,13 +1239,14 @@ window.aturJalur = async function() {
         
         if (Array.isArray(data)) {
             data.forEach(item => {
-                if(item.key.includes('TANGGAL_PENGUMUMAN')) {
-                    config[item.key] = item.value;
-                } else {
-                    config[item.key] = item.is_active;
-                }
+                // Semua pakai kolom value di D1
+                config[item.key] = item.value;
             });
         }
+
+        // Jalur aktif jika value === 'true' atau belum pernah diset (default aktif)
+        const regChecked = config['JALUR_REGULER'] !== 'false';
+        const presChecked = config['JALUR_PRESTASI'] !== 'false';
 
         const { value: formValues } = await Swal.fire({
             title: 'Pengaturan Sistem PPDB',
@@ -1256,7 +1257,7 @@ window.aturJalur = async function() {
                             <strong style="color:#00796b;">Jalur Reguler</strong><br>
                             <small>Tes Akademik & BTQ</small>
                         </div>
-                        <input type="checkbox" id="check-reguler" ${config['JALUR_REGULER'] !== false ? 'checked' : ''} style="transform:scale(1.5);">
+                        <input type="checkbox" id="check-reguler" ${regChecked ? 'checked' : ''} style="transform:scale(1.5);">
                     </div>
                     
                     <div style="background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
@@ -1264,7 +1265,7 @@ window.aturJalur = async function() {
                             <strong style="color:#991b1b;">Jalur Prestasi</strong><br>
                             <small>Non-Akademik</small>
                         </div>
-                        <input type="checkbox" id="check-prestasi" ${config['JALUR_PRESTASI'] !== false ? 'checked' : ''} style="transform:scale(1.5);">
+                        <input type="checkbox" id="check-prestasi" ${presChecked ? 'checked' : ''} style="transform:scale(1.5);">
                     </div>
                     
                     <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
