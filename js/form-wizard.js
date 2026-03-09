@@ -171,7 +171,6 @@ document.addEventListener('change', function(e) {
 /* ===========================================================
    3. LOGIKA WIZARD (STEPPER)
    =========================================================== */
-// Label tiap step
 const STEP_LABELS = {
     1: 'Data Peserta Didik',
     2: 'Data Keluarga',
@@ -185,14 +184,27 @@ function showStep(step) {
     const section = document.getElementById(`section-${step}`);
     if (section) section.classList.add('active');
 
-    // Update pmb-step (progress bar baru)
+    // Update pmb-step dots
     document.querySelectorAll('.pmb-step').forEach((el, index) => {
         el.classList.remove('active', 'finished');
         if (index + 1 === step) el.classList.add('active');
         else if (index + 1 < step) el.classList.add('finished');
     });
 
-    // Update progress bar fill & label
+    // Update dot icon: finished -> centang
+    document.querySelectorAll('.pmb-step').forEach((el, index) => {
+        const dot = el.querySelector('.pmb-step-dot');
+        const icon = dot ? dot.querySelector('i') : null;
+        if (!icon) return;
+        const originalIcons = ['ph-user','ph-users-three','ph-graduation-cap','ph-upload-simple','ph-trophy'];
+        if (index + 1 < step) {
+            icon.className = 'ph ph-check-bold';
+        } else {
+            if (originalIcons[index]) icon.className = `ph ${originalIcons[index]}`;
+        }
+    });
+
+    // Update progress bar
     const total = window.totalStep;
     const pct = Math.round((step / total) * 100);
     const fill = document.getElementById('pmb-progress-fill');
