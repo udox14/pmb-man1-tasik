@@ -584,3 +584,14 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
 .upload-row-item.uploaded .upload-row-status { color: #10b981; }
 .upload-row-item.error .upload-row-status { color: #ef4444; }
 .upload-badge-required { font-size: 0.65rem; background: #fee2e2; color: #dc2626; padding: 1px 6px; border-radius: 99px; font-weight: 700; }
+
+/* Upload Row — Mobile Fix */
+@media (max-width: 480px) {
+    .upload-row-item { padding: 10px 12px; gap: 10px; align-items: center; }
+    .upload-row-left { gap: 10px; }
+    .upload-row-icon { width: 36px; height: 36px; font-size: 1.1rem; flex-shrink: 0; }
+    .upload-row-title { font-size: 0.85rem; gap: 5px; }
+    .upload-row-hint { display: none; }
+    .upload-row-status { font-size: 0.72rem; max-width: 110px; white-space: normal; text-align: right; line-height: 1.3; }
+    .upload-badge-required { display: none; }
+}
