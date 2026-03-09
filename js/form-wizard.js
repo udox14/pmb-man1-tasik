@@ -171,23 +171,43 @@ document.addEventListener('change', function(e) {
 /* ===========================================================
    3. LOGIKA WIZARD (STEPPER)
    =========================================================== */
+// Label tiap step
+const STEP_LABELS = {
+    1: 'Data Peserta Didik',
+    2: 'Data Keluarga',
+    3: 'Asal Sekolah & Pesantren',
+    4: 'Upload Berkas',
+    5: 'Data Prestasi'
+};
+
 function showStep(step) {
     document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
     const section = document.getElementById(`section-${step}`);
     if (section) section.classList.add('active');
-    
-    document.querySelectorAll('.wizard-step').forEach((el, index) => {
+
+    // Update pmb-step (progress bar baru)
+    document.querySelectorAll('.pmb-step').forEach((el, index) => {
+        el.classList.remove('active', 'finished');
         if (index + 1 === step) el.classList.add('active');
         else if (index + 1 < step) el.classList.add('finished');
-        else el.classList.remove('active', 'finished');
     });
+
+    // Update progress bar fill & label
+    const total = window.totalStep;
+    const pct = Math.round((step / total) * 100);
+    const fill = document.getElementById('pmb-progress-fill');
+    const label = document.getElementById('pmb-step-label');
+    const pctEl = document.getElementById('pmb-step-pct');
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.innerHTML = `Langkah ${step} dari ${total} &nbsp;·&nbsp; <b>${STEP_LABELS[step] || ''}</b>`;
+    if (pctEl) pctEl.textContent = pct + '%';
 
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
     const btnSubmit = document.getElementById('btn-submit');
 
     if(btnPrev) btnPrev.style.display = step === 1 ? 'none' : 'inline-flex';
-    
+
     if (step === window.totalStep) {
         if(btnNext) btnNext.style.display = 'none';
         if(btnSubmit) btnSubmit.style.display = 'inline-flex';
