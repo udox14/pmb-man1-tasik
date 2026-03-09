@@ -299,62 +299,133 @@
                 <!-- SECTION 4: UPLOAD BERKAS (MODERN GRID) -->
                 <div class="form-section" id="section-4">
                     <h3 class="form-section-title">D. Upload Berkas</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem;">
-                        <i class="ph ph-warning-circle"></i> <b>Format:</b> 
-                        <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">PDF</span> untuk dokumen, 
-                        <span style="background: #fce7f3; color: #be185d; padding: 2px 6px; border-radius: 4px; font-weight: bold;">JPG/PNG</span> untuk Foto.<br>
-                        <b>Maksimal Ukuran:</b> <span style="color: #dc2626; font-weight: bold;">2MB</span> (Semua Berkas).
-                    </p>
-                    
-                    <div class="upload-grid-modern">
-                        <!-- Card 1: Foto -->
-                        <div class="upload-card-item">
-                            <input type="file" id="file_foto" accept="image/png, image/jpeg, image/jpg" required onchange="updateFileName(this)">
-                            <div class="upload-icon-box"><i class="ph ph-user-focus"></i></div>
-                            <span class="upload-label-text">Pas Foto (Latar Biru)</span>
-                            <span class="upload-status-text" id="lbl-file_foto">Max 2MB (JPG/PNG)</span>
-                        </div>
 
-                        <!-- Card 2: KK -->
-                        <div class="upload-card-item">
-                            <input type="file" id="file_kk" accept=".pdf" required onchange="updateFileName(this)">
-                            <div class="upload-icon-box"><i class="ph ph-users-three"></i></div>
-                            <span class="upload-label-text">Kartu Keluarga (KK)</span>
-                            <span class="upload-status-text" id="lbl-file_kk">Max 2MB (PDF Only)</span>
+                    <!-- Info Bar -->
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                        <div style="flex:1; min-width:200px; background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:10px;">
+                            <i class="ph ph-info" style="font-size:1.3rem; color:#0d9488; flex-shrink:0;"></i>
+                            <div style="font-size:0.82rem; color:#0f766e; line-height:1.5;">
+                                <b>Format:</b> <span style="background:#e0f2fe; color:#0369a1; padding:1px 6px; border-radius:4px; font-weight:700;">PDF</span> untuk dokumen &nbsp;·&nbsp; <span style="background:#fce7f3; color:#be185d; padding:1px 6px; border-radius:4px; font-weight:700;">JPG/PNG</span> untuk Foto<br>
+                                <b>Maks ukuran:</b> <span style="color:#dc2626; font-weight:700;">2MB</span> per file &nbsp;·&nbsp; Foto dikompres otomatis
+                            </div>
                         </div>
-
-                        <!-- Card 3: Akta -->
-                        <div class="upload-card-item">
-                            <input type="file" id="file_akta" accept=".pdf" required onchange="updateFileName(this)">
-                            <div class="upload-icon-box"><i class="ph ph-scroll"></i></div>
-                            <span class="upload-label-text">Akta Kelahiran</span>
-                            <span class="upload-status-text" id="lbl-file_akta">Max 2MB (PDF Only)</span>
-                        </div>
-
-                        <!-- Card 4: SKB -->
-                        <div class="upload-card-item">
-                            <input type="file" id="file_skb" accept=".pdf" required onchange="updateFileName(this)">
-                            <div class="upload-icon-box"><i class="ph ph-certificate"></i></div>
-                            <span class="upload-label-text">Surat Kelakuan Baik</span>
-                            <span class="upload-status-text" id="lbl-file_skb">Max 2MB (PDF Only)</span>
-                        </div>
-
-                        <!-- Card 5: KTP -->
-                        <div class="upload-card-item">
-                            <input type="file" id="file_ktp_ortu" accept=".pdf" required onchange="updateFileName(this)">
-                            <div class="upload-icon-box"><i class="ph ph-identification-card"></i></div>
-                            <span class="upload-label-text">KTP Orang Tua (Gabung)</span>
-                            <span class="upload-status-text" id="lbl-file_ktp_ortu">Max 2MB (PDF Only)</span>
-                        </div>
-
-                        <!-- Card 6: Rapor -->
-                        <div class="upload-card-item">
-                            <input type="file" id="file_rapor" accept=".pdf" required onchange="updateFileName(this)">
-                            <div class="upload-icon-box"><i class="ph ph-book-open-text"></i></div>
-                            <span class="upload-label-text">Scan Rapor (5 Semester)</span>
-                            <span class="upload-status-text" id="lbl-file_rapor" style="color: var(--primary); font-weight: 700;">Max 2MB (PDF Only)</span>
+                        <div style="flex:1; min-width:200px; background:#fffbeb; border:1px solid #fcd34d; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:10px;">
+                            <i class="ph ph-file-pdf" style="font-size:1.3rem; color:#d97706; flex-shrink:0;"></i>
+                            <div style="font-size:0.82rem; color:#92400e; line-height:1.5;">
+                                <b>PDF terlalu besar?</b> Kompres gratis di:<br>
+                                <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#d97706; font-weight:700; text-decoration:underline;">ilovepdf.com</a> &nbsp;·&nbsp;
+                                <a href="https://smallpdf.com/compress-pdf" target="_blank" style="color:#d97706; font-weight:700; text-decoration:underline;">smallpdf.com</a>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Upload Grid: List Style -->
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+
+                        <!-- Foto -->
+                        <div class="upload-row-item" id="row-file_foto">
+                            <input type="file" id="file_foto" accept="image/png, image/jpeg, image/jpg" required onchange="updateFileName(this)">
+                            <div class="upload-row-left">
+                                <div class="upload-row-icon" style="background:#fce7f3; color:#be185d;"><i class="ph ph-user-focus"></i></div>
+                                <div>
+                                    <div class="upload-row-title">Pas Foto <span class="upload-badge-required">Wajib</span></div>
+                                    <div class="upload-row-hint">Latar biru · JPG/PNG · Maks 2MB · <em>Dikompres otomatis</em></div>
+                                </div>
+                            </div>
+                            <div class="upload-row-status" id="lbl-file_foto">
+                                <i class="ph ph-upload-simple"></i> Pilih File
+                            </div>
+                        </div>
+
+                        <!-- KK -->
+                        <div class="upload-row-item" id="row-file_kk">
+                            <input type="file" id="file_kk" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-row-left">
+                                <div class="upload-row-icon" style="background:#eff6ff; color:#2563eb;"><i class="ph ph-users-three"></i></div>
+                                <div>
+                                    <div class="upload-row-title">Kartu Keluarga (KK) <span class="upload-badge-required">Wajib</span></div>
+                                    <div class="upload-row-hint">PDF · Maks 2MB · Scan halaman yang memuat nama calon siswa</div>
+                                </div>
+                            </div>
+                            <div class="upload-row-status" id="lbl-file_kk">
+                                <i class="ph ph-upload-simple"></i> Pilih File
+                            </div>
+                        </div>
+
+                        <!-- Akta -->
+                        <div class="upload-row-item" id="row-file_akta">
+                            <input type="file" id="file_akta" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-row-left">
+                                <div class="upload-row-icon" style="background:#f0fdf4; color:#16a34a;"><i class="ph ph-scroll"></i></div>
+                                <div>
+                                    <div class="upload-row-title">Akta Kelahiran <span class="upload-badge-required">Wajib</span></div>
+                                    <div class="upload-row-hint">PDF · Maks 2MB · Akta asli atau fotokopi yang discan</div>
+                                </div>
+                            </div>
+                            <div class="upload-row-status" id="lbl-file_akta">
+                                <i class="ph ph-upload-simple"></i> Pilih File
+                            </div>
+                        </div>
+
+                        <!-- SKB -->
+                        <div class="upload-row-item" id="row-file_skb">
+                            <input type="file" id="file_skb" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-row-left">
+                                <div class="upload-row-icon" style="background:#fdf4ff; color:#9333ea;"><i class="ph ph-certificate"></i></div>
+                                <div>
+                                    <div class="upload-row-title">Surat Kelakuan Baik <span class="upload-badge-required">Wajib</span></div>
+                                    <div class="upload-row-hint">PDF · Maks 2MB · Dari sekolah asal / kelurahan</div>
+                                </div>
+                            </div>
+                            <div class="upload-row-status" id="lbl-file_skb">
+                                <i class="ph ph-upload-simple"></i> Pilih File
+                            </div>
+                        </div>
+
+                        <!-- KTP Ortu -->
+                        <div class="upload-row-item" id="row-file_ktp_ortu">
+                            <input type="file" id="file_ktp_ortu" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-row-left">
+                                <div class="upload-row-icon" style="background:#fff7ed; color:#ea580c;"><i class="ph ph-identification-card"></i></div>
+                                <div>
+                                    <div class="upload-row-title">KTP Orang Tua <span class="upload-badge-required">Wajib</span></div>
+                                    <div class="upload-row-hint">PDF · Maks 2MB · KTP Ayah & Ibu digabung dalam <b>1 file PDF</b></div>
+                                </div>
+                            </div>
+                            <div class="upload-row-status" id="lbl-file_ktp_ortu">
+                                <i class="ph ph-upload-simple"></i> Pilih File
+                            </div>
+                        </div>
+
+                        <!-- Rapor -->
+                        <div class="upload-row-item" id="row-file_rapor">
+                            <input type="file" id="file_rapor" accept=".pdf" required onchange="updateFileName(this)">
+                            <div class="upload-row-left">
+                                <div class="upload-row-icon" style="background:#f0fdfa; color:#0d9488;"><i class="ph ph-book-open-text"></i></div>
+                                <div>
+                                    <div class="upload-row-title">Scan Rapor <span class="upload-badge-required">Wajib</span></div>
+                                    <div class="upload-row-hint">PDF · Maks 2MB · <b>5 Semester</b> (Kelas 7 s/d 9 Sem.1) digabung 1 file</div>
+                                </div>
+                            </div>
+                            <div class="upload-row-status" id="lbl-file_rapor">
+                                <i class="ph ph-upload-simple"></i> Pilih File
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Progress bar upload keseluruhan -->
+                    <div style="margin-top:16px; background:#f1f5f9; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:12px;" id="upload-progress-bar">
+                        <i class="ph ph-check-circle" style="font-size:1.3rem; color:#94a3b8;"></i>
+                        <div style="flex:1;">
+                            <div style="font-size:0.8rem; color:#64748b; margin-bottom:4px;">Progress Upload Berkas</div>
+                            <div style="background:#e2e8f0; border-radius:99px; height:6px;">
+                                <div id="upload-progress-fill" style="height:6px; border-radius:99px; background:var(--primary); width:0%; transition:width 0.3s;"></div>
+                            </div>
+                        </div>
+                        <span id="upload-progress-text" style="font-size:0.85rem; font-weight:700; color:#64748b;">0/6</span>
+                    </div>
+
                 </div>
 
                 <!-- SECTION 5: DATA PRESTASI (KHUSUS JALUR PRESTASI) -->
@@ -451,58 +522,65 @@
 
         // Validasi untuk Upload Grid (Section 4)
         // Semua file sekarang batas maksimal 2MB (2048 KB)
+        const UPLOAD_IDS = ['file_foto','file_kk','file_akta','file_skb','file_ktp_ortu','file_rapor'];
+
+        function updateUploadProgress() {
+            const filled = UPLOAD_IDS.filter(id => {
+                const el = document.getElementById(id);
+                return el && el.files && el.files.length > 0;
+            }).length;
+            const pct = Math.round((filled / UPLOAD_IDS.length) * 100);
+            const fill = document.getElementById('upload-progress-fill');
+            const text = document.getElementById('upload-progress-text');
+            const icon = document.querySelector('#upload-progress-bar i');
+            if (fill) fill.style.width = pct + '%';
+            if (text) {
+                text.innerText = filled + '/' + UPLOAD_IDS.length;
+                text.style.color = filled === UPLOAD_IDS.length ? '#10b981' : '#64748b';
+            }
+            if (icon) icon.className = filled === UPLOAD_IDS.length ? 'ph ph-check-circle' : 'ph ph-upload-simple';
+            if (fill) fill.style.background = filled === UPLOAD_IDS.length ? '#10b981' : 'var(--primary)';
+        }
+
         function updateFileName(input) {
             const label = document.getElementById('lbl-' + input.id);
+            const row = document.getElementById('row-' + input.id);
             const file = input.files[0];
-            
-            if (file) {
-                const limit = 2048; // 2MB untuk semua berkas
 
+            if (file) {
+                const limit = 2048;
                 let typeMsg = 'PDF';
                 if (input.id === 'file_foto') typeMsg = 'JPG/PNG';
 
-                // Cek Tipe
                 const isPdf = file.type === 'application/pdf';
                 const isImage = file.type.startsWith('image/');
-                let validFormat = false;
-
-                if (input.id === 'file_foto' && isImage) validFormat = true;
-                else if (input.id !== 'file_foto' && isPdf) validFormat = true;
+                let validFormat = (input.id === 'file_foto') ? isImage : isPdf;
 
                 if (!validFormat) {
                     Swal.fire('Format Salah', `File harus berupa ${typeMsg}.`, 'error');
                     input.value = '';
-                    if (label) {
-                        label.innerText = `Format salah! Harus ${typeMsg}`;
-                        label.style.color = '#dc2626';
-                    }
-                    input.parentElement.style.borderColor = '#dc2626';
-                    input.parentElement.style.backgroundColor = '#fef2f2';
+                    if (label) label.innerHTML = `<i class="ph ph-x-circle"></i> Format salah! Harus ${typeMsg}`;
+                    if (row) { row.classList.remove('uploaded'); row.classList.add('error'); }
+                    updateUploadProgress();
                     return;
                 }
 
-                // Cek Ukuran
                 const sizeKB = file.size / 1024;
                 if (sizeKB > limit) {
-                    Swal.fire('File Terlalu Besar', `Ukuran file (${(sizeKB/1024).toFixed(2)} MB) melebihi batas maksimal 2 MB.`, 'error');
+                    Swal.fire('File Terlalu Besar', `Ukuran file (${(sizeKB/1024).toFixed(2)} MB) melebihi batas 2 MB.<br><br>Kompres PDF di <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#2563eb;">ilovepdf.com</a>`, 'error');
                     input.value = '';
-                    if (label) {
-                        label.innerText = `Terlalu Besar! Max 2MB`;
-                        label.style.color = '#dc2626';
-                    }
-                    input.parentElement.style.borderColor = '#dc2626';
-                    input.parentElement.style.backgroundColor = '#fef2f2';
+                    if (label) label.innerHTML = `<i class="ph ph-x-circle"></i> Terlalu besar!`;
+                    if (row) { row.classList.remove('uploaded'); row.classList.add('error'); }
+                    updateUploadProgress();
                     return;
                 }
 
-                // Jika Valid
-                if (label) {
-                    label.innerText = file.name;
-                    label.style.color = 'var(--primary)';
-                    label.style.fontWeight = 'bold';
-                }
-                input.parentElement.style.borderColor = 'var(--primary)';
-                input.parentElement.style.backgroundColor = '#f0fdfa';
+                // Valid
+                const shortName = file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name;
+                const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                if (label) label.innerHTML = `<i class="ph ph-check-circle"></i> ${shortName} <span style="color:#94a3b8;">(${sizeMB}MB)</span>`;
+                if (row) { row.classList.remove('error'); row.classList.add('uploaded'); }
+                updateUploadProgress();
             }
         }
 
