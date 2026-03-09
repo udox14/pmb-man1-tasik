@@ -419,7 +419,7 @@ function compressImage(file, quality) {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                const MAX_WIDTH = 1800;
+                const MAX_WIDTH = 2000;
                 if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
@@ -545,7 +545,7 @@ window.submitForm = async function() {
                 let file = fileInput.files[0];
                 if (autoCompress && file.type.startsWith('image/')) {
                     try {
-                        const compressedBlob = await compressImage(file, 0.92);
+                        const compressedBlob = await compressImage(file, 0.95);
                         if (compressedBlob.size < file.size) file = compressedBlob;
                     } catch (e) { console.warn("Compress fail", e); }
                 }
