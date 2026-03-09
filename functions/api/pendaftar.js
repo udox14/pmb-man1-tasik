@@ -42,11 +42,13 @@ export async function onRequestPost(context) {
   try {
     const body = await request.json();
 
-    // Generate no_pendaftaran: PMB-YYYYMMDD-XXXX
-    const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const rand = Math.floor(1000 + Math.random() * 9000);
-    const no_pendaftaran = `PMB-${dateStr}-${rand}`;
+    // Generate no_pendaftaran format 2627XXX — berurutan
+    // 26 = tahun masuk, 27 = tahun lulus, XXX = nomor urut 3 digit
+    const countRow = await env.DB.prepare(
+      'SELECT COUNT(*) as total FROM pendaftar'
+    ).first();
+    const urut = (countRow.total || 0) + 1;
+    const no_pendaftaran = `2627${String(urut).padStart(3, '0')}`;
 
     const id = crypto.randomUUID();
 

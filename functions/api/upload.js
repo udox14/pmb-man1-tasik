@@ -40,10 +40,10 @@ export async function onRequestPost(context) {
       httpMetadata: { contentType: file.type || 'application/octet-stream' },
     });
 
-    // Public URL via R2 custom domain atau workers URL
-    // Format: https://pub-{hash}.r2.dev/{key} jika public bucket
-    // Kita return path saja, nanti di-handle via /api/file/[key]
-    const publicUrl = `/api/file/${key}`;
+    // Ambil base URL dari request untuk buat absolute URL
+    const requestUrl = new URL(request.url);
+    const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
+    const publicUrl = `${baseUrl}/api/file/${key}`;
 
     return Response.json({ url: publicUrl, key }, { headers: CORS });
   } catch (err) {
