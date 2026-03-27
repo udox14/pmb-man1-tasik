@@ -225,9 +225,9 @@
             margin: 0;
         }
 
-        /* "Tahun Ajaran 2026/2027" — teal, 2rem */
+        /* "Tahun Ajaran 2026/2027" — teal, 1.5rem */
         .hl-ta {
-            font-size: clamp(1rem, 2.2vw, 2rem);
+            font-size: clamp(1rem, 2.2vw, 1.5rem);
             font-weight: 700;
             color: var(--teal);
             letter-spacing: .5px;
@@ -309,15 +309,19 @@
             box-shadow: 0 4px 20px rgba(217,119,6,.4) !important;
             transform: none !important;
         }
-        .jalur-tab.disabled {
-            opacity: .3 !important;
+        /* Disabled: netral abu, warna teal/gold tidak bocor */
+        .jalur-tab.disabled,
+        #tab-reguler.active.disabled,
+        #tab-prestasi.active.disabled {
             cursor: not-allowed !important;
             pointer-events: none !important;
-            filter: none !important;
-            background: rgba(255,255,255,.04) !important;
-            color: rgba(255,255,255,.25) !important;
+            background: rgba(255,255,255,.07) !important;
+            color: rgba(255,255,255,.3) !important;
             box-shadow: none !important;
-            border-color: rgba(255,255,255,.06) !important;
+            border-color: rgba(255,255,255,.08) !important;
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
         }
 
         /* ── NISN input row ── */
@@ -375,8 +379,11 @@
             transform: none !important;
         }
         .compact-action .btn:disabled {
-            background: rgba(255,255,255,.2) !important;
-            color: rgba(255,255,255,.5) !important;
+            background: rgba(255,255,255,.15) !important;
+            color: rgba(255,255,255,.55) !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
+            cursor: not-allowed !important;
+            letter-spacing: .1px !important;
         }
 
         /* Link Alur Pendaftaran — hanya tampil di mobile */
@@ -1242,7 +1249,7 @@
                     <span class="h-stat-label">Tes Pembuktian Prestasi</span>
                 </div>
                 <div class="h-stat">
-                    <span class="h-stat-num">20 April – 20 Mei</span>
+                    <span class="h-stat-num">20 Apr – 20 Mei</span>
                     <span class="h-stat-label">Pendaftaran Jalur Reguler</span>
                 </div>
                 <div class="h-stat">
