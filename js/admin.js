@@ -1143,7 +1143,7 @@ window.viewDetail = async function(id) {
             document.body.appendChild(fvEl);
         }
 
-        function openFileViewer(btnIndex) {
+        window.openFileViewer = function(btnIndex) {
             const allFiles = [
                 { label: 'Foto Siswa',          url: p.foto_url,                      type: 'img' },
                 { label: 'Kartu Keluarga',       url: p.scan_kk_url,                   type: 'pdf' },
@@ -1158,11 +1158,11 @@ window.viewDetail = async function(id) {
             const idx = fvFiles.findIndex(f => f.url === clicked.url);
             if (idx === -1) return;
             fvCurrent = idx;
-            renderFileViewer();
+            window.renderFileViewer();
             document.getElementById('fv-overlay-body').classList.add('open');
         }
 
-        function renderFileViewer() {
+        window.renderFileViewer = function() {
             const f = fvFiles[fvCurrent];
             if (!f) return;
             document.getElementById('fv-title').textContent   = f.label;
@@ -1200,7 +1200,7 @@ window.viewDetail = async function(id) {
             const nxt = fvCurrent + dir;
             if (nxt < 0 || nxt >= fvFiles.length) return;
             fvCurrent = nxt;
-            renderFileViewer();
+            window.renderFileViewer();
         };
 
         window.closeFileViewer = function() {
