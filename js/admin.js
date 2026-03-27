@@ -880,12 +880,13 @@ window.viewDetail = async function(id) {
                         .detail-grid { grid-template-columns: 1fr 1fr; }
                     }
 
-                    /* ── File Viewer Overlay ── */
-                    .fv-overlay {
-                        display: none; position: fixed; inset: 0; z-index: 99999;
-                        background: rgba(0,0,0,.88); flex-direction: column;
+                    /* ── File Viewer Overlay ── (di-inject ke body, bukan dalam Swal) */
+                    .fv-overlay-body {
+                        display: none; position: fixed; inset: 0; z-index: 2147483647;
+                        background: rgba(0,0,0,.92); flex-direction: column;
+                        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
                     }
-                    .fv-overlay.open { display: flex; }
+                    .fv-overlay-body.open { display: flex; }
                     .fv-topbar {
                         height: 52px; background: #0d1b2a; display: flex;
                         align-items: center; justify-content: space-between;
@@ -969,31 +970,6 @@ window.viewDetail = async function(id) {
                             <i class="ph ph-book-open-text"></i> Rapor
                         </a>
                         ${p.scan_sertifikat_prestasi_url ? `<a href="#" onclick="openFileViewer(6);return false;" class="file-btn" id="fb-6"><i class="ph ph-trophy"></i> Sertifikat Prestasi</a>` : ''}
-
-                        <!-- File Viewer Overlay -->
-                        <div class="fv-overlay" id="fv-overlay">
-                            <div class="fv-topbar">
-                                <span class="fv-title" id="fv-title">—</span>
-                                <span class="fv-counter" id="fv-counter"></span>
-                                <button class="fv-close" onclick="closeFileViewer()" title="Tutup (Esc)">
-                                    <i class="ph ph-x"></i>
-                                </button>
-                            </div>
-                            <div class="fv-body" id="fv-body">
-                                <button class="fv-nav fv-prev" id="fv-prev" onclick="stepFileViewer(-1)">
-                                    <i class="ph ph-caret-left"></i>
-                                </button>
-                                <iframe class="fv-frame" id="fv-frame" src="about:blank"></iframe>
-                                <img class="fv-img" id="fv-img" src="" style="display:none;" alt="">
-                                <button class="fv-nav fv-next" id="fv-next" onclick="stepFileViewer(1)">
-                                    <i class="ph ph-caret-right"></i>
-                                </button>
-                            </div>
-                            <div class="fv-hints">
-                                <span class="fv-hint"><kbd>←</kbd><kbd>→</kbd> navigasi berkas</span>
-                                <span class="fv-hint"><kbd>Esc</kbd> tutup</span>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- KANAN: header + body -->
@@ -1136,9 +1112,38 @@ window.viewDetail = async function(id) {
 
         let fvCurrent = 0;
 
+        // ── Inject overlay ke document.body agar lepas dari Swal ──────
+        let fvEl = document.getElementById('fv-overlay-body');
+        if (!fvEl) {
+            fvEl = document.createElement('div');
+            fvEl.id        = 'fv-overlay-body';
+            fvEl.className = 'fv-overlay-body';
+            fvEl.innerHTML = `
+                <div class="fv-topbar">
+                    <span class="fv-title" id="fv-title">—</span>
+                    <span class="fv-counter" id="fv-counter"></span>
+                    <button class="fv-close" onclick="window.closeFileViewer()" title="Tutup (Esc)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+                <div class="fv-body">
+                    <button class="fv-nav fv-prev" id="fv-prev" onclick="window.stepFileViewer(-1)">
+                        <i class="ph ph-caret-left"></i>
+                    </button>
+                    <iframe class="fv-frame" id="fv-frame" src="about:blank"></iframe>
+                    <img class="fv-img" id="fv-img" src="" style="display:none;" alt="">
+                    <button class="fv-nav fv-next" id="fv-next" onclick="window.stepFileViewer(1)">
+                        <i class="ph ph-caret-right"></i>
+                    </button>
+                </div>
+                <div class="fv-hints">
+                    <span class="fv-hint"><kbd>←</kbd><kbd>→</kbd> navigasi berkas</span>
+                    <span class="fv-hint"><kbd>Esc</kbd> tutup</span>
+                </div>`;
+            document.body.appendChild(fvEl);
+        }
+
         function openFileViewer(btnIndex) {
-            // Cari file berdasarkan index btn (0=foto, 1=kk, dst)
-            // Tapi setelah filter, index bisa bergeser — cari by label/url
             const allFiles = [
                 { label: 'Foto Siswa',          url: p.foto_url,                      type: 'img' },
                 { label: 'Kartu Keluarga',       url: p.scan_kk_url,                   type: 'pdf' },
@@ -1154,32 +1159,27 @@ window.viewDetail = async function(id) {
             if (idx === -1) return;
             fvCurrent = idx;
             renderFileViewer();
-            document.getElementById('fv-overlay').classList.add('open');
+            document.getElementById('fv-overlay-body').classList.add('open');
         }
 
         function renderFileViewer() {
             const f = fvFiles[fvCurrent];
             if (!f) return;
-            const title   = document.getElementById('fv-title');
-            const counter = document.getElementById('fv-counter');
-            const frame   = document.getElementById('fv-frame');
-            const img     = document.getElementById('fv-img');
-            const prev    = document.getElementById('fv-prev');
-            const next    = document.getElementById('fv-next');
+            document.getElementById('fv-title').textContent   = f.label;
+            document.getElementById('fv-counter').textContent = (fvCurrent + 1) + ' / ' + fvFiles.length;
+            document.getElementById('fv-prev').disabled = fvCurrent === 0;
+            document.getElementById('fv-next').disabled = fvCurrent === fvFiles.length - 1;
+            const frame = document.getElementById('fv-frame');
+            const img   = document.getElementById('fv-img');
 
-            title.textContent   = f.label;
-            counter.textContent = (fvCurrent + 1) + ' / ' + fvFiles.length;
-            prev.disabled = fvCurrent === 0;
-            next.disabled = fvCurrent === fvFiles.length - 1;
-
-            // Highlight active button di sidebar
+            // Highlight active file-btn di sidebar Swal
             document.querySelectorAll('.file-btn').forEach(b => b.classList.remove('fv-active'));
-            const allFiles2 = [
+            const origUrls = [
                 p.foto_url, p.scan_kk_url, p.scan_akta_url,
                 p.scan_skb_url, p.scan_ktp_ortu_url,
                 p.scan_rapor_url, p.scan_sertifikat_prestasi_url
             ];
-            const origIdx = allFiles2.indexOf(f.url);
+            const origIdx = origUrls.indexOf(f.url);
             if (origIdx >= 0) {
                 const btn = document.getElementById('fb-' + origIdx);
                 if (btn) btn.classList.add('fv-active');
@@ -1197,14 +1197,15 @@ window.viewDetail = async function(id) {
         }
 
         window.stepFileViewer = function(dir) {
-            const next = fvCurrent + dir;
-            if (next < 0 || next >= fvFiles.length) return;
-            fvCurrent = next;
+            const nxt = fvCurrent + dir;
+            if (nxt < 0 || nxt >= fvFiles.length) return;
+            fvCurrent = nxt;
             renderFileViewer();
         };
 
         window.closeFileViewer = function() {
-            document.getElementById('fv-overlay').classList.remove('open');
+            const ov = document.getElementById('fv-overlay-body');
+            if (ov) ov.classList.remove('open');
             const frame = document.getElementById('fv-frame');
             if (frame) frame.src = 'about:blank';
             document.querySelectorAll('.file-btn').forEach(b => b.classList.remove('fv-active'));
@@ -1212,8 +1213,8 @@ window.viewDetail = async function(id) {
 
         // Keyboard navigation
         document.addEventListener('keydown', function fvKeyHandler(e) {
-            const overlay = document.getElementById('fv-overlay');
-            if (!overlay || !overlay.classList.contains('open')) {
+            const ov = document.getElementById('fv-overlay-body');
+            if (!ov || !ov.classList.contains('open')) {
                 document.removeEventListener('keydown', fvKeyHandler);
                 return;
             }
@@ -1556,6 +1557,106 @@ window.aturJalur = async function() {
 }
 
 // ==========================================
-// 12. INISIALISASI
+// 12. RESET DATABASE
+// ==========================================
+window.resetDatabase = async function() {
+    // Step 1: Konfirmasi pertama
+    const step1 = await Swal.fire({
+        title: 'Reset Semua Data?',
+        html: `
+            <p style="color:#334155; font-size:.9rem; line-height:1.6; margin-bottom:12px;">
+                Tindakan ini akan <b>menghapus permanen</b> seluruh data pendaftar
+                dan data prestasi dari database.
+            </p>
+            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px;
+                        padding:12px 14px; text-align:left; font-size:.82rem; color:#991b1b; line-height:1.6;">
+                <b>Yang akan dihapus:</b><br>
+                &bull; Seluruh data pendaftar<br>
+                &bull; Seluruh data prestasi<br>
+                &bull; Nomor urut pendaftaran kembali ke awal<br><br>
+                <b>Yang tidak terpengaruh:</b><br>
+                &bull; Berkas/file di R2 (foto, dokumen) — hapus manual jika perlu<br>
+                &bull; Akun admin<br>
+                &bull; Pengaturan sistem (buka/tutup jalur, tanggal pengumuman)
+            </div>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Lanjutkan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc2626',
+        focusCancel: true,
+    });
+
+    if (!step1.isConfirmed) return;
+
+    // Step 2: Konfirmasi kedua — ketik RESET
+    const step2 = await Swal.fire({
+        title: 'Konfirmasi Akhir',
+        html: `<p style="color:#334155; font-size:.88rem; margin-bottom:12px;">
+                   Ketik <b>RESET</b> untuk melanjutkan. Tindakan ini tidak dapat dibatalkan.
+               </p>`,
+        input: 'text',
+        inputPlaceholder: 'Ketik RESET di sini',
+        inputAttributes: {
+            autocomplete: 'off',
+            style: 'text-transform:uppercase; letter-spacing:2px; font-weight:700; text-align:center;'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Hapus Semua Data',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc2626',
+        preConfirm: (val) => {
+            if (val.trim().toUpperCase() !== 'RESET') {
+                Swal.showValidationMessage('Ketik RESET (huruf kapital) untuk melanjutkan');
+                return false;
+            }
+            return true;
+        }
+    });
+
+    if (!step2.isConfirmed) return;
+
+    // Proses
+    Swal.fire({
+        title: 'Menghapus Data...',
+        text: 'Mohon tunggu sebentar',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        const res = await fetch('/api/reset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Reset-Confirm': 'YES_DELETE_ALL',
+            }
+        });
+
+        const result = await res.json();
+
+        if (!res.ok || result.error) {
+            throw new Error(result.error || 'Gagal mereset data.');
+        }
+
+        await Swal.fire({
+            icon: 'success',
+            title: 'Data Berhasil Dihapus',
+            text: 'Semua data pendaftar telah dihapus. Nomor urut akan mulai dari awal.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#00796b',
+        });
+
+        // Reload tampilan
+        loadPendaftar();
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire('Gagal', err.message, 'error');
+    }
+};
+
+// ==========================================
+// 13. INISIALISASI
 // ==========================================
 loadPendaftar();
