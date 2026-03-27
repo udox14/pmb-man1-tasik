@@ -3,287 +3,1223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - PMB MAN 1 Tasikmalaya</title>
+    <title>Admin Panel — PMB MAN 1 Tasikmalaya</title>
     <link rel="icon" href="../images/logo.png" type="image/png">
-
-    <!-- Gunakan CSS Global -->
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- LIBRARIES UNTUK EXPORT EXCEL & ZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        /* ================================================================
+           TOKENS
+        ================================================================ */
+        :root {
+            --ink:        #0d1b2a;
+            --ink-mid:    #334155;
+            --ink-soft:   #64748b;
+            --ink-faint:  #94a3b8;
+            --rule:       #e2e8f0;
+            --rule-dark:  #cbd5e1;
+            --surface:    #ffffff;
+            --bg:         #f1f5f9;
+            --teal:       #00796b;
+            --teal-dark:  #004d40;
+            --teal-dim:   #e0f2f1;
+            --gold:       #d97706;
+            --ok:         #16a34a;
+            --err:        #dc2626;
+            --radius:     8px;
+            --sidebar-w:  240px;
+            --topbar-h:   56px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            background-image: none;
+            color: var(--ink);
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            padding-top: 0;
+            overflow-x: hidden;
+        }
+
+        /* ================================================================
+           LAYOUT
+        ================================================================ */
+        .admin-body { padding-top: 0; }
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================================================================
+           SIDEBAR
+        ================================================================ */
+        .admin-sidebar {
+            width: var(--sidebar-w);
+            background: var(--ink);
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            transition: transform .25s cubic-bezier(.4,0,.2,1);
+            border-right: none;
+        }
+
+        /* Sidebar header */
+        .sidebar-header {
+            height: var(--topbar-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-brand-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--teal);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        .sidebar-brand-text {
+            font-size: .78rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* Mobile close button */
+        .mobile-close-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,.5);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color .15s;
+        }
+        .mobile-close-btn:hover { color: white; }
+
+        /* Sidebar nav */
+        .sidebar-menu {
+            flex: 1;
+            padding: 12px 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: var(--radius);
+            color: rgba(255,255,255,.45);
+            text-decoration: none;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            white-space: nowrap;
+            border: none;
+            background: none;
+        }
+        .menu-item i {
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            width: 18px;
+            text-align: center;
+        }
+        .menu-item:hover {
+            background: rgba(255,255,255,.07);
+            color: rgba(255,255,255,.85);
+        }
+        .menu-item.active {
+            background: rgba(255,255,255,.1);
+            color: white;
+        }
+
+        .menu-section-label {
+            font-size: .62rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.2);
+            padding: 16px 12px 6px;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,.06);
+            margin: 8px 10px;
+        }
+
+        .menu-item--danger { color: rgba(239,68,68,.7); }
+        .menu-item--danger:hover { background: rgba(239,68,68,.1); color: #f87171; }
+
+        /* Sidebar bottom */
+        .sidebar-footer {
+            padding: 12px 10px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            flex-shrink: 0;
+        }
+
+        /* ================================================================
+           MAIN
+        ================================================================ */
+        .admin-main {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left .25s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* ── Topbar ───────────────────────────────────────────────── */
+        .admin-topbar {
+            height: var(--topbar-h);
+            background: var(--surface);
+            border-bottom: 1px solid var(--rule);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--ink-mid);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            transition: background .15s;
+        }
+        .toggle-btn:hover { background: var(--bg); }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .topbar-admin-label {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--ink-mid);
+        }
+        .topbar-avatar {
+            width: 30px;
+            height: 30px;
+            background: var(--ink);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 800;
+        }
+
+        /* ── Content pad ──────────────────────────────────────────── */
+        .admin-content-pad {
+            padding: 24px;
+            flex: 1;
+        }
+
+        /* ── Admin panels ─────────────────────────────────────────── */
+        .admin-panel { display: none; animation: fadeInUp .25s ease; }
+        .admin-panel.active { display: block; }
+
+        /* ================================================================
+           STAT CARDS
+        ================================================================ */
+        .stats-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card-modern {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .bg-blue   { background: #eff6ff; color: #2563eb; }
+        .bg-yellow { background: #fefce8; color: #ca8a04; }
+        .bg-green  { background: #f0fdf4; color: var(--ok); }
+
+        .stat-card-modern h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1;
+            margin: 0 0 3px;
+            letter-spacing: -1px;
+        }
+        .stat-card-modern small {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--ink-faint);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        /* ================================================================
+           BULK ACTIONS BAR
+        ================================================================ */
+        .bulk-actions-bar {
+            background: var(--ink);
+            color: white;
+            padding: 10px 16px;
+            border-radius: var(--radius);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 10px;
+            font-size: .8rem;
+            font-weight: 600;
+            animation: slideDown .2s ease;
+        }
+        .bulk-actions-bar.show { display: flex; }
+        .bulk-actions-bar b { color: white; }
+
+        .bulk-actions-bar .btn {
+            padding: 7px 14px;
+            font-size: .78rem;
+            font-weight: 700;
+            border-radius: 6px;
+        }
+        .bulk-actions-bar .btn-primary {
+            background: var(--teal);
+            color: white;
+            box-shadow: none;
+        }
+        .bulk-actions-bar .btn-secondary {
+            background: rgba(255,255,255,.12);
+            color: white;
+            border: 1px solid rgba(255,255,255,.15);
+        }
+        .bulk-actions-bar .btn-secondary:hover { background: rgba(255,255,255,.2); }
+
+        /* ================================================================
+           ADMIN CARD
+        ================================================================ */
+        .admin-card {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        /* ── Table controls ───────────────────────────────────────── */
+        .table-controls {
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--rule);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .table-controls-left {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Shared control input style */
+        .ctrl-input {
+            padding: 8px 12px;
+            border: 1px solid var(--rule-dark);
+            border-radius: var(--radius);
+            font-size: .78rem;
+            font-weight: 500;
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: border-color .15s;
+            font-family: inherit;
+        }
+        .ctrl-input:focus { border-color: var(--teal); }
+
+        select.ctrl-input {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: .85em;
+            padding-right: 28px;
+            cursor: pointer;
+        }
+
+        .search-box input {
+            padding: 8px 12px 8px 34px;
+            border: 1px solid var(--rule-dark);
+            border-radius: var(--radius);
+            font-size: .78rem;
+            width: 220px;
+            outline: none;
+            background: var(--surface);
+            color: var(--ink);
+            transition: border-color .15s;
+            font-family: inherit;
+        }
+        .search-box { position: relative; }
+        .search-box::before {
+            content: '\e1d8'; /* ph-magnifying-glass */
+            font-family: 'Phosphor';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-faint);
+            font-size: .9rem;
+            pointer-events: none;
+        }
+        .search-box input:focus { border-color: var(--teal); }
+
+        /* ── Table ────────────────────────────────────────────────── */
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
+        }
+        .admin-table th {
+            padding: 10px 14px;
+            text-align: left;
+            background: var(--bg);
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            border-bottom: 1px solid var(--rule);
+            white-space: nowrap;
+        }
+        .admin-table th[style*="cursor: pointer"] { cursor: pointer; }
+        .admin-table th i { opacity: .4; margin-left: 3px; }
+
+        .admin-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--rule);
+            vertical-align: middle;
+            color: var(--ink-mid);
+        }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover td { background: var(--bg); }
+
+        .student-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .student-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--rule);
+            background: var(--bg);
+            flex-shrink: 0;
+        }
+        .student-name {
+            font-weight: 700;
+            color: var(--ink);
+            font-size: .8rem;
+            line-height: 1.3;
+        }
+        .student-nisn {
+            font-size: .7rem;
+            color: var(--ink-faint);
+        }
+
+        /* Badges */
+        .badge-modern {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 99px;
+            font-size: .67rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+        .badge-green  { background: #dcfce7; color: #166534; }
+        .badge-red    { background: #fee2e2; color: #991b1b; }
+        .badge-yellow { background: #fef9c3; color: #854d0e; }
+        .badge-blue   { background: #dbeafe; color: #1e40af; }
+        .badge-gray   { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--rule); }
+
+        /* Action button in table */
+        .btn-table-action {
+            padding: 5px 12px;
+            border: 1px solid var(--rule-dark);
+            background: var(--surface);
+            border-radius: 6px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--ink-mid);
+            cursor: pointer;
+            transition: border-color .15s, background .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-table-action:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
+
+        /* Checkbox */
+        input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--teal);
+            cursor: pointer;
+        }
+
+        /* ── Pagination ───────────────────────────────────────────── */
+        .pagination-container {
+            padding: 12px 18px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 4px;
+            border-top: 1px solid var(--rule);
+        }
+        .page-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--rule);
+            border-radius: 6px;
+            background: var(--surface);
+            font-size: .75rem;
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+        .page-btn:hover { background: var(--bg); }
+        .page-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+        .page-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+        /* ================================================================
+           PANEL JADWAL
+        ================================================================ */
+        .panel-section-title {
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            padding: 16px 20px 12px;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .panel-section-body { padding: 20px; }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: .74rem;
+            font-weight: 700;
+            color: var(--ink-mid);
+            margin-bottom: 5px;
+        }
+        .input-modern-form {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--rule-dark);
+            border-radius: var(--radius);
+            font-size: .82rem;
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: border-color .15s;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .input-modern-form:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,121,107,.1); }
+        textarea.input-modern-form { resize: vertical; }
+
+        select.input-modern-form {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: .85em;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+
+        /* Note box */
+        .info-note {
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--teal);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            font-size: .75rem;
+            color: var(--ink-soft);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .info-note b { color: var(--ink); }
+
+        /* Filter bar inside panel */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--rule);
+            background: var(--bg);
+        }
+        .filter-bar-label {
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            margin-right: 4px;
+        }
+        .filter-bar-count {
+            margin-left: auto;
+            font-size: .75rem;
+            color: var(--ink-soft);
+        }
+        .filter-bar-count b { color: var(--teal); font-size: .9rem; }
+
+        /* Jadwal card action row */
+        .card-action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .card-action-row h3 {
+            font-size: .88rem;
+            font-weight: 800;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+        .card-action-row h3 i { color: var(--ink-soft); }
+
+        /* ================================================================
+           PANEL EXPORT
+        ================================================================ */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .export-card {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .export-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--ink-mid);
+        }
+        .export-card h3 {
+            font-size: .92rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0;
+            line-height: 1.3;
+        }
+        .export-card p {
+            font-size: .78rem;
+            color: var(--ink-soft);
+            line-height: 1.65;
+            margin: 0;
+            flex: 1;
+        }
+        .export-card .info-note { margin-bottom: 0; }
+        .export-card .btn-export {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            background: var(--ink);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: .8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .export-card .btn-export:hover { background: var(--teal-dark); }
+        .export-card .btn-export i { font-size: .95rem; }
+
+        /* ================================================================
+           BUTTONS
+        ================================================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: .8rem;
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+            border: none;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        .btn:hover { transform: none; }
+        .btn-primary {
+            background: var(--teal);
+            color: white;
+            box-shadow: none;
+        }
+        .btn-primary:hover { background: var(--teal-dark); }
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--ink-mid);
+            border: 1px solid var(--rule-dark);
+        }
+        .btn-secondary:hover { background: var(--bg); }
+        .btn-sm { padding: 7px 13px; font-size: .74rem; }
+
+        /* ================================================================
+           MOBILE
+        ================================================================ */
+        @media (max-width: 900px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                width: 260px !important;
+                box-shadow: none;
+            }
+            .admin-sidebar.mobile-open {
+                transform: translateX(0);
+                box-shadow: 8px 0 40px rgba(0,0,0,.25);
+            }
+            .mobile-close-btn { display: flex; }
+
+            .admin-main { margin-left: 0 !important; width: 100% !important; }
+            .admin-main.expanded { margin-left: 0 !important; }
+
+            .stats-grid-modern { grid-template-columns: 1fr 1fr; }
+            .stat-card-modern { padding: 14px; gap: 12px; }
+            .stat-card-modern h2 { font-size: 1.3rem; }
+
+            .admin-content-pad { padding: 14px; }
+            .table-controls { flex-direction: column; align-items: stretch; gap: 8px; }
+            .table-controls-left { flex-wrap: wrap; }
+            .search-box input { width: 100%; }
+
+            .bulk-actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .bulk-actions-bar > div:last-child {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            #btn-bulk-jadwal, #btn-bulk-zip { grid-column: 1 / -1; }
+
+            /* Table → card layout on mobile */
+            .admin-table thead { display: none; }
+            .admin-table,
+            .admin-table tbody,
+            .admin-table tr,
+            .admin-table td { display: block; width: 100%; }
+
+            .admin-table tr {
+                background: var(--surface);
+                border: 1px solid var(--rule);
+                border-radius: 10px;
+                margin-bottom: 10px;
+                padding: 8px 12px;
+            }
+            .admin-table tr:hover td { background: transparent; }
+
+            .admin-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid var(--rule);
+                font-size: .78rem;
+            }
+            .admin-table td:last-child { border-bottom: none; padding-bottom: 0; }
+            .admin-table td::before {
+                content: attr(data-label);
+                font-size: .65rem;
+                font-weight: 700;
+                color: var(--ink-faint);
+                text-transform: uppercase;
+                letter-spacing: .4px;
+                margin-right: 12px;
+                white-space: nowrap;
+            }
+
+            .admin-table td[data-label="Peserta"] {
+                flex-direction: column;
+                align-items: flex-start;
+                background: var(--bg);
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 4px;
+            }
+            .admin-table td[data-label="Peserta"]::before { display: none; }
+
+            .admin-table td[data-label="Pilih"] { justify-content: flex-start; gap: 8px; }
+            .admin-table td[data-label="Pilih"]::before { content: "Pilih"; }
+
+            .admin-table td[data-label="Aksi"]::before { display: none; }
+            .admin-table td[data-label="Aksi"] button { width: 100%; justify-content: center; }
+
+            .admin-table td select.input-modern-form { width: auto; font-size: .75rem; }
+
+            .filter-bar { padding: 10px 14px; }
+            .filter-bar select { font-size: .75rem; }
+
+            .card-action-row { padding: 12px 14px; }
+            .panel-section-body { padding: 14px; }
+
+            .export-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid-modern { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body class="admin-body">
 
-    <div class="admin-wrapper">
-        
-        <!-- SIDEBAR -->
-        <aside class="admin-sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div style="display: flex; align-items: center;">
-                    <i class="ph ph-shield-check" style="font-size: 1.8rem; color: var(--accent);"></i>
-                    <span class="sidebar-brand-text">ADMIN PMB</span>
+<div class="admin-wrapper">
+
+    <!-- ══════════════════════════════════════
+         SIDEBAR
+    ══════════════════════════════════════ -->
+    <aside class="admin-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon">
+                    <i class="ph ph-shield-check"></i>
                 </div>
-                <!-- Tombol Close Khusus Mobile -->
-                <button class="mobile-close-btn" onclick="toggleSidebar()">
-                    <i class="ph ph-x"></i>
-                </button>
+                <span class="sidebar-brand-text">Admin PMB</span>
             </div>
-            <nav class="sidebar-menu">
-                <a href="#" id="menu-pendaftar" class="menu-item active" onclick="switchAdminPanel('pendaftar')">
-                    <i class="ph ph-users"></i><span>Data Pendaftar</span>
-                </a>
-                <a href="#" id="menu-jadwal" class="menu-item" onclick="switchAdminPanel('jadwal')">
-                    <i class="ph ph-calendar-plus"></i><span>Panel Penjadwalan</span>
-                </a>
-                
-                <!-- MENU BARU: EXPORT DATA -->
-                <a href="#" id="menu-export" class="menu-item" onclick="switchAdminPanel('export')" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
-                    <i class="ph ph-export"></i><span style="color: var(--accent); font-weight: bold;">Export Data & Berkas</span>
-                </a>
-                
-                <a href="#" class="menu-item" onclick="aturJalur()" style="margin-top: 20px;">
-                    <i class="ph ph-gear"></i><span>Pengaturan Sistem</span>
-                </a>
-                <a href="#" class="menu-item" onclick="logout()" style="margin-top: 30px; color: #f87171;">
-                    <i class="ph ph-sign-out"></i><span>Keluar</span>
-                </a>
-            </nav>
-        </aside>
+            <button class="mobile-close-btn" onclick="toggleSidebar()">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
 
-        <!-- MAIN CONTENT -->
-        <main class="admin-main" id="mainContent">
-            
-            <!-- TOPBAR -->
-            <div class="admin-topbar">
-                <button class="toggle-btn" onclick="toggleSidebar()">
-                    <i class="ph ph-list"></i>
-                </button>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <span style="font-size: 0.9rem; font-weight: 600;">Administrator</span>
-                    <div style="width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">A</div>
-                </div>
+        <nav class="sidebar-menu">
+            <span class="menu-section-label">Menu</span>
+
+            <a href="#" id="menu-pendaftar" class="menu-item active"
+               onclick="switchAdminPanel('pendaftar')">
+                <i class="ph ph-users"></i>
+                <span>Data Pendaftar</span>
+            </a>
+            <a href="#" id="menu-jadwal" class="menu-item"
+               onclick="switchAdminPanel('jadwal')">
+                <i class="ph ph-calendar-plus"></i>
+                <span>Panel Penjadwalan</span>
+            </a>
+
+            <div class="menu-divider"></div>
+            <span class="menu-section-label">Data</span>
+
+            <a href="#" id="menu-export" class="menu-item"
+               onclick="switchAdminPanel('export')">
+                <i class="ph ph-export"></i>
+                <span>Export Data &amp; Berkas</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item" onclick="aturJalur()">
+                <i class="ph ph-gear"></i>
+                <span>Pengaturan Sistem</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" class="menu-item menu-item--danger" onclick="logout()">
+                <i class="ph ph-sign-out"></i>
+                <span>Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════
+         MAIN
+    ══════════════════════════════════════ -->
+    <main class="admin-main" id="mainContent">
+
+        <!-- Topbar -->
+        <div class="admin-topbar">
+            <button class="toggle-btn" onclick="toggleSidebar()">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="topbar-right">
+                <span class="topbar-admin-label">Administrator</span>
+                <div class="topbar-avatar">A</div>
             </div>
+        </div>
 
-            <div class="admin-content-pad">
-                
-                <!-- PANEL 1: DATA PENDAFTAR -->
-                <div id="panel-pendaftar" class="admin-panel active">
-                    <!-- STATS CARDS -->
-                    <div class="stats-grid-modern">
-                        <div class="stat-card-modern">
-                            <div class="stat-icon-box bg-blue"><i class="ph ph-users-three"></i></div>
-                            <div><h2 id="count-total" style="margin:0;">0</h2><small style="color:var(--text-muted);">Total Pendaftar</small></div>
-                        </div>
-                        <div class="stat-card-modern">
-                            <div class="stat-icon-box bg-yellow"><i class="ph ph-clock"></i></div>
-                            <div><h2 id="count-pending" style="margin:0;">0</h2><small style="color:var(--text-muted);">Perlu Verifikasi</small></div>
-                        </div>
-                        <div class="stat-card-modern">
-                            <div class="stat-icon-box bg-green"><i class="ph ph-check-circle"></i></div>
-                            <div><h2 id="count-lulus" style="margin:0;">0</h2><small style="color:var(--text-muted);">Siswa Diterima</small></div>
-                        </div>
-                    </div>
+        <div class="admin-content-pad">
 
-                    <!-- BULK ACTIONS BAR -->
-                    <div class="bulk-actions-bar" id="bulkActions">
+            <!-- ══════════════════════════════
+                 PANEL 1: DATA PENDAFTAR
+            ══════════════════════════════ -->
+            <div id="panel-pendaftar" class="admin-panel active">
+
+                <!-- Stats -->
+                <div class="stats-grid-modern">
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box bg-blue">
+                            <i class="ph ph-users-three"></i>
+                        </div>
                         <div>
-                            <i class="ph ph-check-square"></i> <b id="selectedCount">0</b> Siswa dipilih
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-primary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('VERIFY')">
-                                ✅ Verifikasi
-                            </button>
-                            <button class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.85rem;" onclick="bulkAction('GRADUATE')">
-                                🎓 Luluskan
-                            </button>
+                            <h2 id="count-total">0</h2>
+                            <small>Total Pendaftar</small>
                         </div>
                     </div>
-
-                    <!-- DATA TABLE CARD -->
-                    <div class="admin-card">
-                        <div class="table-controls">
-                            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-                                <div style="display: flex; align-items: center; gap: 5px;">
-                                    <select id="rowsPerPage" onchange="changeLimit()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white;">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                </div>
-                                <select id="filterVerif" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
-                                    <option value="">Semua Status Berkas</option>
-                                    <option value="true">✅ Terverifikasi</option>
-                                    <option value="false">⏳ Pending / Ditolak</option>
-                                </select>
-                                <select id="filterLulus" onchange="filterTable()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; min-width: 150px;">
-                                    <option value="">Semua Status Kelulusan</option>
-                                    <option value="PENDING">⏳ Menunggu</option>
-                                    <option value="DITERIMA">🎉 Diterima</option>
-                                    <option value="TIDAK DITERIMA">🚫 Tidak Diterima</option>
-                                </select>
-                            </div>
-                            <div class="search-box">
-                                <input type="text" id="searchInput" placeholder="Cari Nama / NISN..." onkeyup="filterTable()" 
-                                       style="padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; width: 250px; outline: none;">
-                            </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box bg-yellow">
+                            <i class="ph ph-clock"></i>
                         </div>
-
-                        <div class="table-responsive">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
-                                        <th style="cursor: pointer;" onclick="sortTable('nama_lengkap')">Nama Lengkap <i class="ph ph-caret-up-down"></i></th>
-                                        <th style="cursor: pointer;" onclick="sortTable('jalur')">Jalur <i class="ph ph-caret-up-down"></i></th>
-                                        <th style="cursor: pointer;" onclick="sortTable('asal_sekolah')">Asal Sekolah <i class="ph ph-caret-up-down"></i></th>
-                                        <th style="cursor: pointer;" onclick="sortTable('status_verifikasi')">Status Berkas <i class="ph ph-caret-up-down"></i></th>
-                                        <th style="cursor: pointer;" onclick="sortTable('status_kelulusan')">Kelulusan <i class="ph ph-caret-up-down"></i></th>
-                                        <th style="text-align: right;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tableBody">
-                                    <!-- Data render here -->
-                                </tbody>
-                            </table>
+                        <div>
+                            <h2 id="count-pending">0</h2>
+                            <small>Perlu Verifikasi</small>
                         </div>
-                        <div class="pagination-container" id="pagination"></div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box bg-green">
+                            <i class="ph ph-check-circle"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-lulus">0</h2>
+                            <small>Siswa Diterima</small>
+                        </div>
                     </div>
                 </div>
 
-                <!-- PANEL 2: MANAJEMEN JADWAL -->
-                <div id="panel-jadwal" class="admin-panel" style="display:none;">
-                    
-                    <div class="admin-card" style="padding: 30px;">
-                        <h3 style="margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
-                            <i class="ph ph-gear"></i> Pengaturan Master Jadwal
-                        </h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">
-                            Tentukan kapasitas dan ketersediaan waktu sebelum melakukan plotting/pembagian jadwal ke peserta tes Reguler.
-                        </p>
+                <!-- Bulk action bar -->
+                <div class="bulk-actions-bar" id="bulkActions">
+                    <div>
+                        <i class="ph ph-check-square"></i>
+                        <b id="selectedCount">0</b> siswa dipilih
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-primary btn-sm" onclick="bulkAction('VERIFY')">
+                            <i class="ph ph-check"></i> Verifikasi
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="bulkAction('GRADUATE')">
+                            <i class="ph ph-graduation-cap"></i> Luluskan
+                        </button>
+                    </div>
+                </div>
 
-                        <div class="form-grid" style="align-items: start;">
+                <!-- Table card -->
+                <div class="admin-card">
+                    <div class="table-controls">
+                        <div class="table-controls-left">
+                            <select id="rowsPerPage" onchange="changeLimit()" class="ctrl-input">
+                                <option value="10">10 baris</option>
+                                <option value="25">25 baris</option>
+                                <option value="50">50 baris</option>
+                                <option value="100">100 baris</option>
+                            </select>
+                            <select id="filterVerif" onchange="filterTable()" class="ctrl-input">
+                                <option value="">Semua Status Berkas</option>
+                                <option value="true">Terverifikasi</option>
+                                <option value="false">Pending / Ditolak</option>
+                            </select>
+                            <select id="filterLulus" onchange="filterTable()" class="ctrl-input">
+                                <option value="">Semua Kelulusan</option>
+                                <option value="PENDING">Menunggu</option>
+                                <option value="DITERIMA">Diterima</option>
+                                <option value="TIDAK DITERIMA">Tidak Diterima</option>
+                            </select>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="searchInput"
+                                   placeholder="Cari nama / NISN..."
+                                   onkeyup="filterTable()">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:36px;">
+                                        <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                                    </th>
+                                    <th style="cursor:pointer;" onclick="sortTable('nama_lengkap')">
+                                        Nama Lengkap <i class="ph ph-caret-up-down"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" onclick="sortTable('jalur')">
+                                        Jalur <i class="ph ph-caret-up-down"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" onclick="sortTable('asal_sekolah')">
+                                        Asal Sekolah <i class="ph ph-caret-up-down"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" onclick="sortTable('status_verifikasi')">
+                                        Status Berkas <i class="ph ph-caret-up-down"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" onclick="sortTable('status_kelulusan')">
+                                        Kelulusan <i class="ph ph-caret-up-down"></i>
+                                    </th>
+                                    <th style="text-align:right;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Rendered by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container" id="pagination"></div>
+                </div>
+
+            </div><!-- /panel-pendaftar -->
+
+
+            <!-- ══════════════════════════════
+                 PANEL 2: PENJADWALAN
+            ══════════════════════════════ -->
+            <div id="panel-jadwal" class="admin-panel" style="display:none;">
+
+                <!-- Master config -->
+                <div class="admin-card" style="margin-bottom:16px;">
+                    <div class="panel-section-title">Pengaturan Master Jadwal</div>
+                    <div class="panel-section-body">
+                        <p style="font-size:.78rem;color:var(--ink-soft);margin:0 0 16px;line-height:1.6;">
+                            Tentukan kapasitas dan ketersediaan waktu sebelum melakukan plotting ke peserta tes Reguler.
+                        </p>
+                        <div class="form-grid">
                             <div class="form-group">
-                                <label style="font-weight: 700;">Tanggal Tes (Satu per baris) *</label>
-                                <textarea id="cfg-dates" class="input-modern-form" rows="4" placeholder="Misal:&#10;Kamis, 21 Mei 2026&#10;Jumat, 22 Mei 2026"></textarea>
+                                <label>Tanggal Tes (Satu per baris)</label>
+                                <textarea id="cfg-dates" class="input-modern-form" rows="4"
+                                          placeholder="Kamis, 21 Mei 2026&#10;Jumat, 22 Mei 2026"></textarea>
                             </div>
                             <div class="form-group">
-                                <label style="font-weight: 700;">Daftar Sesi (Satu per baris) *</label>
-                                <textarea id="cfg-sessions" class="input-modern-form" rows="4" placeholder="Misal:&#10;Sesi 1 (07.30 - 09.30)&#10;Sesi 2 (10.00 - 12.00)"></textarea>
+                                <label>Daftar Sesi (Satu per baris)</label>
+                                <textarea id="cfg-sessions" class="input-modern-form" rows="4"
+                                          placeholder="Sesi 1 (07.30 - 09.30)&#10;Sesi 2 (10.00 - 12.00)"></textarea>
                             </div>
                             <div class="form-group">
-                                <label style="font-weight: 700;">Jumlah Ruangan *</label>
+                                <label>Jumlah Ruangan</label>
                                 <input type="number" id="cfg-rooms" class="input-modern-form" placeholder="Contoh: 4">
-                                <small style="color: #64748b; font-size: 0.8rem; display:block; margin-top:5px;">Sistem akan membuat Ruang 1 sampai Ruang X.</small>
+                                <small style="font-size:.7rem;color:var(--ink-faint);display:block;margin-top:4px;">
+                                    Sistem membuat Ruang 1 s.d. Ruang X
+                                </small>
                             </div>
                             <div class="form-group">
-                                <label style="font-weight: 700;">Kapasitas Peserta / Ruangan *</label>
+                                <label>Kapasitas Peserta / Ruangan</label>
                                 <input type="number" id="cfg-capacity" class="input-modern-form" placeholder="Contoh: 20">
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="saveScheduleConfig()" style="margin-top: 15px;">
+                        <button class="btn btn-primary btn-sm" onclick="saveScheduleConfig()" style="margin-top:4px;">
                             <i class="ph ph-floppy-disk"></i> Simpan Pengaturan
                         </button>
                     </div>
+                </div>
 
-                    <div class="admin-card">
-                        <div class="table-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                            <h3 style="margin: 0; color: var(--primary); display: flex; align-items: center; gap: 10px;">
-                                <i class="ph ph-calendar-check"></i> Plotting Jadwal Peserta
-                            </h3>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn btn-primary" id="btn-save-plotting" style="display:none; background:#059669; border:none;" onclick="saveManualPlotting()">
-                                    <i class="ph ph-check-circle"></i> Simpan Perubahan Plotting
-                                </button>
-                                <button class="btn btn-secondary" onclick="autoPlotting()" style="border-color:var(--accent); color:#b45309; background:#fffbeb;">
-                                    <i class="ph ph-magic-wand"></i> Plotting Otomatis
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- FILTER JADWAL -->
-                        <div style="padding: 15px 20px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
-                            <span style="font-weight: 600; color: #475569; font-size: 0.9rem;"><i class="ph ph-funnel"></i> Filter Tampilan:</span>
-                            <select id="filterPlotTgl" class="input-modern-form" style="padding: 8px 15px; font-size: 0.85rem; width: auto; min-width: 150px;" onchange="renderPlottingTable()">
-                                <option value="">Semua Tanggal</option>
-                            </select>
-                            <select id="filterPlotSesi" class="input-modern-form" style="padding: 8px 15px; font-size: 0.85rem; width: auto; min-width: 150px;" onchange="renderPlottingTable()">
-                                <option value="">Semua Sesi</option>
-                            </select>
-                            <select id="filterPlotRuang" class="input-modern-form" style="padding: 8px 15px; font-size: 0.85rem; width: auto; min-width: 150px;" onchange="renderPlottingTable()">
-                                <option value="">Semua Ruangan</option>
-                            </select>
-                            <div style="margin-left: auto; font-size: 0.85rem; color: #64748b;">
-                                Total tampil: <b id="plotCount" style="color: var(--primary); font-size: 1.1rem;">0</b> siswa
-                            </div>
-                        </div>
-
-                        <div style="padding: 10px 20px; background: #f0fdfa; border-bottom: 1px solid #ccfbf1; font-size: 0.85rem; color: #0f766e;">
-                            *Tabel ini <b>HANYA</b> menampilkan peserta <b>REGULER MURNI</b> terverifikasi. <br>
-                            *Peserta limpahan dari jalur Prestasi (Bebas Tes) otomatis <b>disembunyikan</b> agar tidak mendapat ruangan.
-                        </div>
-                        <div class="table-responsive">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nama Peserta / NISN</th>
-                                        <th>Tanggal Tes</th>
-                                        <th>Sesi / Waktu</th>
-                                        <th>Ruangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="plottingTableBody">
-                                    <!-- Plotting rows render here -->
-                                </tbody>
-                            </table>
+                <!-- Plotting table -->
+                <div class="admin-card">
+                    <div class="card-action-row">
+                        <h3>
+                            <i class="ph ph-calendar-check"></i>
+                            Plotting Jadwal Peserta
+                        </h3>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" id="btn-save-plotting"
+                                    style="display:none;" onclick="saveManualPlotting()">
+                                <i class="ph ph-check-circle"></i> Simpan Plotting
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="autoPlotting()">
+                                <i class="ph ph-magic-wand"></i> Plotting Otomatis
+                            </button>
                         </div>
                     </div>
 
+                    <div class="filter-bar">
+                        <span class="filter-bar-label">Filter:</span>
+                        <select id="filterPlotTgl" class="ctrl-input" onchange="renderPlottingTable()">
+                            <option value="">Semua Tanggal</option>
+                        </select>
+                        <select id="filterPlotSesi" class="ctrl-input" onchange="renderPlottingTable()">
+                            <option value="">Semua Sesi</option>
+                        </select>
+                        <select id="filterPlotRuang" class="ctrl-input" onchange="renderPlottingTable()">
+                            <option value="">Semua Ruangan</option>
+                        </select>
+                        <span class="filter-bar-count">
+                            Tampil: <b id="plotCount">0</b> siswa
+                        </span>
+                    </div>
+
+                    <div class="info-note" style="margin:12px 18px 0;border-radius:6px;">
+                        Hanya menampilkan peserta <b>Reguler Murni</b> terverifikasi.
+                        Peserta limpahan Prestasi (Bebas Tes) otomatis disembunyikan.
+                    </div>
+
+                    <div class="table-responsive" style="margin-top:12px;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Peserta / NISN</th>
+                                    <th>Tanggal Tes</th>
+                                    <th>Sesi / Waktu</th>
+                                    <th>Ruangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plottingTableBody">
+                                <!-- Rendered by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- PANEL 3: EXPORT DATA (BARU) -->
-                <div id="panel-export" class="admin-panel" style="display:none;">
-                    
-                    <div class="admin-card" style="padding: 40px; text-align: center;">
-                        <i class="ph ph-microsoft-excel-logo" style="font-size: 4rem; color: #16a34a; margin-bottom: 15px;"></i>
-                        <h2 style="margin: 0 0 10px 0; color: #1e293b;">Export Data Rekapitulasi (Excel)</h2>
-                        <p style="color: #64748b; max-width: 600px; margin: 0 auto 30px;">
-                            Download seluruh data pendaftar dalam format Excel (.xlsx). Laporan ini mencakup biodata lengkap, status verifikasi, jalur pendaftaran, hingga ruangan dan jadwal tes CBT.
+            </div><!-- /panel-jadwal -->
+
+
+            <!-- ══════════════════════════════
+                 PANEL 3: EXPORT
+            ══════════════════════════════ -->
+            <div id="panel-export" class="admin-panel" style="display:none;">
+                <div class="export-grid">
+
+                    <!-- Excel -->
+                    <div class="export-card">
+                        <div class="export-card-icon">
+                            <i class="ph ph-microsoft-excel-logo"></i>
+                        </div>
+                        <h3>Export Rekapitulasi (Excel)</h3>
+                        <p>
+                            Download seluruh data pendaftar dalam format Excel (.xlsx).
+                            Mencakup biodata lengkap, status verifikasi, jalur pendaftaran,
+                            hingga ruangan dan jadwal tes CBT.
                         </p>
-                        <button class="btn btn-primary" style="background: #16a34a; border: none; font-size: 1.1rem; padding: 15px 30px;" onclick="exportToExcel()">
-                            <i class="ph ph-download-simple"></i> Download Data Excel
+                        <button class="btn-export" onclick="exportToExcel()">
+                            <i class="ph ph-download-simple"></i>
+                            Download Data Excel
                         </button>
                     </div>
 
-                    <div class="admin-card" style="padding: 40px; text-align: center; border-top: 5px solid var(--accent);">
-                        <i class="ph ph-folder-zip" style="font-size: 4rem; color: #d97706; margin-bottom: 15px;"></i>
-                        <h2 style="margin: 0 0 10px 0; color: #1e293b;">Backup Seluruh Berkas Peserta (ZIP)</h2>
-                        <p style="color: #64748b; max-width: 600px; margin: 0 auto 30px;">
-                            Sistem akan mendownload semua berkas (Foto, KK, Akta, dll) dari seluruh peserta dan mengelompokkannya ke dalam folder dengan format <b>NAMA PENDAFTAR_NISN</b>.
-                        </p>
-                        
-                        <div style="background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; padding: 15px; border-radius: 12px; max-width: 600px; margin: 0 auto 25px; text-align: left; font-size: 0.9rem;">
-                            <i class="ph ph-lightbulb" style="font-size: 1.2rem; margin-right: 5px;"></i> 
-                            <b>Tips Pro:</b> Jika Anda hanya ingin mendownload berkas dari <b>beberapa siswa tertentu saja</b>, silakan kembali ke menu <b>Data Pendaftar</b>, centang nama siswa di tabel, lalu klik tombol <b>Download Berkas</b> yang muncul.
+                    <!-- ZIP -->
+                    <div class="export-card">
+                        <div class="export-card-icon">
+                            <i class="ph ph-folder-zip"></i>
                         </div>
-
-                        <button class="btn btn-primary" style="background: #d97706; border: none; font-size: 1.1rem; padding: 15px 30px;" onclick="downloadAllFilesZip()">
-                            <i class="ph ph-download-simple"></i> Download Semua Berkas (.ZIP)
+                        <h3>Backup Berkas Peserta (ZIP)</h3>
+                        <p>
+                            Download semua berkas (Foto, KK, Akta, dll) dari seluruh peserta,
+                            dikelompokkan per folder dengan format
+                            <b>NAMA_NISN</b>.
+                        </p>
+                        <div class="info-note">
+                            Untuk berkas beberapa siswa saja, kembali ke
+                            <b>Data Pendaftar</b>, centang nama, lalu klik
+                            <b>Download Berkas</b>.
+                        </div>
+                        <button class="btn-export" onclick="downloadAllFilesZip()">
+                            <i class="ph ph-download-simple"></i>
+                            Download Semua Berkas (.ZIP)
                         </button>
                     </div>
 
                 </div>
+            </div><!-- /panel-export -->
 
-            </div>
-        </main>
-    </div>
+        </div><!-- /admin-content-pad -->
+    </main>
+</div>
 
-    <script src="../js/config.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/admin.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin.js"></script>
 </body>
 </html>
