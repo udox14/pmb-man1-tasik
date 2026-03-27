@@ -879,30 +879,121 @@ window.viewDetail = async function(id) {
                         .d-header { position: static; }
                         .detail-grid { grid-template-columns: 1fr 1fr; }
                     }
+
+                    /* ── File Viewer Overlay ── */
+                    .fv-overlay {
+                        display: none; position: fixed; inset: 0; z-index: 99999;
+                        background: rgba(0,0,0,.88); flex-direction: column;
+                    }
+                    .fv-overlay.open { display: flex; }
+                    .fv-topbar {
+                        height: 52px; background: #0d1b2a; display: flex;
+                        align-items: center; justify-content: space-between;
+                        padding: 0 16px; flex-shrink: 0; gap: 12px;
+                    }
+                    .fv-title {
+                        font-size: 0.8rem; font-weight: 700; color: white;
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                    }
+                    .fv-counter {
+                        font-size: 0.72rem; color: rgba(255,255,255,.45);
+                        white-space: nowrap; flex-shrink: 0;
+                    }
+                    .fv-close {
+                        background: rgba(255,255,255,.1); border: none; color: white;
+                        width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 1.1rem; flex-shrink: 0; transition: background .15s;
+                    }
+                    .fv-close:hover { background: rgba(255,255,255,.2); }
+                    .fv-body {
+                        flex: 1; display: flex; align-items: center;
+                        justify-content: center; position: relative; overflow: hidden;
+                    }
+                    .fv-frame {
+                        width: calc(100% - 120px); height: 100%;
+                        border: none; background: #f8fafc;
+                    }
+                    .fv-img {
+                        max-width: calc(100% - 120px); max-height: 100%;
+                        object-fit: contain; border-radius: 4px;
+                    }
+                    .fv-nav {
+                        position: absolute; top: 50%; transform: translateY(-50%);
+                        background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+                        color: white; width: 44px; height: 44px; border-radius: 8px;
+                        cursor: pointer; display: flex; align-items: center;
+                        justify-content: center; font-size: 1.2rem;
+                        transition: background .15s; z-index: 2;
+                    }
+                    .fv-nav:hover { background: rgba(255,255,255,.25); }
+                    .fv-nav:disabled { opacity: .2; cursor: not-allowed; }
+                    .fv-prev { left: 12px; }
+                    .fv-next { right: 12px; }
+                    .fv-hints {
+                        height: 34px; display: flex; align-items: center;
+                        justify-content: center; gap: 16px; flex-shrink: 0;
+                    }
+                    .fv-hint {
+                        font-size: 0.65rem; color: rgba(255,255,255,.3);
+                        display: flex; align-items: center; gap: 4px;
+                    }
+                    .fv-hint kbd {
+                        background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+                        border-radius: 3px; padding: 1px 5px; font-size: 0.6rem; font-family: inherit;
+                    }
+                    .file-btn.fv-active { border-color: #00796b; background: #f0fdf4; color: #00796b; }
+                    .file-btn.fv-active i { color: #00796b; }
                 </style>
 
                 <div class="d-wrapper">
                     <!-- SIDEBAR: foto + berkas -->
                     <div class="d-left">
                         <img src="${p.foto_url || 'https://via.placeholder.com/300x400?text=FOTO'}"
-                             class="d-photo" alt="Foto Siswa">
+                             class="d-photo" alt="Foto Siswa"
+                             style="cursor:pointer;" onclick="openFileViewer(0)">
                         <span class="d-files-label">Berkas Lampiran</span>
-                        <a href="${p.scan_kk_url}" target="_blank" class="file-btn">
+                        <a href="#" onclick="openFileViewer(1);return false;" class="file-btn" id="fb-1">
                             <i class="ph ph-file-pdf"></i> Kartu Keluarga
                         </a>
-                        <a href="${p.scan_akta_url}" target="_blank" class="file-btn">
+                        <a href="#" onclick="openFileViewer(2);return false;" class="file-btn" id="fb-2">
                             <i class="ph ph-file-pdf"></i> Akta Kelahiran
                         </a>
-                        <a href="${p.scan_skb_url || '#'}" target="_blank" class="file-btn">
+                        <a href="#" onclick="openFileViewer(3);return false;" class="file-btn" id="fb-3">
                             <i class="ph ph-file-pdf"></i> Surat Kelakuan Baik
                         </a>
-                        <a href="${p.scan_ktp_ortu_url}" target="_blank" class="file-btn">
+                        <a href="#" onclick="openFileViewer(4);return false;" class="file-btn" id="fb-4">
                             <i class="ph ph-file-pdf"></i> KTP Orang Tua
                         </a>
-                        <a href="${p.scan_rapor_url || '#'}" target="_blank" class="file-btn">
+                        <a href="#" onclick="openFileViewer(5);return false;" class="file-btn" id="fb-5">
                             <i class="ph ph-book-open-text"></i> Rapor
                         </a>
-                        ${p.scan_sertifikat_prestasi_url ? `<a href="${p.scan_sertifikat_prestasi_url}" target="_blank" class="file-btn"><i class="ph ph-trophy"></i> Sertifikat Prestasi</a>` : ''}
+                        ${p.scan_sertifikat_prestasi_url ? `<a href="#" onclick="openFileViewer(6);return false;" class="file-btn" id="fb-6"><i class="ph ph-trophy"></i> Sertifikat Prestasi</a>` : ''}
+
+                        <!-- File Viewer Overlay -->
+                        <div class="fv-overlay" id="fv-overlay">
+                            <div class="fv-topbar">
+                                <span class="fv-title" id="fv-title">—</span>
+                                <span class="fv-counter" id="fv-counter"></span>
+                                <button class="fv-close" onclick="closeFileViewer()" title="Tutup (Esc)">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                            <div class="fv-body" id="fv-body">
+                                <button class="fv-nav fv-prev" id="fv-prev" onclick="stepFileViewer(-1)">
+                                    <i class="ph ph-caret-left"></i>
+                                </button>
+                                <iframe class="fv-frame" id="fv-frame" src="about:blank"></iframe>
+                                <img class="fv-img" id="fv-img" src="" style="display:none;" alt="">
+                                <button class="fv-nav fv-next" id="fv-next" onclick="stepFileViewer(1)">
+                                    <i class="ph ph-caret-right"></i>
+                                </button>
+                            </div>
+                            <div class="fv-hints">
+                                <span class="fv-hint"><kbd>←</kbd><kbd>→</kbd> navigasi berkas</span>
+                                <span class="fv-hint"><kbd>Esc</kbd> tutup</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- KANAN: header + body -->
@@ -1030,6 +1121,107 @@ window.viewDetail = async function(id) {
                 </div>
             `
         });
+
+        // ── File Viewer Functions ─────────────────────────────────────
+        // Bangun daftar berkas yang tersedia
+        const fvFiles = [
+            { label: 'Foto Siswa',          url: p.foto_url,                      type: 'img' },
+            { label: 'Kartu Keluarga',       url: p.scan_kk_url,                   type: 'pdf' },
+            { label: 'Akta Kelahiran',       url: p.scan_akta_url,                 type: 'pdf' },
+            { label: 'Surat Kelakuan Baik',  url: p.scan_skb_url,                  type: 'pdf' },
+            { label: 'KTP Orang Tua',        url: p.scan_ktp_ortu_url,             type: 'pdf' },
+            { label: 'Rapor',                url: p.scan_rapor_url,                type: 'pdf' },
+            { label: 'Sertifikat Prestasi',  url: p.scan_sertifikat_prestasi_url,  type: 'pdf' },
+        ].filter(f => f.url);   // hanya yang ada URL-nya
+
+        let fvCurrent = 0;
+
+        function openFileViewer(btnIndex) {
+            // Cari file berdasarkan index btn (0=foto, 1=kk, dst)
+            // Tapi setelah filter, index bisa bergeser — cari by label/url
+            const allFiles = [
+                { label: 'Foto Siswa',          url: p.foto_url,                      type: 'img' },
+                { label: 'Kartu Keluarga',       url: p.scan_kk_url,                   type: 'pdf' },
+                { label: 'Akta Kelahiran',       url: p.scan_akta_url,                 type: 'pdf' },
+                { label: 'Surat Kelakuan Baik',  url: p.scan_skb_url,                  type: 'pdf' },
+                { label: 'KTP Orang Tua',        url: p.scan_ktp_ortu_url,             type: 'pdf' },
+                { label: 'Rapor',                url: p.scan_rapor_url,                type: 'pdf' },
+                { label: 'Sertifikat Prestasi',  url: p.scan_sertifikat_prestasi_url,  type: 'pdf' },
+            ];
+            const clicked = allFiles[btnIndex];
+            if (!clicked || !clicked.url) return;
+            const idx = fvFiles.findIndex(f => f.url === clicked.url);
+            if (idx === -1) return;
+            fvCurrent = idx;
+            renderFileViewer();
+            document.getElementById('fv-overlay').classList.add('open');
+        }
+
+        function renderFileViewer() {
+            const f = fvFiles[fvCurrent];
+            if (!f) return;
+            const title   = document.getElementById('fv-title');
+            const counter = document.getElementById('fv-counter');
+            const frame   = document.getElementById('fv-frame');
+            const img     = document.getElementById('fv-img');
+            const prev    = document.getElementById('fv-prev');
+            const next    = document.getElementById('fv-next');
+
+            title.textContent   = f.label;
+            counter.textContent = (fvCurrent + 1) + ' / ' + fvFiles.length;
+            prev.disabled = fvCurrent === 0;
+            next.disabled = fvCurrent === fvFiles.length - 1;
+
+            // Highlight active button di sidebar
+            document.querySelectorAll('.file-btn').forEach(b => b.classList.remove('fv-active'));
+            const allFiles2 = [
+                p.foto_url, p.scan_kk_url, p.scan_akta_url,
+                p.scan_skb_url, p.scan_ktp_ortu_url,
+                p.scan_rapor_url, p.scan_sertifikat_prestasi_url
+            ];
+            const origIdx = allFiles2.indexOf(f.url);
+            if (origIdx >= 0) {
+                const btn = document.getElementById('fb-' + origIdx);
+                if (btn) btn.classList.add('fv-active');
+            }
+
+            if (f.type === 'img') {
+                frame.style.display = 'none';
+                img.style.display   = 'block';
+                img.src             = f.url;
+            } else {
+                img.style.display   = 'none';
+                frame.style.display = 'block';
+                frame.src           = f.url;
+            }
+        }
+
+        window.stepFileViewer = function(dir) {
+            const next = fvCurrent + dir;
+            if (next < 0 || next >= fvFiles.length) return;
+            fvCurrent = next;
+            renderFileViewer();
+        };
+
+        window.closeFileViewer = function() {
+            document.getElementById('fv-overlay').classList.remove('open');
+            const frame = document.getElementById('fv-frame');
+            if (frame) frame.src = 'about:blank';
+            document.querySelectorAll('.file-btn').forEach(b => b.classList.remove('fv-active'));
+        };
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function fvKeyHandler(e) {
+            const overlay = document.getElementById('fv-overlay');
+            if (!overlay || !overlay.classList.contains('open')) {
+                document.removeEventListener('keydown', fvKeyHandler);
+                return;
+            }
+            if (e.key === 'ArrowRight') { e.preventDefault(); window.stepFileViewer(1); }
+            if (e.key === 'ArrowLeft')  { e.preventDefault(); window.stepFileViewer(-1); }
+            if (e.key === 'Escape')     { window.closeFileViewer(); }
+        });
+
     } catch (e) { 
         console.error(e); 
         Swal.fire('Error', 'Gagal memuat detail siswa.', 'error');
