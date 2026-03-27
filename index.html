@@ -135,20 +135,20 @@
             pointer-events: none;
         }
 
-        /* Teal glow — bottom left only, very subtle */
+        /* Overlay kiri-ke-kanan — solid 50%, fade halus ke kanan */
         .hero-root::after {
             content: '';
             position: absolute;
             inset: 0;
-            /* Gradasi dari kiri (solid) ke kanan (transparan) — full lebar */
             background: linear-gradient(
                 to right,
-                var(--ink)              0%,
-                var(--ink)             35%,
-                rgba(13,27,42,.92)     45%,
-                rgba(13,27,42,.55)     58%,
-                rgba(13,27,42,.15)     75%,
-                transparent           100%
+                #0d1b2a                0%,
+                #0d1b2a               50%,
+                rgba(13,27,42,.85)    58%,
+                rgba(13,27,42,.55)    66%,
+                rgba(13,27,42,.22)    78%,
+                rgba(13,27,42,.05)    90%,
+                transparent          100%
             );
             z-index: 1;
             pointer-events: none;
@@ -205,11 +205,14 @@
         .hl-pmb {
             font-size: clamp(1.8rem, 3.5vw, 3.4rem);
             font-weight: 800;
-            line-height: 1.05;
+            line-height: 0.95;
             letter-spacing: -2px;
             color: white;
             margin: 0;
         }
+
+        /* Span tiap baris — akan di-scale JS di mobile */
+        .hl-line { display: block; }
 
         /* "MAN 1 TASIKMALAYA" — putih besar, paksa satu baris */
         .hl-school {
@@ -222,9 +225,9 @@
             margin: 0;
         }
 
-        /* "Tahun Ajaran 2026/2027" — teal, 1.5rem */
+        /* "Tahun Ajaran 2026/2027" — teal, 2rem */
         .hl-ta {
-            font-size: clamp(1rem, 2.2vw, 1.5rem);
+            font-size: clamp(1rem, 2.2vw, 2rem);
             font-weight: 700;
             color: var(--teal);
             letter-spacing: .5px;
@@ -916,8 +919,44 @@
 
 
         /* ================================================================
-           HELP WIDGET — no overrides needed, global CSS works
+           HELP WIDGET
         ================================================================ */
+        .help-widget { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .help-toggle {
+            background: var(--ink); color: white; border: none;
+            padding: 11px 20px; border-radius: 99px;
+            font-weight: 700; font-size: .82rem; font-family: inherit;
+            box-shadow: 0 4px 20px rgba(0,0,0,.25); cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            transition: background .2s, transform .2s;
+        }
+        .help-toggle i { font-size: 1rem; color: #4ade80; }
+        .help-toggle:hover { background: #1e293b; transform: translateY(-1px); }
+        .help-toggle.opened { padding: 11px 14px; background: #1e293b; }
+        .help-toggle.opened span { display: none; }
+        .help-toggle.opened i { color: white; }
+        .help-popup {
+            background: white; width: 290px; border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.15); overflow: hidden;
+            transform-origin: bottom right;
+            transform: scale(.95) translateY(6px); opacity: 0;
+            transition: all .2s cubic-bezier(.4,0,.2,1);
+            border: 1px solid var(--rule); visibility: hidden;
+            position: absolute; bottom: 52px; right: 0;
+        }
+        .help-popup.active { transform: scale(1) translateY(0); opacity: 1; visibility: visible; }
+        .help-header { background: var(--ink); padding: 16px 18px 14px; }
+        .help-header-label { display: block; font-size: .78rem; font-weight: 800; color: white; margin-bottom: 3px; }
+        .help-header-sub { font-size: .7rem; color: rgba(255,255,255,.4); margin: 0; }
+        .help-list { padding: 6px 0; }
+        .help-item { display: flex; align-items: center; gap: 11px; padding: 10px 16px; text-decoration: none; color: var(--ink-mid); transition: background .15s; border-bottom: 1px solid var(--rule); }
+        .help-item:last-child { border-bottom: none; }
+        .help-item:hover { background: var(--bg); }
+        .wa-icon { width: 34px; height: 34px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .contact-info { flex: 1; min-width: 0; }
+        .contact-name { display: block; font-size: .8rem; font-weight: 700; color: var(--ink); }
+        .contact-role { display: block; font-size: .68rem; color: var(--ink-faint); margin-top: 1px; }
+        .help-arrow { font-size: .82rem; color: var(--ink-faint); flex-shrink: 0; }
 
 
         /* ================================================================
@@ -925,7 +964,7 @@
         ================================================================ */
         @media (max-width: 900px) {
             .hero-grid {
-                text-align: left;
+                text-align: center;
                 max-width: 100%;
                 grid-template-columns: 1fr;
             }
@@ -935,9 +974,15 @@
                 display: none;
             }
             .hero-root::after { display: none; }
+            .hero-content { align-items: center; }
 
             .hero-headline { letter-spacing: -1px; }
             .hero-desc { max-width: 100%; }
+
+            /* Mobile title: tengah */
+            .hl-pmb    { font-size: clamp(2.2rem, 9vw, 3.4rem); letter-spacing: -1px; text-align: center; }
+            .hl-school { font-size: clamp(1.6rem, 7vw, 3.4rem); letter-spacing: -1px; white-space: normal; text-align: center; }
+            .hl-ta     { text-align: center; }
 
             .alur-link-mobile { display: flex; }
             .hero-mobile-strip { display: flex; }
@@ -952,7 +997,7 @@
 
             .jalur-tabs {
                 max-width: 100%;
-                justify-content: flex-start;
+                justify-content: center;
             }
 
             .compact-action {
@@ -991,6 +1036,28 @@
         }
 
         @media (max-width: 600px) {
+            /* Help widget mobile */
+            .help-widget { bottom: 16px; right: 16px; }
+
+            /* Tombol: lingkaran ikon WA saja */
+            .help-toggle { width: 50px; height: 50px; padding: 0; border-radius: 50%; justify-content: center; }
+            .help-toggle span { display: none; }
+            .help-toggle i { font-size: 1.3rem; }
+
+            /* Popup: fixed supaya tidak terpotong viewport */
+            .help-popup {
+                position: fixed;
+                width: calc(100vw - 32px);
+                left: 16px;
+                right: 16px;
+                bottom: 82px;
+                top: auto;
+                max-height: 70vh;
+                overflow-y: auto;
+                border-radius: 14px;
+                transform-origin: bottom center;
+            }
+
             .hero-body { padding: 44px 0; }
 
             .jalur-tab { font-size: .82rem; padding: 11px 10px; }
@@ -1092,7 +1159,7 @@
                 <!-- Content -->
                 <div>
                     <div class="hero-headline">
-                        <p class="hl-pmb">Penerimaan<br>Murid Baru</p>
+                        <p class="hl-pmb"><span class="hl-line" id="hl-penerimaan">Penerimaan</span><span class="hl-line" id="hl-muridbaru">Murid Baru (PMB)</span></p>
                         <p class="hl-school">MAN 1 TASIKMALAYA</p>
                         <p class="hl-ta">Tahun Ajaran 2026/2027</p>
                     </div>
@@ -1175,7 +1242,7 @@
                     <span class="h-stat-label">Tes Pembuktian Prestasi</span>
                 </div>
                 <div class="h-stat">
-                    <span class="h-stat-num">20 Apr – 20 Mei</span>
+                    <span class="h-stat-num">20 April – 20 Mei</span>
                     <span class="h-stat-label">Pendaftaran Jalur Reguler</span>
                 </div>
                 <div class="h-stat">
@@ -1442,16 +1509,17 @@
 <div class="help-widget">
     <div class="help-popup" id="helpPopup">
         <div class="help-header">
-            <h4>Hubungi Panitia</h4>
-            <p>Klik nama untuk chat via WhatsApp</p>
+            <span class="help-header-label">Hubungi Panitia PMB</span>
+            <p class="help-header-sub">Senin – Sabtu &nbsp;·&nbsp; 08.00 – 16.00 WIB</p>
         </div>
         <div class="help-list">
             <a href="https://wa.me/6281323325771" target="_blank" class="help-item">
                 <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
                 <div class="contact-info">
                     <span class="contact-name">Dede Fathul Umam</span>
-                    <span class="contact-role">Panitia PMB</span>
+                    <span class="contact-role">Ketua Panitia PMB</span>
                 </div>
+                <i class="ph ph-arrow-up-right help-arrow"></i>
             </a>
             <a href="https://wa.me/6281220338298" target="_blank" class="help-item">
                 <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
@@ -1459,6 +1527,7 @@
                     <span class="contact-name">H. Undang Kurniawan</span>
                     <span class="contact-role">Panitia PMB</span>
                 </div>
+                <i class="ph ph-arrow-up-right help-arrow"></i>
             </a>
             <a href="https://wa.me/6281287722857" target="_blank" class="help-item">
                 <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
@@ -1466,6 +1535,7 @@
                     <span class="contact-name">M. Rofiq Najib</span>
                     <span class="contact-role">Panitia PMB</span>
                 </div>
+                <i class="ph ph-arrow-up-right help-arrow"></i>
             </a>
             <a href="https://wa.me/6282218943383" target="_blank" class="help-item">
                 <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
@@ -1473,11 +1543,12 @@
                     <span class="contact-name">M. Iqbal Abdul Wakil</span>
                     <span class="contact-role">Panitia PMB</span>
                 </div>
+                <i class="ph ph-arrow-up-right help-arrow"></i>
             </a>
         </div>
     </div>
     <button class="help-toggle" id="helpBtn" onclick="toggleHelp()">
-        <i class="ph ph-chat-teardrop-text"></i>
+        <i class="ph ph-whatsapp-logo"></i>
         <span>Butuh Bantuan?</span>
     </button>
 </div>
@@ -1499,5 +1570,6 @@
         }
     })();
 </script>
+
 </body>
 </html>

@@ -638,3 +638,112 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
     .nav-buttons { padding: 12px 16px !important; gap: 8px !important; }
     .btn { font-size: 0.82rem !important; padding: 10px 16px !important; }
 }
+
+
+
+/* ================================================================
+   SWEETALERT2 — CUSTOM THEME
+================================================================ */
+.swal2-popup {
+    border-radius: 14px !important;
+    padding: 24px 24px 22px !important;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,.13) !important;
+    border: 1px solid #e2e8f0 !important;
+    text-align: left !important;
+    border-top: 6px solid #e2e8f0 !important;
+}
+/* Accent bar + tombol confirm sesuai tipe */
+.swal2-popup:has(.swal2-error)    { border-top-color: #dc2626 !important; }
+.swal2-popup:has(.swal2-success)  { border-top-color: #16a34a !important; }
+.swal2-popup:has(.swal2-warning)  { border-top-color: #d97706 !important; }
+.swal2-popup:has(.swal2-info)     { border-top-color: #2563eb !important; }
+.swal2-popup:has(.swal2-question) { border-top-color: #475569 !important; }
+
+.swal2-popup:has(.swal2-error)    .swal2-confirm { background: #dc2626 !important; }
+.swal2-popup:has(.swal2-error)    .swal2-confirm:hover { background: #b91c1c !important; }
+.swal2-popup:has(.swal2-success)  .swal2-confirm { background: #16a34a !important; }
+.swal2-popup:has(.swal2-success)  .swal2-confirm:hover { background: #15803d !important; }
+.swal2-popup:has(.swal2-warning)  .swal2-confirm { background: #d97706 !important; }
+.swal2-popup:has(.swal2-warning)  .swal2-confirm:hover { background: #b45309 !important; }
+.swal2-popup:has(.swal2-info)     .swal2-confirm { background: #2563eb !important; }
+.swal2-popup:has(.swal2-info)     .swal2-confirm:hover { background: #1d4ed8 !important; }
+.swal2-popup:has(.swal2-question) .swal2-confirm { background: #0d1b2a !important; }
+
+/* Sembunyikan ikon bawaan Swal sepenuhnya */
+.swal2-icon { display: none !important; }
+
+.swal2-title {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: #0d1b2a !important;
+    padding: 0 !important;
+    margin: 0 0 8px !important;
+    text-align: left !important;
+    width: 100% !important;
+}
+.swal2-html-container, .swal2-content {
+    font-size: .86rem !important;
+    color: #64748b !important;
+    line-height: 1.65 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+}
+.swal2-actions { margin-top: 22px !important; gap: 8px !important; justify-content: center !important; }
+.swal2-confirm {
+    background: #0d1b2a !important; color: white !important;
+    border-radius: 8px !important; font-size: .82rem !important;
+    font-weight: 700 !important; padding: 10px 22px !important;
+    box-shadow: none !important; font-family: inherit !important;
+}
+.swal2-confirm:hover { background: #1e293b !important; }
+.swal2-confirm:focus { box-shadow: 0 0 0 3px rgba(13,27,42,.2) !important; }
+.swal2-cancel {
+    background: #f1f5f9 !important; color: #475569 !important;
+    border: 1px solid #cbd5e1 !important; border-radius: 8px !important;
+    font-size: .82rem !important; font-weight: 700 !important;
+    padding: 10px 22px !important; box-shadow: none !important; font-family: inherit !important;
+}
+.swal2-cancel:hover { background: #e2e8f0 !important; }
+.swal2-deny {
+    background: #fee2e2 !important; color: #dc2626 !important;
+    border: none !important; border-radius: 8px !important;
+    font-size: .82rem !important; font-weight: 700 !important;
+    padding: 10px 22px !important; font-family: inherit !important;
+}
+.swal2-deny:hover { background: #fecaca !important; }
+.swal2-input, .swal2-select, .swal2-textarea {
+    border: 1px solid #cbd5e1 !important; border-radius: 8px !important;
+    font-size: .86rem !important; font-family: inherit !important;
+    color: #0d1b2a !important; box-shadow: none !important;
+    padding: 10px 12px !important; margin: 12px 0 0 !important;
+}
+.swal2-input:focus, .swal2-select:focus, .swal2-textarea:focus {
+    border-color: #00796b !important;
+    box-shadow: 0 0 0 3px rgba(0,121,107,.12) !important;
+}
+.swal2-validation-message {
+    font-size: .78rem !important; border-radius: 6px !important;
+    font-family: inherit !important; background: #fef2f2 !important;
+    color: #dc2626 !important; border: none !important;
+    margin: 8px 0 0 !important; justify-content: flex-start !important;
+}
+.swal2-close { color: #94a3b8 !important; font-size: 1.3rem !important; }
+.swal2-close:hover { color: #475569 !important; background: transparent !important; }
+.swal2-toast {
+    border-radius: 10px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.1) !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 12px 16px !important;
+    border-top: none !important;
+    border-left: 4px solid #e2e8f0 !important;
+}
+.swal2-toast:has(.swal2-error)    { border-left-color: #dc2626 !important; }
+.swal2-toast:has(.swal2-success)  { border-left-color: #16a34a !important; }
+.swal2-toast:has(.swal2-warning)  { border-left-color: #d97706 !important; }
+.swal2-toast:has(.swal2-info)     { border-left-color: #2563eb !important; }
+.swal2-toast .swal2-icon { display: none !important; }
+.swal2-toast .swal2-title { font-size: .82rem !important; text-align: left !important; }
+.swal2-loader { border-color: #00796b transparent #00796b transparent !important; }
+.swal2-backdrop-show { background: rgba(13,27,42,.5) !important; backdrop-filter: blur(4px) !important; }
