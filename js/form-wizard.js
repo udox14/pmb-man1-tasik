@@ -378,22 +378,22 @@ function initPrestasiUI() {
     // INJECT HTML
     container.innerHTML = `
         <div class="pres-category-box">
-            <div class="pres-cat-header"><span>📚 Prestasi Akademik</span><small style="font-weight:400; color:#64748b;">(OSN, OMI, Debat, dll)</small></div>
+            <div class="pres-cat-header"><span>Prestasi Akademik</span><small style="font-weight:400; color:#64748b;">(OSN, OMI, Debat, dll)</small></div>
             <div id="list-akademik"></div>
             <button class="btn-add-pres" onclick="addPrestasiRow('akademik')">+ Tambah (Maks 3)</button>
         </div>
         <div class="pres-category-box">
-            <div class="pres-cat-header"><span>⚽ Prestasi Non-Akademik</span><small style="font-weight:400; color:#64748b;">(Olah Raga, Seni, LKBB)</small></div>
+            <div class="pres-cat-header"><span>Prestasi Non-Akademik</span><small style="font-weight:400; color:#64748b;">(Olah Raga, Seni, LKBB)</small></div>
             <div id="list-nonakademik"></div>
             <button class="btn-add-pres" onclick="addPrestasiRow('nonakademik')">+ Tambah (Maks 3)</button>
         </div>
         <div class="pres-category-box">
-            <div class="pres-cat-header"><span>🕌 Prestasi Keagamaan</span><small style="font-weight:400; color:#64748b;">(MQK, MTQ, dll)</small></div>
+            <div class="pres-cat-header"><span>Prestasi Keagamaan</span><small style="font-weight:400; color:#64748b;">(MQK, MTQ, dll)</small></div>
             <div id="list-keagamaan"></div>
             <button class="btn-add-pres" onclick="addPrestasiRow('keagamaan')">+ Tambah (Maks 3)</button>
         </div>
-        <div class="pres-category-box" style="border-color: #10b981;">
-            <div class="pres-cat-header" style="color: #047857;"><span>📖 Tahfidz Al-Qur'an</span><small style="font-weight:400; color:#64748b;">(Min. 10 Juz)</small></div>
+        <div class="pres-category-box">
+            <div class="pres-cat-header"><span>Tahfidz Al-Qur'an</span><small style="font-weight:400; color:#64748b;">(Min. 10 Juz)</small></div>
             <div id="list-tahfidz">
                 <div class="pres-row-tahfidz">
                     <div><label class="pres-label">Jumlah Hafalan (Juz)</label><input type="number" class="input-modern-form tahfidz-juz" placeholder="Min. 10"></div>
@@ -405,10 +405,10 @@ function initPrestasiUI() {
         
         <!-- UPLOAD SERTIFIKAT: 2MB -->
         <div class="upload-grid-modern" style="margin-top: 30px;">
-            <div class="upload-card-item" style="border-color: var(--accent); background: #fffbeb; grid-column: 1 / -1;">
+            <div class="upload-card-item" style="grid-column: 1 / -1;">
                 <input type="file" id="file_sertifikat" accept=".pdf" onchange="validateSimpleUpload(this, 2048)">
-                <div class="upload-icon-box" style="color: #d97706;"><i class="ph ph-trophy"></i></div>
-                <span class="upload-label-text" style="color: #92400e;">Upload Sertifikat Prestasi (Gabung 1 PDF) *</span>
+                <div class="upload-icon-box"><i class="ph ph-trophy"></i></div>
+                <span class="upload-label-text">Upload Sertifikat Prestasi (Gabung 1 PDF) *</span>
                 <span class="upload-status-text" id="lbl-file_sertifikat">Max 2MB (PDF Only)</span>
             </div>
         </div>
