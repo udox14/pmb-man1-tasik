@@ -776,12 +776,12 @@ window.viewDetail = async function(id) {
             const pres = await apiGet('prestasi', { pendaftar_id: id });
             if (Array.isArray(pres) && pres.length > 0) {
                 prestasiHtml = `
-                <div style="margin-top:20px; background:#f0fdfa; padding:15px; border-radius:8px; border:1px solid #ccfbf1;">
-                    <div class="detail-section-title" style="margin-top:0;">🏅 Data Prestasi</div>
-                    <ul style="padding-left:20px; margin:5px 0 0 0; font-size:0.9rem;">
+                <div class="d-prestasi-box">
+                    <div class="detail-title" style="margin-top:0;">Data Prestasi</div>
+                    <ul>
                 `;
                 pres.forEach(x => {
-                    prestasiHtml += `<li><b>${x.nama_lomba}</b> (${x.tingkat}) - ${x.tahun_perolehan}</li>`;
+                    prestasiHtml += `<li><b>${x.nama_lomba}</b> — ${x.tingkat}, ${x.tahun_perolehan}</li>`;
                 });
                 prestasiHtml += `</ul></div>`;
             }
@@ -808,57 +808,116 @@ window.viewDetail = async function(id) {
             showCloseButton: true,
             html: `
                 <style>
-                    .d-wrapper { display: grid; grid-template-columns: 300px 1fr; max-height: 85vh; overflow-y: auto; text-align: left; align-items: start; }
-                    .d-left { background: #f8fafc; padding: 30px; border-right: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 5; height: fit-content; }
+                    /* ── Layout ── */
+                    .d-wrapper { display: grid; grid-template-columns: 220px 1fr; max-height: 85vh; overflow-y: auto; text-align: left; align-items: start; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+                    .d-left { background: #f8fafc; padding: 20px; border-right: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 5; height: fit-content; }
                     .d-right { display: block; height: auto; overflow: visible; }
-                    .d-header { padding: 20px 30px; border-bottom: 1px solid #e2e8f0; background: white; position: sticky; top: 0; z-index: 10; }
-                    .d-body { padding: 30px; background: #fff; }
-                    .file-btn { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; text-decoration: none; color: #475569; font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; transition: 0.2s; }
-                    .file-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; }
-                    .detail-title { font-size: 1rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin: 25px 0 15px 0; }
-                    .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-                    .detail-item label { display: block; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 3px; }
-                    .detail-item b { display: block; font-size: 0.95rem; color: #1e293b; }
-                    .status-row { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
-                    .status-box { display: flex; align-items: center; background: #f8fafc; padding: 4px; border-radius: 6px; border: 1px solid #e2e8f0; }
-                    .status-label { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin: 0 8px; }
-                    .btn-act { border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: white; opacity: 0.4; transition: 0.2s; margin-left: 2px; }
-                    .btn-act:hover { opacity: 0.7; }
-                    .btn-act.active { opacity: 1; transform: scale(1.05); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-                    .act-blue { background-color: #2563eb; } .act-green { background-color: #16a34a; } .act-red { background-color: #dc2626; }
-                    
-                    .sch-input { width: 100%; padding: 8px 12px; border: 1px solid #bfdbfe; border-radius: 6px; font-family: inherit; font-size: 0.9rem; color: #1e3a8a; background: white; outline: none; transition: 0.2s; }
-                    .sch-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+                    .d-header { padding: 16px 22px; border-bottom: 1px solid #e2e8f0; background: white; position: sticky; top: 0; z-index: 10; }
+                    .d-body { padding: 20px 22px; background: #fff; }
+
+                    /* ── Photo ── */
+                    .d-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 14px; }
+
+                    /* ── File buttons ── */
+                    .d-files-label { font-size: 0.62rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; display: block; }
+                    .file-btn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid #e2e8f0; background: white; border-radius: 7px; text-decoration: none; color: #334155; font-weight: 600; font-size: 0.76rem; margin-bottom: 5px; transition: 0.15s; }
+                    .file-btn i { font-size: 0.9rem; color: #64748b; flex-shrink: 0; }
+                    .file-btn:hover { border-color: #00796b; color: #00796b; background: #f0fdf4; }
+                    .file-btn:hover i { color: #00796b; }
+
+                    /* ── Header info ── */
+                    .d-name { font-size: 1.1rem; font-weight: 800; color: #0d1b2a; margin: 0 0 4px; line-height: 1.2; }
+                    .d-meta { font-size: 0.75rem; color: #64748b; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+                    .d-meta span { display: inline-flex; align-items: center; gap: 3px; }
+                    .d-badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
+                    .d-badge-teal { background: #e0f2f1; color: #00695c; }
+                    .d-badge-red  { background: #fee2e2; color: #991b1b; }
+
+                    /* ── Status action row ── */
+                    .status-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+                    .status-box { display: flex; align-items: center; background: #f8fafc; padding: 3px; border-radius: 6px; border: 1px solid #e2e8f0; gap: 1px; }
+                    .status-label { font-size: 0.62rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 6px; white-space: nowrap; }
+                    /* btn-act, act-blue/green/red, active — tidak diubah agar JS tetap kerja */
+                    .btn-act { border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; color: white; opacity: 0.35; transition: 0.15s; }
+                    .btn-act:hover { opacity: 0.65; }
+                    .btn-act.active { opacity: 1; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+                    .act-blue { background: #2563eb; } .act-green { background: #16a34a; } .act-red { background: #dc2626; }
+                    #btn-save-changes { background: #0d1b2a !important; opacity: 1 !important; padding: 5px 14px !important; font-size: 0.7rem !important; margin-left: auto; border-radius: 5px; }
+
+                    /* ── Section title ── */
+                    .detail-title { font-size: 0.62rem; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; color: #94a3b8; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; margin: 20px 0 12px; }
+
+                    /* ── Data grid ── */
+                    .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+                    .detail-item label { display: block; font-size: 0.62rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 3px; }
+                    .detail-item b { display: block; font-size: 0.82rem; font-weight: 600; color: #1e293b; line-height: 1.4; }
+
+                    /* ── Sub boxes (keluarga) ── */
+                    .d-sub-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+                    .d-sub-label { font-size: 0.62rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; display: block; }
+
+                    /* ── CBT schedule inputs ── */
+                    .d-cbt-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+                    .sch-input { width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 0.82rem; color: #1e293b; background: white; outline: none; transition: 0.15s; }
+                    .sch-input:focus { border-color: #00796b; box-shadow: 0 0 0 3px rgba(0,121,107,0.12); }
+
+                    /* ── Pesantren box ── */
+                    .d-pesantren-box { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #00796b; border-radius: 8px; padding: 12px 14px; margin-top: 12px; }
+
+                    /* ── Prestasi box ── */
+                    .d-prestasi-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-top: 14px; }
+                    .d-prestasi-box ul { padding-left: 16px; margin: 8px 0 0; font-size: 0.8rem; color: #334155; line-height: 1.7; }
+
+                    /* ── No HP row ── */
+                    .d-phone-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 0.82rem; }
+                    .d-phone-row label { color: #94a3b8; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+                    .d-phone-row b { color: #0d1b2a; font-weight: 700; }
 
                     @media (max-width: 768px) {
-                        .d-wrapper { display: block; height: auto; max-height: 85vh; overflow-y: auto; }
-                        .d-left { position: static; width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; height: auto; }
+                        .d-wrapper { display: block; max-height: 88vh; overflow-y: auto; }
+                        .d-left { position: static; width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
                         .d-header { position: static; }
+                        .detail-grid { grid-template-columns: 1fr 1fr; }
                     }
                 </style>
 
                 <div class="d-wrapper">
-                    <!-- SIDEBAR DETAIL -->
+                    <!-- SIDEBAR: foto + berkas -->
                     <div class="d-left">
-                        <img src="${p.foto_url || 'https://via.placeholder.com/300x400'}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="color: #475569; margin-bottom: 10px; font-size: 0.85rem; font-weight: 700;">BERKAS LAMPIRAN</h5>
-                        <a href="${p.scan_kk_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> Kartu Keluarga</a>
-                        <a href="${p.scan_akta_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> Akta Lahir</a>
-                        <a href="${p.scan_skb_url || '#'}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> SKB</a>
-                        <a href="${p.scan_ktp_ortu_url}" target="_blank" class="file-btn"><i class="ph ph-file-pdf"></i> KTP Ortu</a>
-                        <a href="${p.scan_rapor_url || '#'}" target="_blank" class="file-btn"><i class="ph ph-book-open-text"></i> Rapor</a>
-                        ${p.scan_sertifikat_prestasi_url ? `<a href="${p.scan_sertifikat_prestasi_url}" target="_blank" class="file-btn" style="border-color: #fbbf24; background: #fffbeb;"><i class="ph ph-trophy" style="color: #d97706;"></i> Sertifikat</a>` : ''}
+                        <img src="${p.foto_url || 'https://via.placeholder.com/300x400?text=FOTO'}"
+                             class="d-photo" alt="Foto Siswa">
+                        <span class="d-files-label">Berkas Lampiran</span>
+                        <a href="${p.scan_kk_url}" target="_blank" class="file-btn">
+                            <i class="ph ph-file-pdf"></i> Kartu Keluarga
+                        </a>
+                        <a href="${p.scan_akta_url}" target="_blank" class="file-btn">
+                            <i class="ph ph-file-pdf"></i> Akta Kelahiran
+                        </a>
+                        <a href="${p.scan_skb_url || '#'}" target="_blank" class="file-btn">
+                            <i class="ph ph-file-pdf"></i> Surat Kelakuan Baik
+                        </a>
+                        <a href="${p.scan_ktp_ortu_url}" target="_blank" class="file-btn">
+                            <i class="ph ph-file-pdf"></i> KTP Orang Tua
+                        </a>
+                        <a href="${p.scan_rapor_url || '#'}" target="_blank" class="file-btn">
+                            <i class="ph ph-book-open-text"></i> Rapor
+                        </a>
+                        ${p.scan_sertifikat_prestasi_url ? `<a href="${p.scan_sertifikat_prestasi_url}" target="_blank" class="file-btn"><i class="ph ph-trophy"></i> Sertifikat Prestasi</a>` : ''}
                     </div>
 
-                    <!-- KONTEN KANAN -->
+                    <!-- KANAN: header + body -->
                     <div class="d-right">
                         <div class="d-header">
-                            <h2 style="margin: 0; color: #1e293b; font-size: 1.5rem;">${p.nama_lengkap}</h2>
-                            <div style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">
-                                ${p.nisn} • ${p.asal_sekolah} • <span style="font-weight:bold; color:var(--primary);">${p.jalur}</span>
-                                ${isBebasTes ? `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:5px;">(BEBAS CBT)</span>` : ''}
+                            <h2 class="d-name">${p.nama_lengkap}</h2>
+                            <div class="d-meta">
+                                <span>${p.nisn}</span>
+                                <span>·</span>
+                                <span>${p.asal_sekolah}</span>
+                                <span>·</span>
+                                <span class="d-badge d-badge-teal">${p.jalur}</span>
+                                ${isBebasTes ? `<span class="d-badge d-badge-red">BEBAS CBT</span>` : ''}
                             </div>
-                            
+
                             <div class="status-row">
                                 <div class="status-box">
                                     <span class="status-label">Verifikasi</span>
@@ -872,39 +931,39 @@ window.viewDetail = async function(id) {
                                     <button onclick="setEditState('lulus', 'DITERIMA', this)" class="btn-act act-green ${isLulusTrue}">Diterima</button>
                                     <button onclick="setEditState('lulus', 'TIDAK DITERIMA', this)" class="btn-act act-red ${isLulusFalse}">Gagal</button>
                                 </div>
-                                <button id="btn-save-changes" onclick="saveDetailChanges()" class="btn-act" style="background: #0f172a; opacity: 1; padding: 6px 20px; font-size: 0.8rem; margin-left: auto;">
-                                    <i class="ph ph-floppy-disk"></i> SIMPAN
+                                <button id="btn-save-changes" onclick="saveDetailChanges()" class="btn-act">
+                                    <i class="ph ph-floppy-disk"></i> Simpan
                                 </button>
                             </div>
                         </div>
 
                         <div class="d-body">
-                            
-                            <!-- INFO JADWAL CBT -->
+
+                            <!-- JADWAL TES CBT -->
                             ${(p.jalur === 'REGULER' && !isBebasTes) ? `
-                            <div class="detail-title" style="margin-top:0;">JADWAL TES CBT</div>
-                            <div class="detail-grid" style="background:#eff6ff; padding:15px; border-radius:10px; border:1px solid #bfdbfe; margin-bottom: 20px;">
+                            <div class="detail-title" style="margin-top:0;">Jadwal Tes CBT</div>
+                            <div class="d-cbt-box detail-grid">
                                 <div class="detail-item">
-                                    <label style="color:#1e40af;">Tanggal Tes</label>
+                                    <label>Tanggal Tes</label>
                                     <input type="text" id="input-tgl" class="sch-input" value="${p.tanggal_tes || ''}" oninput="triggerSaveAnim()">
                                 </div>
                                 <div class="detail-item">
-                                    <label style="color:#1e40af;">Sesi / Waktu</label>
+                                    <label>Sesi / Waktu</label>
                                     <input type="text" id="input-sesi" class="sch-input" value="${p.sesi_tes || ''}" oninput="triggerSaveAnim()">
                                 </div>
                                 <div class="detail-item">
-                                    <label style="color:#1e40af;">Ruang Ujian</label>
+                                    <label>Ruang Ujian</label>
                                     <input type="text" id="input-ruang" class="sch-input" value="${p.ruang_tes || ''}" oninput="triggerSaveAnim()">
                                 </div>
                             </div>
                             ` : ''}
 
                             <!-- DATA PRIBADI -->
-                            <div class="detail-title" ${(p.jalur !== 'REGULER' || isBebasTes) ? 'style="margin-top:0;"' : ''}>DATA PRIBADI</div>
+                            <div class="detail-title" ${(p.jalur !== 'REGULER' || isBebasTes) ? 'style="margin-top:0;"' : ''}>Data Pribadi</div>
                             <div class="detail-grid">
                                 <div class="detail-item"><label>NIK</label><b>${val(p.nik)}</b></div>
-                                <div class="detail-item"><label>TTL</label><b>${val(p.tempat_lahir)}, ${val(p.tanggal_lahir)}</b></div>
-                                <div class="detail-item"><label>JK</label><b>${val(p.jenis_kelamin)}</b></div>
+                                <div class="detail-item"><label>Tempat, Tanggal Lahir</label><b>${val(p.tempat_lahir)}, ${val(p.tanggal_lahir)}</b></div>
+                                <div class="detail-item"><label>Jenis Kelamin</label><b>${val(p.jenis_kelamin)}</b></div>
                                 <div class="detail-item"><label>Agama</label><b>${val(p.agama)}</b></div>
                                 <div class="detail-item"><label>Anak Ke</label><b>${val(p.anak_ke)} dari ${val(p.jumlah_saudara)}</b></div>
                                 <div class="detail-item"><label>Status Anak</label><b>${val(p.status_anak)}</b></div>
@@ -912,59 +971,57 @@ window.viewDetail = async function(id) {
                             </div>
 
                             <!-- ALAMAT -->
-                            <div class="detail-title">ALAMAT DOMISILI</div>
+                            <div class="detail-title">Alamat Domisili</div>
                             <div class="detail-grid">
-                                <div class="detail-item" style="grid-column: span 2;"><label>Alamat Lengkap</label><b>${val(p.alamat_lengkap)}</b></div>
+                                <div class="detail-item" style="grid-column:span 2;"><label>Alamat Lengkap</label><b>${val(p.alamat_lengkap)}</b></div>
                                 <div class="detail-item"><label>RT / RW</label><b>${val(p.rt)} / ${val(p.rw)}</b></div>
-                                <div class="detail-item"><label>Desa/Kelurahan</label><b>${val(p.desa_kelurahan)}</b></div>
+                                <div class="detail-item"><label>Desa / Kelurahan</label><b>${val(p.desa_kelurahan)}</b></div>
                                 <div class="detail-item"><label>Kecamatan</label><b>${val(p.kecamatan)}</b></div>
-                                <div class="detail-item"><label>Kab/Kota</label><b>${val(p.kabupaten_kota)}</b></div>
+                                <div class="detail-item"><label>Kab / Kota</label><b>${val(p.kabupaten_kota)}</b></div>
                                 <div class="detail-item"><label>Provinsi</label><b>${val(p.provinsi)}</b></div>
                                 <div class="detail-item"><label>Kode Pos</label><b>${val(p.kode_pos)}</b></div>
                             </div>
 
-                            <!-- DATA ORTU -->
-                            <div class="detail-title">DATA KELUARGA</div>
-                            <div style="background:#f8fafc; padding:15px; border-radius:10px; margin-bottom:15px;">
-                                <h6 style="margin:0 0 10px 0; color:#64748b; font-size:0.8rem; border-bottom:1px solid #e2e8f0;">AYAH</h6>
+                            <!-- DATA KELUARGA -->
+                            <div class="detail-title">Data Keluarga</div>
+                            <div class="d-sub-box" style="margin-bottom:8px;">
+                                <span class="d-sub-label">Ayah</span>
                                 <div class="detail-grid">
-                                    <div class="detail-item"><label>Nama Ayah</label><b>${val(p.nama_ayah)}</b></div>
-                                    <div class="detail-item"><label>NIK Ayah</label><b>${val(p.nik_ayah)}</b></div>
+                                    <div class="detail-item"><label>Nama</label><b>${val(p.nama_ayah)}</b></div>
+                                    <div class="detail-item"><label>NIK</label><b>${val(p.nik_ayah)}</b></div>
                                     <div class="detail-item"><label>Pekerjaan</label><b>${val(p.pekerjaan_ayah)}</b></div>
                                     <div class="detail-item"><label>Pendidikan</label><b>${val(p.pendidikan_ayah)}</b></div>
                                     <div class="detail-item"><label>Penghasilan</label><b>${money(p.penghasilan_ayah)}</b></div>
                                 </div>
                             </div>
-                            
-                            <div style="background:#f8fafc; padding:15px; border-radius:10px;">
-                                <h6 style="margin:0 0 10px 0; color:#64748b; font-size:0.8rem; border-bottom:1px solid #e2e8f0;">IBU</h6>
+                            <div class="d-sub-box">
+                                <span class="d-sub-label">Ibu</span>
                                 <div class="detail-grid">
-                                    <div class="detail-item"><label>Nama Ibu</label><b>${val(p.nama_ibu)}</b></div>
-                                    <div class="detail-item"><label>NIK Ibu</label><b>${val(p.nik_ibu)}</b></div>
+                                    <div class="detail-item"><label>Nama</label><b>${val(p.nama_ibu)}</b></div>
+                                    <div class="detail-item"><label>NIK</label><b>${val(p.nik_ibu)}</b></div>
                                     <div class="detail-item"><label>Pekerjaan</label><b>${val(p.pekerjaan_ibu)}</b></div>
                                     <div class="detail-item"><label>Pendidikan</label><b>${val(p.pendidikan_ibu)}</b></div>
                                     <div class="detail-item"><label>Penghasilan</label><b>${money(p.penghasilan_ibu)}</b></div>
                                 </div>
                             </div>
-                            
-                            <div style="margin-top:15px;">
-                                <label style="font-size:0.8rem; color:#64748b;">NO. HP ORTU:</label> 
-                                <b style="color:var(--primary); font-size: 1.1rem;">${val(p.no_telepon_ortu)}</b>
+                            <div class="d-phone-row">
+                                <label>No. HP Orang Tua</label>
+                                <b>${val(p.no_telepon_ortu)}</b>
                             </div>
 
                             <!-- DATA SEKOLAH -->
-                            <div class="detail-title">SEKOLAH ASAL</div>
+                            <div class="detail-title">Sekolah Asal</div>
                             <div class="detail-grid">
-                                <div class="detail-item"><label>Asal Sekolah</label><b>${val(p.asal_sekolah)}</b></div>
+                                <div class="detail-item"><label>Nama Sekolah</label><b>${val(p.asal_sekolah)}</b></div>
                                 <div class="detail-item"><label>NPSN</label><b>${val(p.npsn_sekolah)}</b></div>
                                 <div class="detail-item"><label>Status</label><b>${val(p.status_sekolah)}</b></div>
-                                <div class="detail-item" style="grid-column: span 2;"><label>Alamat Sekolah</label><b>${val(p.alamat_sekolah)}</b></div>
+                                <div class="detail-item" style="grid-column:span 2;"><label>Alamat Sekolah</label><b>${val(p.alamat_sekolah)}</b></div>
                             </div>
-                            
+
                             <!-- PESANTREN -->
-                            <div style="margin-top:15px; background: #fffbeb; padding: 15px; border: 1px solid #fcd34d; border-radius: 8px;">
-                                <label style="font-size:0.8rem; color:#b45309; font-weight: bold;">PILIHAN PESANTREN / TEMPAT TINGGAL:</label><br> 
-                                <b style="color:#92400e; font-size: 1.1rem;">${val(p.pilihan_pesantren)}</b>
+                            <div class="d-pesantren-box">
+                                <label style="font-size:0.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;display:block;margin-bottom:4px;">Pilihan Tempat Tinggal</label>
+                                <b style="font-size:0.88rem;color:#0d1b2a;">${val(p.pilihan_pesantren)}</b>
                             </div>
 
                             ${prestasiHtml}
