@@ -3,60 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bukti Pendaftaran - MAN 1 Tasikmalaya</title>
+    <title>Bukti Pendaftaran — MAN 1 Tasikmalaya</title>
     <link rel="icon" href="images/logo.png" type="image/png">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* TAMPILAN WEB */
-        .resume-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        .resume-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); text-align: center; position: relative; overflow: hidden; }
-        .resume-card::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background-image: url('images/logo.png'); background-size: contain; background-repeat: no-repeat; opacity: 0.05; pointer-events: none; }
-        .success-icon { width: 80px; height: 80px; background: #d1fae5; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 20px; box-shadow: 0 0 0 10px #ecfdf5; }
-        .account-box { background: #f8fafc; border: 2px dashed var(--primary); border-radius: 12px; padding: 20px; margin: 30px 0; text-align: left; }
-        .account-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; display: block; margin-bottom: 10px; text-align: center; }
-        .cred-row { display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 1rem; }
-        .cred-row:last-child { border-bottom: none; }
-        .cred-label { color: #64748b; }
-        .cred-val { font-weight: 800; color: #1e293b; font-family: monospace; font-size: 1.1rem; }
-        .summary-list { text-align: left; margin-top: 30px; }
-        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
-        .sum-label { color: #64748b; }
-        .sum-val { font-weight: 600; color: #1e293b; text-align: right; }
+        /* ── Tokens ─────────────────────────────────────────────── */
+        :root {
+            --ink:       #0d1b2a;
+            --ink-mid:   #334155;
+            --ink-soft:  #64748b;
+            --ink-faint: #94a3b8;
+            --rule:      #e2e8f0;
+            --rule-dark: #cbd5e1;
+            --surface:   #ffffff;
+            --bg:        #f1f5f9;
+            --teal:      #00796b;
+            --teal-dark: #004d40;
+            --teal-dim:  #e0f2f1;
+            --radius:    10px;
+            --header-height: 64px;
+        }
 
-        /* TAMPILAN CETAK (PRINT) */
+        body {
+            background: var(--bg);
+            background-image: none;
+            padding-top: var(--header-height);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* ── Header ─────────────────────────────────────────────── */
+        header {
+            height: var(--header-height);
+            background: rgba(255,255,255,.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--rule);
+            box-shadow: none;
+        }
+        .brand-title    { font-size: 1rem; font-weight: 800; color: var(--ink); }
+        .brand-subtitle { font-size: .72rem; color: var(--ink-soft); }
+        .kemenag-logo   { width: 36px; }
+        .nav-actions .btn {
+            border-radius: var(--radius);
+            padding: 8px 16px;
+            font-size: .82rem;
+            font-weight: 700;
+        }
+
+        /* ── Web layout ──────────────────────────────────────────── */
+        .resume-container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 36px 20px 60px;
+        }
+
+        /* ── Success icon ────────────────────────────────────────── */
+        .success-wrap {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 14px;
+            box-shadow: 0 0 0 8px #f0fdf4;
+        }
+        .success-wrap h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0 0 6px;
+        }
+        .success-wrap p {
+            font-size: .84rem;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+
+        /* ── Card ────────────────────────────────────────────────── */
+        .resume-card {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .card-head {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--rule);
+            background: var(--bg);
+        }
+        .card-head-label {
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+        .card-body { padding: 20px; }
+
+        /* ── Account box ─────────────────────────────────────────── */
+        .account-box {
+            background: var(--ink);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .account-box::before {
+            content: '';
+            position: absolute;
+            right: -20px; top: -20px;
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.04);
+        }
+        .account-box::after {
+            content: '';
+            position: absolute;
+            right: 20px; bottom: -30px;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.03);
+        }
+        .account-label {
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.4);
+            display: block;
+            margin-bottom: 14px;
+        }
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .cred-row:last-of-type { border-bottom: none; }
+        .cred-label {
+            font-size: .78rem;
+            color: rgba(255,255,255,.45);
+            font-weight: 500;
+        }
+        .cred-val {
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* CBT notice di dalam account box */
+        .cbt-notice {
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,.07);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.1);
+            font-size: .75rem;
+            color: rgba(255,255,255,.6);
+            line-height: 1.6;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .cbt-notice i { font-size: .9rem; flex-shrink: 0; margin-top: 1px; color: var(--teal); }
+        .cbt-notice b { color: rgba(255,255,255,.85); }
+
+        /* ── Summary rows ────────────────────────────────────────── */
+        .summary-list { display: flex; flex-direction: column; }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--rule);
+            font-size: .84rem;
+        }
+        .summary-item:last-child { border-bottom: none; }
+        .sum-label { color: var(--ink-soft); flex-shrink: 0; }
+        .sum-val   { font-weight: 700; color: var(--ink); text-align: right; }
+
+        /* ── Action buttons ──────────────────────────────────────── */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .action-row .btn {
+            flex: 1;
+            justify-content: center;
+            border-radius: var(--radius);
+            padding: 12px;
+            font-size: .84rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-dark {
+            background: var(--surface);
+            border: 1px solid var(--rule-dark);
+            color: var(--ink-mid);
+        }
+        .btn-outline-dark:hover { background: var(--bg); transform: none; }
+        .btn-primary {
+            background: var(--teal);
+            color: white;
+            border: none;
+            box-shadow: none;
+        }
+        .btn-primary:hover { background: var(--teal-dark); transform: none; }
+
+        /* ── PRINT STYLES ─────────────────────────────────────────── */
         @media print {
             body > *:not(#print-layout) { display: none !important; }
-            body { background: white !important; margin: 0; padding: 0; font-family: 'Times New Roman', serif !important; color: black !important; }
-            #print-layout { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 20px 40px; box-sizing: border-box; }
+            body {
+                background: white !important;
+                margin: 0; padding: 0;
+                font-family: 'Times New Roman', serif !important;
+                color: black !important;
+            }
+            #print-layout {
+                display: block !important;
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                padding: 20px 40px;
+                box-sizing: border-box;
+            }
             #print-layout * { visibility: visible !important; }
-            .print-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; }
-            .print-label { font-weight: bold; width: 180px; }
-            .print-val { flex: 1; }
-            .print-kop { border-bottom: 3px double black; padding-bottom: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 20px; text-align: center; line-height: 1.2; }
-            .print-account { border: 2px solid black; padding: 15px; margin: 20px 0; }
-            @page { size: A4; margin: 1cm; }
+            .print-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 0;
+                border-bottom: 1px dotted #ccc;
+                font-size: 14px;
+            }
+            .print-label { font-weight: bold; width: 200px; flex-shrink: 0; }
+            .print-val   { flex: 1; }
+            .print-kop {
+                border-bottom: 3px double black;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                text-align: center;
+                line-height: 1.2;
+            }
+            .print-account {
+                border: 2px solid black;
+                padding: 15px 20px;
+                margin: 20px 0;
+            }
+            .print-account-title {
+                text-align: center;
+                font-weight: bold;
+                font-size: 15px;
+                border-bottom: 1px solid black;
+                padding-bottom: 8px;
+                margin-bottom: 12px;
+            }
+            .print-cbt-notice {
+                margin-top: 10px;
+                padding: 8px 12px;
+                border: 1px dashed #666;
+                font-size: 12px;
+                color: #333;
+                font-style: italic;
+                line-height: 1.5;
+            }
+            @page { size: A4; margin: 1.5cm; }
+        }
+
+        /* ── Mobile ──────────────────────────────────────────────── */
+        @media (max-width: 480px) {
+            .brand-subtitle { display: none; }
+            .resume-container { padding: 20px 14px 48px; }
+            .action-row { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER WEB -->
+    <!-- HEADER -->
     <header class="no-print">
         <div class="container">
             <nav>
                 <div class="brand-wrapper">
-                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo" class="kemenag-logo">
+                    <img src="images/logo.png"
+                         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                         alt="Logo" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
-                        <div class="brand-subtitle">Sukamanah - Sukarame</div>
+                        <div class="brand-subtitle">Sukamanah · Sukarame · Kab. Tasikmalaya</div>
                     </div>
                 </div>
                 <div class="nav-actions">
-                    <a href="login.html" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;">
-                        <i class="ph ph-sign-in"></i> LOGIN DASHBOARD
+                    <a href="login.html" class="btn btn-primary">
+                        <i class="ph ph-sign-in"></i> Masuk Dashboard
                     </a>
                 </div>
             </nav>
@@ -65,175 +327,279 @@
 
     <!-- KONTEN WEB -->
     <div class="resume-container no-print">
+
+        <!-- Success header -->
+        <div class="success-wrap">
+            <div class="success-icon"><i class="ph ph-check-fat"></i></div>
+            <h2>Pendaftaran Berhasil!</h2>
+            <p>Simpan dan cetak bukti ini sebagai arsip pendaftaran Anda.</p>
+        </div>
+
+        <!-- Akun siswa -->
+        <div class="account-box">
+            <span class="account-label">Akun Siswa</span>
+            <div class="cred-row">
+                <span class="cred-label">Username (NISN)</span>
+                <span class="cred-val" id="res-nisn">—</span>
+            </div>
+            <div class="cred-row">
+                <span class="cred-label">Password (Tgl Lahir)</span>
+                <span class="cred-val" id="res-pass">—</span>
+            </div>
+            <div class="cbt-notice">
+                <i class="ph ph-monitor"></i>
+                <span>
+                    <b>Penting:</b> Akun ini juga akan digunakan untuk mengikuti
+                    <b>Tes Masuk CBT (Computer Based Test)</b> nanti. Harap simpan
+                    baik-baik dan jangan bagikan kepada siapapun.
+                </span>
+            </div>
+        </div>
+
+        <!-- Ringkasan data -->
         <div class="resume-card">
-            <div class="success-icon"><i class="ph ph-check"></i></div>
-            <h2 style="color: var(--primary); font-weight: 800; margin-bottom: 10px;">Pendaftaran Berhasil!</h2>
-            <p style="color: var(--text-muted);">Data tersimpan. Simpan akun ini untuk login.</p>
-
-            <div class="account-box">
-                <span class="account-label">AKUN SISWA</span>
-                <div class="cred-row"><span class="cred-label">Username (NISN)</span><span class="cred-val" id="res-nisn">...</span></div>
-                <div class="cred-row"><span class="cred-label">Password (Tgl Lahir)</span><span class="cred-val" id="res-pass">...</span></div>
+            <div class="card-head">
+                <span class="card-head-label">Ringkasan Pendaftaran</span>
             </div>
-
-            <div class="summary-list">
-                <h4 style="border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px;">Ringkasan Data</h4>
-                <div class="summary-item"><span class="sum-label">No. Pendaftaran</span><span class="sum-val" id="res-no-daftar">-</span></div>
-                <div class="summary-item"><span class="sum-label">Nama Lengkap</span><span class="sum-val" id="res-nama">-</span></div>
-                <div class="summary-item"><span class="sum-label">Jalur</span><span class="sum-val" id="res-jalur">-</span></div>
-                <div class="summary-item" id="row-ruangan"><span class="sum-label">Ruangan Tes</span><span class="sum-val" id="res-ruang">-</span></div>
-                <div class="summary-item"><span class="sum-label">Asal Sekolah</span><span class="sum-val" id="res-sekolah">-</span></div>
-                <div class="summary-item"><span class="sum-label">Waktu Daftar</span><span class="sum-val" id="res-waktu">-</span></div>
-            </div>
-
-            <div class="no-print" style="margin-top: 40px; display: flex; justify-content: center; gap: 15px;">
-                <button onclick="window.print()" class="btn btn-secondary"><i class="ph ph-printer"></i> Cetak Bukti</button>
-                <a href="login.html" class="btn btn-primary">Masuk Dashboard <i class="ph ph-arrow-right"></i></a>
+            <div class="card-body">
+                <div class="summary-list">
+                    <div class="summary-item">
+                        <span class="sum-label">No. Pendaftaran</span>
+                        <span class="sum-val" id="res-no-daftar">—</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="sum-label">Nama Lengkap</span>
+                        <span class="sum-val" id="res-nama">—</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="sum-label">Jalur</span>
+                        <span class="sum-val" id="res-jalur">—</span>
+                    </div>
+                    <div class="summary-item" id="row-ruangan">
+                        <span class="sum-label">Ruangan Tes</span>
+                        <span class="sum-val" id="res-ruang">—</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="sum-label">Asal Sekolah</span>
+                        <span class="sum-val" id="res-sekolah">—</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="sum-label">Waktu Daftar</span>
+                        <span class="sum-val" id="res-waktu">—</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- LAYOUT CETAK -->
-    <div id="print-layout" style="display: none;">
+        <!-- Tombol aksi -->
+        <div class="action-row no-print">
+            <button onclick="window.print()" class="btn btn-outline-dark">
+                <i class="ph ph-printer"></i> Cetak Bukti
+            </button>
+            <a href="login.html" class="btn btn-primary">
+                Masuk Dashboard <i class="ph ph-arrow-right"></i>
+            </a>
+        </div>
+
+    </div><!-- /resume-container -->
+
+
+    <!-- ══════════════════════════════════════
+         LAYOUT CETAK — semua ID dipertahankan
+    ══════════════════════════════════════ -->
+    <div id="print-layout" style="display:none;">
+
+        <!-- Kop surat -->
         <div class="print-kop">
-            <img src="images/logo.png" style="width: 90px; height: auto;">
+            <img src="images/logo.png" style="width:90px; height:auto;">
             <div>
-                <h5 style="margin:0; font-size:14px; font-weight:normal;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
-                <h5 style="margin:0; font-size:14px; font-weight:normal;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
-                <h3 style="margin:5px 0; font-size:20px; font-weight:bold;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
-                <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
-                <p style="margin:0; font-size:12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
-                <p style="margin:0; font-size:12px;"><b>website: www.manegeri1tasikmalaya.sch.id &nbsp; email: manegeri1tasik@gmail.com</b></p>
+                <h5 style="margin:0; font-size:14px; font-weight:normal; letter-spacing:.5px;">
+                    KEMENTERIAN AGAMA REPUBLIK INDONESIA
+                </h5>
+                <h5 style="margin:0; font-size:14px; font-weight:normal; letter-spacing:.5px;">
+                    KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA
+                </h5>
+                <h3 style="margin:5px 0; font-size:20px; font-weight:bold; font-family:Arial,sans-serif;">
+                    MADRASAH ALIYAH NEGERI 1 TASIKMALAYA
+                </h3>
+                <p style="margin:0; font-size:12px;">
+                    Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya
+                </p>
+                <p style="margin:0; font-size:12px;">Kode Pos 46461 &nbsp;|&nbsp; Telp/Fax. (0265) 545719</p>
+                <p style="margin:0; font-size:12px;">
+                    <b>website: www.manegeri1tasikmalaya.sch.id &nbsp;&nbsp; email: manegeri1tasik@gmail.com</b>
+                </p>
             </div>
         </div>
 
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h3 style="margin:0; text-decoration: underline; font-size: 18px;">TANDA BUKTI PENDAFTARAN</h3>
-            <p style="margin:5px 0 0 0; font-size: 14px;">PENERIMAAN MURID BARU TAHUN AJARAN 2026/2027</p>
+        <!-- Judul -->
+        <div style="text-align:center; margin-bottom:25px;">
+            <h3 style="margin:0; text-decoration:underline; font-size:18px; font-family:Arial,sans-serif;">
+                TANDA BUKTI PENDAFTARAN
+            </h3>
+            <p style="margin:4px 0 0; font-size:14px;">
+                PENERIMAAN MURID BARU TAHUN AJARAN 2026/2027
+            </p>
         </div>
 
-        <div style="font-size: 14px; line-height: 1.6;">
-            <div class="print-row"><span class="print-label">NOMOR PENDAFTARAN</span><span class="print-val">: <b id="p-no"></b></span></div>
-            <div class="print-row"><span class="print-label">TANGGAL DAFTAR</span><span class="print-val">: <span id="p-tgl"></span></span></div>
-            <div class="print-row"><span class="print-label">JALUR PENDAFTARAN</span><span class="print-val">: <span id="p-jalur"></span></span></div>
-            <br>
-            <div class="print-row"><span class="print-label">NISN</span><span class="print-val">: <span id="p-nisn"></span></span></div>
-            <div class="print-row"><span class="print-label">NAMA LENGKAP</span><span class="print-val">: <b id="p-nama"></b></span></div>
-            <div class="print-row"><span class="print-label">ASAL SEKOLAH</span><span class="print-val">: <span id="p-sekolah"></span></span></div>
-            <div class="print-row" id="row-ruangan-print"><span class="print-label">RUANGAN TES</span><span class="print-val">: <b id="p-ruang"></b></span></div>
+        <!-- Data pendaftar -->
+        <div style="font-size:14px; line-height:1.6;">
+            <div class="print-row">
+                <span class="print-label">NOMOR PENDAFTARAN</span>
+                <span class="print-val">: <b id="p-no"></b></span>
+            </div>
+            <div class="print-row">
+                <span class="print-label">TANGGAL DAFTAR</span>
+                <span class="print-val">: <span id="p-tgl"></span></span>
+            </div>
+            <div class="print-row">
+                <span class="print-label">JALUR PENDAFTARAN</span>
+                <span class="print-val">: <span id="p-jalur"></span></span>
+            </div>
+            <div style="margin:6px 0;"></div>
+            <div class="print-row">
+                <span class="print-label">NISN</span>
+                <span class="print-val">: <span id="p-nisn"></span></span>
+            </div>
+            <div class="print-row">
+                <span class="print-label">NAMA LENGKAP</span>
+                <span class="print-val">: <b id="p-nama"></b></span>
+            </div>
+            <div class="print-row">
+                <span class="print-label">ASAL SEKOLAH</span>
+                <span class="print-val">: <span id="p-sekolah"></span></span>
+            </div>
+            <div class="print-row" id="row-ruangan-print">
+                <span class="print-label">RUANGAN TES</span>
+                <span class="print-val">: <b id="p-ruang"></b></span>
+            </div>
         </div>
 
+        <!-- Kotak akun -->
         <div class="print-account">
-            <p style="margin:0 0 10px 0; text-align:center; font-weight:bold; border-bottom:1px solid black; padding-bottom:5px;">AKUN LOGIN SISWA</p>
-            <table style="width:100%; font-size:14px;">
+            <div class="print-account-title">AKUN LOGIN SISWA</div>
+            <table style="width:100%; font-size:14px; border-collapse:collapse;">
                 <tr>
-                    <td width="50%">Username (NISN) : <b id="p-user" style="font-size:16px;"></b></td>
-                    <td width="50%">Password (Tgl Lahir) : <b id="p-pass" style="font-size:16px;"></b></td>
+                    <td style="width:50%; padding:4px 0;">
+                        Username (NISN) &nbsp;: <b id="p-user" style="font-size:16px;"></b>
+                    </td>
+                    <td style="width:50%; padding:4px 0;">
+                        Password (Tgl Lahir) : <b id="p-pass" style="font-size:16px;"></b>
+                    </td>
                 </tr>
             </table>
-            <p style="margin:5px 0 0 0; font-size:11px; font-style:italic;">*Gunakan format DDMMYYYY (Cth: 22122008) untuk password.</p>
-        </div>
-
-        <div style="margin-top: 50px; display: flex; justify-content: flex-end;">
-            <div style="text-align: center; width: 250px;">
-                <p style="margin:0;">Tasikmalaya, <span id="p-cetak-tgl"></span></p>
-                <p style="margin:0;">Pendaftar,</p>
-                <br><br><br>
-                <p style="margin:0; font-weight:bold; text-decoration:underline;" id="p-ttd-nama"></p>
+            <p style="margin:6px 0 0; font-size:11px; font-style:italic; color:#555;">
+                * Format password: DDMMYYYY &nbsp;&mdash;&nbsp; Contoh: 22122008
+            </p>
+            <div class="print-cbt-notice">
+                <b>Catatan Penting:</b> Akun di atas (NISN &amp; Password) juga akan digunakan sebagai
+                kredensial login pada saat pelaksanaan <b>Tes Masuk CBT (Computer Based Test)</b>.
+                Harap simpan dengan baik dan jangan diberikan kepada siapapun.
             </div>
         </div>
-    </div>
 
-    <!-- SCRIPT (ROBUST DATA LOADING) -->
+        <!-- TTD -->
+        <div style="margin-top:50px; display:flex; justify-content:flex-end;">
+            <div style="text-align:center; width:260px;">
+                <p style="margin:0; font-size:14px;">
+                    Tasikmalaya, <span id="p-cetak-tgl"></span>
+                </p>
+                <p style="margin:2px 0 0; font-size:14px;">Pendaftar,</p>
+                <div style="height:60px;"></div>
+                <p style="margin:0; font-weight:bold; text-decoration:underline;
+                           font-size:14px;" id="p-ttd-nama"></p>
+            </div>
+        </div>
+
+    </div><!-- /print-layout -->
+
+
+    <!-- SCRIPT — semua ID & logic dipertahankan -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dataRaw = localStorage.getItem('resume_data');
-            
+
             if (!dataRaw) {
-                // Jangan langsung redirect, beri info dulu
                 Swal.fire({
                     icon: 'error',
                     title: 'Data Tidak Ditemukan',
-                    text: 'Tidak ada data pendaftaran yang tersimpan di browser ini. Mohon login untuk melihat data.'
-                }).then(() => {
-                    window.location.href = 'index.html';
-                });
+                    text: 'Tidak ada data pendaftaran di browser ini. Silakan login untuk melihat data.',
+                    confirmButtonColor: '#00796b',
+                }).then(() => { window.location.href = 'index.html'; });
                 return;
             }
 
             let data;
-            try {
-                data = JSON.parse(dataRaw);
-            } catch (e) {
-                console.error("Data corrupt");
-                return;
-            }
+            try { data = JSON.parse(dataRaw); }
+            catch (e) { console.error('Data corrupt'); return; }
 
-            // Safe Access Functions (Mencegah error jika data null)
-            const getVal = (key, fallback = '-') => (data[key] !== null && data[key] !== undefined) ? data[key] : fallback;
-            
-            // Format Tanggal
+            const getVal = (key, fallback = '-') =>
+                (data[key] !== null && data[key] !== undefined) ? data[key] : fallback;
+
+            // Format tanggal daftar
             let tglDaftar = '-';
             try {
-                if(data.created_at) tglDaftar = new Date(data.created_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+                if (data.created_at)
+                    tglDaftar = new Date(data.created_at)
+                        .toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
             } catch(e) {}
 
-            const tglCetak = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            const tglCetak = new Date().toLocaleDateString('id-ID',
+                { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // Format Password (Tgl Lahir DDMMYYYY)
-            let passDisplay = '******';
+            // Format password (DDMMYYYY dari YYYY-MM-DD)
+            let passDisplay = '——';
             if (data.tanggal_lahir) {
                 try {
-                    const parts = data.tanggal_lahir.split('-'); // YYYY-MM-DD
-                    if(parts.length === 3) passDisplay = parts[2] + parts[1] + parts[0];
+                    const parts = data.tanggal_lahir.split('-');
+                    if (parts.length === 3)
+                        passDisplay = parts[2] + parts[1] + parts[0];
                 } catch(e) {}
             }
 
-            // --- ISI DATA KE HTML (Safe Mode) ---
             const setText = (id, val) => {
                 const el = document.getElementById(id);
-                if(el) el.innerText = val;
+                if (el) el.innerText = val;
             };
 
-            // WEB
-            setText('res-nisn', getVal('nisn'));
+            // ── Web ──────────────────────────────────────
+            setText('res-nisn',      getVal('nisn'));
+            setText('res-pass',      passDisplay);
             setText('res-no-daftar', getVal('no_pendaftaran'));
-            setText('res-nama', getVal('nama_lengkap'));
-            setText('res-jalur', getVal('jalur'));
-            setText('res-sekolah', getVal('asal_sekolah'));
-            setText('res-waktu', tglDaftar);
-            setText('res-pass', passDisplay);
+            setText('res-nama',      getVal('nama_lengkap'));
+            setText('res-jalur',     getVal('jalur'));
+            setText('res-sekolah',   getVal('asal_sekolah'));
+            setText('res-waktu',     tglDaftar);
 
             const rowRuang = document.getElementById('row-ruangan');
-            const elRuang = document.getElementById('res-ruang');
+            const elRuang  = document.getElementById('res-ruang');
             if (data.jalur === 'REGULER') {
-                if(elRuang) {
-                    elRuang.innerText = 'Ruang ' + getVal('ruang_tes', 'Belum Ditentukan');
-                    elRuang.style.color = 'var(--primary)';
-                    elRuang.style.fontWeight = '800';
+                if (elRuang) {
+                    elRuang.innerText    = getVal('ruang_tes', 'Belum Ditentukan');
+                    elRuang.style.color  = 'var(--teal)';
                 }
             } else {
-                if(rowRuang) rowRuang.style.display = 'none';
+                if (rowRuang) rowRuang.style.display = 'none';
             }
 
-            // PRINT
-            setText('p-no', getVal('no_pendaftaran'));
-            setText('p-tgl', tglDaftar);
-            setText('p-jalur', getVal('jalur'));
-            setText('p-nisn', getVal('nisn'));
-            setText('p-nama', getVal('nama_lengkap').toUpperCase());
-            setText('p-sekolah', getVal('asal_sekolah'));
-            setText('p-user', getVal('nisn'));
-            setText('p-pass', passDisplay);
+            // ── Print ─────────────────────────────────────
+            setText('p-no',       getVal('no_pendaftaran'));
+            setText('p-tgl',      tglDaftar);
+            setText('p-jalur',    getVal('jalur'));
+            setText('p-nisn',     getVal('nisn'));
+            setText('p-nama',     getVal('nama_lengkap').toUpperCase());
+            setText('p-sekolah',  getVal('asal_sekolah'));
+            setText('p-user',     getVal('nisn'));
+            setText('p-pass',     passDisplay);
             setText('p-ttd-nama', getVal('nama_lengkap').toUpperCase());
-            setText('p-cetak-tgl', tglCetak);
+            setText('p-cetak-tgl',tglCetak);
 
             const rowRuangPrint = document.getElementById('row-ruangan-print');
-            const elRuangPrint = document.getElementById('p-ruang');
+            const elRuangPrint  = document.getElementById('p-ruang');
             if (data.jalur === 'REGULER') {
-                if(elRuangPrint) elRuangPrint.innerText = 'Ruang ' + getVal('ruang_tes', '-');
+                if (elRuangPrint) elRuangPrint.innerText = getVal('ruang_tes', '-');
             } else {
-                if(rowRuangPrint) rowRuangPrint.style.display = 'none';
+                if (rowRuangPrint) rowRuangPrint.style.display = 'none';
             }
         });
     </script>

@@ -1217,12 +1217,16 @@ window.viewDetail = async function(id) {
                 .map(k => '- ' + (labelMap[k] || k))
                 .join('%0A');
             const phone = (p.no_telepon_ortu || '').replace(/^0/, '62').replace(/[^0-9]/g, '');
-            const msg = encodeURIComponent(
-                `Halo ${p.nama_lengkap}, salam dari Panitia PMB MAN 1 Tasikmalaya.`
-            ) + '%0A%0A' +
-            encodeURIComponent('Berkas pendaftaran Anda perlu diperbaiki. Berkas berikut perlu diupload ulang:') + '%0A' +
-            berkasNames + '%0A%0A' +
-            encodeURIComponent('Silakan login ke portal PMB dan upload ulang berkas tersebut. Terima kasih.');
+            const msg =
+                encodeURIComponent('Assalamualaikum Warahmatullahi Wabarakatuh.') + '%0A%0A' +
+                encodeURIComponent(`Kepada Yth. Orang Tua / Wali dari ${p.nama_lengkap},`) + '%0A%0A' +
+                encodeURIComponent('Mohon maaf mengganggu waktunya. Kami dari Panitia Penerimaan Murid Baru (PMB) MAN 1 Tasikmalaya ingin menyampaikan bahwa berkas pendaftaran putra/putri Bapak/Ibu masih perlu dilengkapi.') + '%0A%0A' +
+                encodeURIComponent('Berkas yang perlu diupload ulang:') + '%0A' +
+                berkasNames + '%0A%0A' +
+                encodeURIComponent('Mohon kiranya Bapak/Ibu dapat membantu putra/putri untuk login kembali ke portal PMB dan mengupload ulang berkas tersebut sesegera mungkin agar proses pendaftaran dapat segera kami tindaklanjuti.') + '%0A%0A' +
+                encodeURIComponent('Apabila ada pertanyaan, jangan ragu untuk menghubungi kami kembali. Terima kasih atas perhatian dan kerjasamanya.') + '%0A%0A' +
+                encodeURIComponent('Wassalamualaikum Warahmatullahi Wabarakatuh.') + '%0A' +
+                encodeURIComponent('Panitia PMB MAN 1 Tasikmalaya');
             window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         };
 

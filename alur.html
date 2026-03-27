@@ -3,90 +3,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alur Pendaftaran - PMB MAN 1 Tasikmalaya</title>
+    <title>Alur Pendaftaran — PMB MAN 1 Tasikmalaya</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    
-    <!-- CSS Utama -->
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <style>
-        /* Desain Khusus Alur (Mobile First Vertical Timeline) */
-        body { background-color: #f8fafc; padding-top: var(--header-height); }
-        
-        .alur-header-box { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; margin-bottom: 40px; }
-        .alur-header-box h1 { margin: 0 0 10px 0; font-size: 2rem; font-weight: 800; }
-        .alur-header-box p { margin: 0; opacity: 0.9; font-size: 1rem; max-width: 600px; margin: 0 auto; }
+        /* ── Tokens ─────────────────────────────────────────────── */
+        :root {
+            --ink:       #0d1b2a;
+            --ink-mid:   #334155;
+            --ink-soft:  #64748b;
+            --ink-faint: #94a3b8;
+            --rule:      #e2e8f0;
+            --rule-dark: #cbd5e1;
+            --surface:   #ffffff;
+            --bg:        #f8fafc;
+            --teal:      #00796b;
+            --teal-dark: #004d40;
+            --teal-dim:  #e0f2f1;
+            --gold:      #d97706;
+            --gold-dim:  #fef3c7;
+            --radius:    10px;
+            --header-height: 64px;
+        }
 
-        .alur-container { max-width: 800px; margin: 0 auto; padding: 0 20px 60px; }
-        
-        /* Tabs Styling - WARNA DIBEDAKAN */
-        .alur-tabs { display: flex; gap: 10px; margin-bottom: 40px; background: white; padding: 5px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .alur-tab-btn { flex: 1; text-align: center; padding: 15px 10px; font-weight: 700; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: 0.3s; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .alur-tab-btn:hover { background: #f1f5f9; color: var(--text-main); }
-        
-        /* Warna spesifik untuk masing-masing tab saat aktif */
-        .alur-tab-btn.active#btn-alur-reguler { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,121,107,0.3); }
-        .alur-tab-btn.active#btn-alur-prestasi { background: #d97706; color: white; box-shadow: 0 4px 10px rgba(217,119,6,0.3); }
-        
-        .alur-content { display: none; animation: fadeIn 0.4s ease; }
+        body {
+            background: var(--bg);
+            background-image: none;
+            padding-top: var(--header-height);
+            color: var(--ink);
+        }
+
+        /* ── Header ─────────────────────────────────────────────── */
+        header {
+            height: var(--header-height);
+            background: rgba(255,255,255,.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--rule);
+            box-shadow: none;
+        }
+        .brand-title    { font-size: 1rem; font-weight: 800; color: var(--ink); }
+        .brand-subtitle { font-size: .72rem; color: var(--ink-soft); }
+        .kemenag-logo   { width: 36px; }
+        .nav-actions .btn {
+            border-radius: var(--radius);
+            padding: 8px 16px;
+            font-size: .82rem;
+            font-weight: 700;
+        }
+        .nav-actions .btn-secondary {
+            background: var(--bg);
+            border: 1px solid var(--rule-dark);
+            color: var(--ink-mid);
+        }
+        .nav-actions .btn-secondary:hover { background: var(--rule); transform: none; }
+
+        /* ── Hero ─────────────────────────────────────────────────── */
+        .alur-hero {
+            background: var(--ink);
+            padding: 48px 20px 52px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .alur-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        .alur-hero-inner { position: relative; z-index: 1; }
+        .alur-hero-eyebrow {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--teal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .alur-hero-eyebrow::before,
+        .alur-hero-eyebrow::after {
+            content: '';
+            display: block;
+            width: 24px;
+            height: 1.5px;
+            background: var(--teal);
+        }
+        .alur-hero h1 {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            color: white;
+            margin: 0 0 10px;
+            letter-spacing: -.5px;
+        }
+        .alur-hero p {
+            font-size: .9rem;
+            color: rgba(255,255,255,.5);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── Wrapper ─────────────────────────────────────────────── */
+        .alur-wrap {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        /* ── Perbandingan dua jalur ──────────────────────────────── */
+        .compare-section { margin-bottom: 40px; }
+        .compare-label {
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .compare-card {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .compare-card-head {
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .compare-card-head i { font-size: 1.1rem; }
+        .compare-card-head strong {
+            font-size: .9rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+        .compare-card-head small {
+            display: block;
+            font-size: .7rem;
+            color: var(--ink-soft);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .compare-rows { padding: 12px 0; }
+        .compare-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 7px 18px;
+            font-size: .8rem;
+            line-height: 1.5;
+        }
+        .compare-row:not(:last-child) { border-bottom: 1px solid var(--rule); }
+        .compare-row-key {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            color: var(--ink-faint);
+            flex-shrink: 0;
+            width: 90px;
+        }
+        .compare-row-val {
+            color: var(--ink-mid);
+            font-weight: 600;
+        }
+        .compare-row-val b { color: var(--ink); }
+
+        /* head colors */
+        .compare-card--reg .compare-card-head { background: var(--teal-dim); }
+        .compare-card--reg .compare-card-head i { color: var(--teal); }
+        .compare-card--pres .compare-card-head { background: var(--gold-dim); }
+        .compare-card--pres .compare-card-head i { color: var(--gold); }
+
+        /* ── Tab switcher ────────────────────────────────────────── */
+        .alur-tabs-wrap {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            margin-bottom: 32px;
+        }
+        .alur-tab-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: .84rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: background .2s, color .2s;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+        }
+        .alur-tab-btn:hover { background: var(--bg); color: var(--ink); }
+        .alur-tab-btn.active#btn-alur-reguler {
+            background: var(--teal);
+            color: white;
+        }
+        .alur-tab-btn.active#btn-alur-prestasi {
+            background: var(--gold);
+            color: white;
+        }
+
+        /* ── Timeline ────────────────────────────────────────────── */
+        .alur-content { display: none; animation: fadeInUp .3s ease; }
         .alur-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Vertical Timeline CSS */
-        /* UPDATE: Tambah margin-left agar tidak mepet kiri layar */
-        .timeline { position: relative; padding-left: 30px; margin-left: 25px; }
-        
-        /* Garis vertikal penghubung */
-        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #e2e8f0; border-radius: 4px; }
-        
-        .timeline-item { position: relative; margin-bottom: 40px; padding-left: 25px; }
+        .timeline {
+            position: relative;
+            padding-left: 52px;
+        }
+        /* Vertical line */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 17px;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: var(--rule);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 28px;
+        }
         .timeline-item:last-child { margin-bottom: 0; }
-        
-        /* Lingkaran / Ikon di garis */
-        .timeline-icon { position: absolute; left: -50px; top: 0; width: 44px; height: 44px; background: white; border: 4px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        /* Kotak Konten */
-        .timeline-box { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; position: relative; }
-        /* Tanda panah segitiga menunjuk ke kiri */
-        .timeline-box::before { content: ''; position: absolute; left: -10px; top: 15px; border-width: 10px 10px 10px 0; border-style: solid; border-color: transparent white transparent transparent; }
-        
-        .timeline-title { margin: 0 0 10px 0; font-size: 1.2rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px; }
-        .timeline-desc { margin: 0; color: #475569; font-size: 0.95rem; line-height: 1.6; }
-        
-        /* List Box Khusus Berkas */
-        .berkas-list { background: #f8fafc; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #e2e8f0; }
-        .berkas-list strong { display: block; color: var(--primary); margin-bottom: 10px; font-size: 0.9rem; }
-        .berkas-list ul { margin: 0; padding-left: 20px; color: #334155; font-size: 0.9rem; }
-        .berkas-list ul li { margin-bottom: 5px; }
 
-        /* Khusus Item Prestasi */
-        .timeline-icon.icon-pres { border-color: #d97706; color: #d97706; }
-        
-        /* Alert Info di dalam timeline */
-        .timeline-alert { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 12px 15px; border-radius: 8px; font-size: 0.85rem; margin-top: 15px; display: flex; gap: 10px; align-items: flex-start; }
-        .timeline-alert i { font-size: 1.2rem; margin-top: 2px; }
+        /* Circle icon */
+        .timeline-icon {
+            position: absolute;
+            left: -52px;
+            top: 16px;
+            width: 36px;
+            height: 36px;
+            background: var(--surface);
+            border: 2px solid var(--rule-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .95rem;
+            color: var(--ink-soft);
+            z-index: 2;
+        }
+        .timeline-icon.done {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: white;
+        }
+        .timeline-icon.icon-pres {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .timeline-icon.icon-pres.done {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
 
-        /* --- MOBILE OPTIMIZATION --- */
-        @media (max-width: 768px) {
-            header .container { padding: 0 15px !important; }
-            .brand-wrapper { gap: 10px !important; }
-            .kemenag-logo { width: 35px !important; }
-            .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
-            .brand-subtitle { display: none !important; } 
-            
-            .alur-header-box h1 { font-size: 1.6rem; }
-            .alur-tabs { flex-direction: column; }
-            
-            /* Penyesuaian jarak garis dan ikon agar tidak mepet kiri di HP */
-            .timeline { margin-left: 15px; padding-left: 20px; }
-            .timeline-item { padding-left: 15px; }
-            .timeline-icon { left: -34px; width: 36px; height: 36px; font-size: 1.1rem; border-width: 3px; }
-            
-            .timeline-box { padding: 20px 15px; }
-            .timeline-box::before { left: -8px; border-width: 8px 8px 8px 0; }
+        /* Step number — pojok kanan atas timeline-box */
+        .step-num {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--rule-dark);
+            line-height: 1;
+            letter-spacing: -2px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* Box */
+        .timeline-box {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            padding: 18px 20px;
+            position: relative;
+        }
+        /* Arrow */
+        .timeline-box::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 22px;
+            width: 12px;
+            height: 12px;
+            background: var(--surface);
+            border-left: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+            transform: rotate(45deg);
+        }
+
+        .timeline-title {
+            font-size: .92rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0 0 8px;
+        }
+        .timeline-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            padding: 3px 9px;
+            border-radius: 99px;
+            margin-bottom: 8px;
+        }
+        .timeline-date i { font-size: .8rem; }
+        .timeline-desc {
+            font-size: .84rem;
+            color: var(--ink-soft);
+            line-height: 1.75;
+            margin: 0;
+        }
+        .timeline-desc b { color: var(--ink); }
+
+        /* Berkas list */
+        .berkas-list {
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-top: 14px;
+        }
+        .berkas-list-title {
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .berkas-list ul {
+            margin: 0;
+            padding-left: 16px;
+            color: var(--ink-mid);
+            font-size: .82rem;
+            line-height: 1.85;
+        }
+        .berkas-list ul li b { color: var(--ink); }
+        .berkas-highlight { color: var(--gold); font-weight: 800; }
+
+        /* Alert box */
+        .timeline-alert {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            font-size: .8rem;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+        .timeline-alert i { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+        .alert-blue  { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        .alert-red   { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+        .alert-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+        .alert-amber { background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; }
+
+        /* Special last step */
+        .timeline-item:last-child .timeline-icon {
+            background: var(--ink);
+            border-color: var(--ink);
+            color: white;
+        }
+        .timeline-item:last-child .timeline-icon.icon-pres {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* ── FAQ Section ─────────────────────────────────────────── */
+        .faq-section {
+            margin-top: 52px;
+            padding-top: 40px;
+            border-top: 1px solid var(--rule);
+        }
+        .faq-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .faq-header h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0 0 6px;
+        }
+        .faq-header p {
+            font-size: .82rem;
+            color: var(--ink-soft);
+        }
+
+        .faq-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .faq-item {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .faq-q {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            font-size: .86rem;
+            font-weight: 700;
+            color: var(--ink);
+            user-select: none;
+        }
+        .faq-q i.faq-chevron {
+            font-size: 1rem;
+            color: var(--ink-faint);
+            flex-shrink: 0;
+            transition: transform .2s;
+        }
+        .faq-item.open .faq-chevron { transform: rotate(180deg); }
+        .faq-a {
+            display: none;
+            padding: 0 18px 14px;
+            font-size: .82rem;
+            color: var(--ink-soft);
+            line-height: 1.75;
+            border-top: 1px solid var(--rule);
+        }
+        .faq-item.open .faq-a { display: block; }
+        .faq-a b { color: var(--ink); }
+
+        /* ── CTA bottom ──────────────────────────────────────────── */
+        .cta-bottom {
+            margin-top: 40px;
+            background: var(--ink);
+            border-radius: 14px;
+            padding: 28px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .cta-bottom h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+            margin: 0 0 4px;
+        }
+        .cta-bottom p {
+            font-size: .8rem;
+            color: rgba(255,255,255,.45);
+            margin: 0;
+        }
+        .cta-bottom .btn-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: white;
+            color: var(--ink);
+            border-radius: var(--radius);
+            font-size: .84rem;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+        .cta-bottom .btn-cta:hover { background: #f1f5f9; }
+
+        /* ── Mobile ──────────────────────────────────────────────── */
+        @media (max-width: 640px) {
+            .brand-subtitle { display: none; }
+            .alur-hero { padding: 36px 20px 44px; }
+            .alur-wrap { padding: 28px 16px 60px; }
+
+            .compare-grid { grid-template-columns: 1fr; }
+            .alur-tabs-wrap { flex-direction: column; }
+            .alur-tab-btn { justify-content: flex-start; padding: 11px 14px; }
+
+            .timeline { padding-left: 40px; }
+            .timeline::before { left: 13px; }
+            .timeline-icon { left: -40px; width: 30px; height: 30px; font-size: .85rem; top: 14px; }
+            .step-num { font-size: 1.6rem; right: 14px; top: 10px; }
+            .timeline-box { padding: 14px 16px; }
+            .timeline-box::before { display: none; }
+            .timeline-title { font-size: .86rem; }
+            .timeline-item { margin-bottom: 20px; }
+
+            .cta-bottom { flex-direction: column; text-align: center; }
+            .cta-bottom .btn-cta { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -97,201 +537,351 @@
         <div class="container">
             <nav>
                 <div class="brand-wrapper">
-                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
+                    <img src="images/logo.png"
+                         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                         alt="Logo Kemenag" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
-                        <div class="brand-subtitle">Sukamanah - Sukarame</div>
+                        <div class="brand-subtitle">Sukamanah · Sukarame · Kab. Tasikmalaya</div>
                     </div>
                 </div>
                 <div class="nav-actions">
-                    <a href="index.html" class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.9rem;">
-                        <i class="ph ph-house"></i> <span class="hide-mobile">Beranda</span>
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="ph ph-house"></i>
+                        <span class="hide-mobile">Beranda</span>
                     </a>
                 </div>
             </nav>
         </div>
     </header>
 
-    <!-- HEADER HERO -->
-    <div class="alur-header-box">
-        <div class="container">
+    <!-- HERO -->
+    <div class="alur-hero">
+        <div class="alur-hero-inner">
+            <p class="alur-hero-eyebrow">PMB 2026/2027</p>
             <h1>Panduan Alur Pendaftaran</h1>
-            <p>Pahami tahapan seleksi dari awal hingga akhir agar pendaftaran Anda berjalan lancar tanpa kendala.</p>
+            <p>Pahami tahapan dari awal hingga akhir agar pendaftaran berjalan lancar.</p>
         </div>
     </div>
 
-    <!-- MAIN KONTEN -->
-    <div class="alur-container">
-        
-        <!-- TABS NAVIGASI -->
-        <div class="alur-tabs">
-            <div class="alur-tab-btn active" onclick="switchAlur('reguler')" id="btn-alur-reguler">
-                <i class="ph ph-student" style="font-size: 1.4rem;"></i> Jalur Reguler
-            </div>
-            <div class="alur-tab-btn" onclick="switchAlur('prestasi')" id="btn-alur-prestasi">
-                <i class="ph ph-trophy" style="font-size: 1.4rem;"></i> Jalur Prestasi
+    <!-- KONTEN -->
+    <div class="alur-wrap">
+
+        <!-- Perbandingan Dua Jalur -->
+        <div class="compare-section">
+            <p class="compare-label">Ringkasan Perbandingan Jalur</p>
+            <div class="compare-grid">
+
+                <div class="compare-card compare-card--reg">
+                    <div class="compare-card-head">
+                        <i class="ph ph-student"></i>
+                        <div>
+                            <strong>Jalur Reguler</strong>
+                            <small>Seleksi berbasis tes CBT</small>
+                        </div>
+                    </div>
+                    <div class="compare-rows">
+                        <div class="compare-row">
+                            <span class="compare-row-key">Buka</span>
+                            <span class="compare-row-val">20 April – 20 Mei 2026</span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="compare-row-key">Seleksi</span>
+                            <span class="compare-row-val">Tes CBT (21–23 Mei 2026)</span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="compare-row-key">Pengumuman</span>
+                            <span class="compare-row-val"><b>25 Mei 2026</b></span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="compare-row-key">Syarat</span>
+                            <span class="compare-row-val">Dokumen umum saja</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compare-card compare-card--pres">
+                    <div class="compare-card-head">
+                        <i class="ph ph-trophy"></i>
+                        <div>
+                            <strong>Jalur Prestasi</strong>
+                            <small>Seleksi berbasis prestasi/hafalan</small>
+                        </div>
+                    </div>
+                    <div class="compare-rows">
+                        <div class="compare-row">
+                            <span class="compare-row-key">Buka</span>
+                            <span class="compare-row-val">6 – 14 April 2026</span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="compare-row-key">Seleksi</span>
+                            <span class="compare-row-val">Tes Pembuktian (16 April)</span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="compare-row-key">Pengumuman</span>
+                            <span class="compare-row-val"><b>18 April 2026</b></span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="compare-row-key">Syarat</span>
+                            <span class="compare-row-val">Prestasi prov. / 10 juz+</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- ====================================
-             KONTEN 1: JALUR REGULER
-             ==================================== -->
+        <!-- Tab Switcher -->
+        <div class="alur-tabs-wrap">
+            <button class="alur-tab-btn active" onclick="switchAlur('reguler')" id="btn-alur-reguler">
+                <i class="ph ph-student"></i> Jalur Reguler
+            </button>
+            <button class="alur-tab-btn" onclick="switchAlur('prestasi')" id="btn-alur-prestasi">
+                <i class="ph ph-trophy"></i> Jalur Prestasi
+            </button>
+        </div>
+
+        <!-- ══════════════════════════════════
+             JALUR REGULER
+        ══════════════════════════════════ -->
         <div class="alur-content active" id="alur-reguler">
             <div class="timeline">
-                
-                <!-- Step 1 -->
+
                 <div class="timeline-item">
                     <div class="timeline-icon"><i class="ph ph-laptop"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">1. Isi Formulir Online</h3>
-                        <p class="timeline-desc">Pendaftar memasukkan NISN di halaman utama untuk memulai. Isi seluruh form biodata (Data Diri, Alamat, Orang Tua, dan Asal Sekolah) dengan lengkap dan benar menggunakan huruf kapital.</p>
+                    <div class="timeline-box"><span class="step-num">01</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> 20 April – 20 Mei 2026
+                        </span>
+                        <h3 class="timeline-title">Isi Formulir Pendaftaran Online</h3>
+                        <p class="timeline-desc">
+                            Masukkan NISN di halaman utama untuk memulai. Isi seluruh data
+                            (Data Diri, Alamat, Orang Tua, Asal Sekolah) dengan lengkap dan benar
+                            menggunakan <b>huruf kapital</b>.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Step 2 -->
                 <div class="timeline-item">
                     <div class="timeline-icon"><i class="ph ph-upload-simple"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">2. Upload Dokumen Persyaratan</h3>
-                        <p class="timeline-desc">Pada langkah terakhir pendaftaran, Anda diwajibkan mengunggah file hasil scan. Pastikan gambar jelas dan tidak terpotong.</p>
+                    <div class="timeline-box"><span class="step-num">02</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> Saat Mendaftar
+                        </span>
+                        <h3 class="timeline-title">Upload Dokumen Persyaratan</h3>
+                        <p class="timeline-desc">
+                            Unggah file scan dokumen berikut pada langkah terakhir pendaftaran.
+                            Pastikan gambar jelas, tidak buram, dan tidak terpotong.
+                        </p>
                         <div class="berkas-list">
-                            <strong><i class="ph ph-files"></i> Berkas Wajib (Maksimal 5 MB per file):</strong>
+                            <div class="berkas-list-title">
+                                <i class="ph ph-files"></i> Berkas Wajib — Maks. 2 MB per file
+                            </div>
                             <ul>
-                                <li><b>Pas Foto Latar Biru</b> (Format: JPG/PNG)</li>
-                                <li><b>Kartu Keluarga / KK</b> (Format: PDF)</li>
-                                <li><b>Akta Kelahiran</b> (Format: PDF)</li>
-                                <li><b>Surat Kelakuan Baik / SKB</b> (Format: PDF)</li>
-                                <li><b>KTP Orang Tua</b> (Ayah dan Ibu digabung 1 PDF)</li>
-                                <li><b>Rapor 5 Semester</b> (Format: PDF)</li>
+                                <li><b>Pas Foto Latar Biru</b> — JPG/PNG</li>
+                                <li><b>Kartu Keluarga (KK)</b> — PDF</li>
+                                <li><b>Akta Kelahiran</b> — PDF</li>
+                                <li><b>Surat Kelakuan Baik (SKB)</b> — PDF</li>
+                                <li><b>KTP Orang Tua</b> — Ayah &amp; Ibu digabung 1 PDF</li>
+                                <li><b>Rapor 5 Semester</b> — PDF</li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 3 -->
                 <div class="timeline-item">
                     <div class="timeline-icon"><i class="ph ph-magnifying-glass"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">3. Menunggu Verifikasi Panitia</h3>
-                        <p class="timeline-desc">Setelah menekan tombol "Kirim Pendaftaran", data Anda akan ditinjau oleh panitia (Pengecekan keaslian berkas). Selama proses ini, Anda bisa login ke <b>Dashboard Siswa</b> untuk memantau status berkas Anda.</p>
+                    <div class="timeline-box"><span class="step-num">03</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-clock"></i> Setelah Submit
+                        </span>
+                        <h3 class="timeline-title">Menunggu Verifikasi Panitia</h3>
+                        <p class="timeline-desc">
+                            Setelah menekan <b>Kirim Formulir</b>, data ditinjau oleh panitia untuk
+                            memastikan keaslian berkas. Pantau status di <b>Dashboard Siswa</b>.
+                            Jika ada berkas yang bermasalah, Anda akan menerima notifikasi untuk
+                            upload ulang.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Step 4 -->
                 <div class="timeline-item">
                     <div class="timeline-icon"><i class="ph ph-printer"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">4. Cetak Kartu Tes CBT</h3>
-                        <p class="timeline-desc">Jika berkas dinyatakan <b>VALID (Terverifikasi)</b>, panitia akan mengatur jadwal dan ruangan ujian Anda. Setelah itu, tombol <b>Cetak Kartu Tes</b> akan muncul di Dashboard Siswa Anda.</p>
-                        <div class="timeline-alert">
-                            <i class="ph ph-warning-circle"></i>
-                            <span>Wajib mencetak kartu ini karena di dalamnya terdapat <b>Sesi Waktu dan Ruangan</b> yang harus ditunjukkan saat hari H ujian.</span>
+                    <div class="timeline-box"><span class="step-num">04</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> Setelah Berkas Valid
+                        </span>
+                        <h3 class="timeline-title">Cetak Kartu Tes CBT</h3>
+                        <p class="timeline-desc">
+                            Jika berkas dinyatakan <b>Valid</b>, panitia akan mengatur jadwal dan
+                            ruangan. Tombol <b>Cetak Kartu Tes</b> akan otomatis muncul di
+                            Dashboard Anda.
+                        </p>
+                        <div class="timeline-alert alert-blue">
+                            <i class="ph ph-info"></i>
+                            <span>Kartu ini wajib dicetak dan dibawa saat hari H ujian karena memuat
+                            <b>sesi waktu dan nomor ruangan</b> yang spesifik untuk Anda.</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 5 -->
                 <div class="timeline-item">
                     <div class="timeline-icon"><i class="ph ph-desktop-tower"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">5. Pelaksanaan Tes CBT</h3>
-                        <p class="timeline-desc">Datang ke kampus MAN 1 Tasikmalaya sesuai hari dan waktu yang tertera di Kartu Ujian. Peserta wajib memakai seragam sekolah asal dan membawa alat tulis.</p>
+                    <div class="timeline-box"><span class="step-num">05</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> 21 – 23 Mei 2026
+                        </span>
+                        <h3 class="timeline-title">Pelaksanaan Tes Seleksi CBT</h3>
+                        <p class="timeline-desc">
+                            Datang ke kampus MAN 1 Tasikmalaya sesuai waktu di Kartu Ujian.
+                            Wajib memakai <b>seragam sekolah asal</b>, membawa kartu ujian,
+                            dan hadir minimal <b>30 menit sebelum</b> waktu yang tertera.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Step 6 -->
                 <div class="timeline-item">
-                    <div class="timeline-icon" style="background: var(--primary); color: white;"><i class="ph ph-confetti"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">6. Pengumuman Kelulusan Akhir</h3>
-                        <p class="timeline-desc">Pantau Hitung Mundur di Dashboard Siswa. Hasil seleksi akan diumumkan pada tanggal <b>25 Mei 2026</b>. Jika Lulus, silakan ikuti instruksi Daftar Ulang/Lapor Diri selanjutnya.</p>
+                    <div class="timeline-icon done"><i class="ph ph-confetti"></i></div>
+                    <div class="timeline-box"><span class="step-num">06</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> 25 Mei 2026
+                        </span>
+                        <h3 class="timeline-title">Pengumuman &amp; Lapor Diri</h3>
+                        <p class="timeline-desc">
+                            Hasil seleksi diumumkan melalui Dashboard Siswa. Jika dinyatakan
+                            <b>Lulus</b>, ikuti tahap Lapor Diri/Daftar Ulang pada
+                            <b>13 – 20 Juni 2026</b>.
+                        </p>
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- ====================================
-             KONTEN 2: JALUR PRESTASI
-             ==================================== -->
+        <!-- ══════════════════════════════════
+             JALUR PRESTASI
+        ══════════════════════════════════ -->
         <div class="alur-content" id="alur-prestasi">
             <div class="timeline">
-                
-                <!-- Step 1 -->
-                <div class="timeline-item">
-                    <div class="timeline-icon icon-pres"><i class="ph ph-laptop"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">1. Isi Formulir Online</h3>
-                        <p class="timeline-desc">Pilih <b>Jalur Prestasi</b> saat memulai pendaftaran di halaman utama. Isi seluruh form biodata (Data Diri, Alamat, Orang Tua, dan Asal Sekolah) dengan lengkap. Jangan lupa masukkan juga rincian riwayat prestasi (Min. Tingkat Provinsi) atau hafalan Tahfidz (Min. 10 Juz) pada kolom yang disediakan.</p>
-                    </div>
-                </div>
 
-                <!-- Step 2 -->
                 <div class="timeline-item">
-                    <div class="timeline-icon icon-pres"><i class="ph ph-upload-simple"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">2. Upload Dokumen & Sertifikat</h3>
-                        <p class="timeline-desc">Pada langkah terakhir, unggah seluruh dokumen persyaratan umum beserta bukti sertifikat prestasi Anda. Pastikan gambar jelas dan tidak buram.</p>
+                    <div class="timeline-icon icon-pres"><i class="ph ph-check-square"></i></div>
+                    <div class="timeline-box"><span class="step-num">01</span>
+                        <h3 class="timeline-title">Pastikan Anda Memenuhi Kriteria</h3>
+                        <p class="timeline-desc">
+                            Sebelum mendaftar, pastikan salah satu syarat berikut terpenuhi:
+                        </p>
                         <div class="berkas-list">
-                            <strong><i class="ph ph-files"></i> Berkas Wajib (Maksimal 5 MB per file):</strong>
+                            <div class="berkas-list-title">
+                                <i class="ph ph-list-checks"></i> Kriteria Jalur Prestasi
+                            </div>
                             <ul>
-                                <li><b>Pas Foto Latar Biru</b> (Format: JPG/PNG)</li>
-                                <li><b>Kartu Keluarga / KK</b> (Format: PDF)</li>
-                                <li><b>Akta Kelahiran</b> (Format: PDF)</li>
-                                <li><b>Surat Kelakuan Baik / SKB</b> (Format: PDF)</li>
-                                <li><b>KTP Orang Tua</b> (Ayah dan Ibu digabung 1 PDF)</li>
-                                <li><b>Rapor 5 Semester</b> (Format: PDF)</li>
-                                <li><b style="color: #d97706;">Sertifikat Prestasi</b> (Digabungkan dalam 1 file PDF)</li>
+                                <li>Prestasi Akademik / Non-Akademik / Keagamaan minimal
+                                    <b>Tingkat Provinsi</b> — dibuktikan sertifikat asli</li>
+                                <li>Hafalan Al-Quran (Tahfidz) <b>minimal 10 Juz</b></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 3 -->
                 <div class="timeline-item">
-                    <div class="timeline-icon icon-pres"><i class="ph ph-shield-check"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">3. Verifikasi Sertifikat & Berkas</h3>
-                        <p class="timeline-desc">Panitia akan menyeleksi keabsahan sertifikat dan kelengkapan berkas Anda. Silakan pantau Dashboard Siswa secara berkala.</p>
-                        <div class="timeline-alert" style="background: #fef2f2; border-color: #fecaca; color: #b91c1c;">
-                            <i class="ph ph-warning-circle"></i>
-                            <span><b>Penting:</b> Jika sertifikat tidak memenuhi kriteria, pendaftaran jalur prestasi Anda akan ditolak. Namun Anda bisa langsung menekan tombol pindah ke <b>Jalur Reguler</b> di Dashboard.</span>
+                    <div class="timeline-icon icon-pres"><i class="ph ph-laptop"></i></div>
+                    <div class="timeline-box"><span class="step-num">02</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> 6 – 14 April 2026
+                        </span>
+                        <h3 class="timeline-title">Isi Formulir &amp; Upload Dokumen</h3>
+                        <p class="timeline-desc">
+                            Pilih <b>Jalur Prestasi</b> di halaman utama. Isi data biodata dan
+                            riwayat prestasi, lalu upload semua berkas berikut:
+                        </p>
+                        <div class="berkas-list">
+                            <div class="berkas-list-title">
+                                <i class="ph ph-files"></i> Berkas Wajib — Maks. 2 MB per file
+                            </div>
+                            <ul>
+                                <li><b>Pas Foto Latar Biru</b> — JPG/PNG</li>
+                                <li><b>Kartu Keluarga (KK)</b> — PDF</li>
+                                <li><b>Akta Kelahiran</b> — PDF</li>
+                                <li><b>Surat Kelakuan Baik (SKB)</b> — PDF</li>
+                                <li><b>KTP Orang Tua</b> — Ayah &amp; Ibu digabung 1 PDF</li>
+                                <li><b>Rapor 5 Semester</b> — PDF</li>
+                                <li class="berkas-highlight">Sertifikat Prestasi — semua digabung 1 PDF</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-icon icon-pres"><i class="ph ph-shield-check"></i></div>
+                    <div class="timeline-box"><span class="step-num">03</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-clock"></i> Setelah Submit
+                        </span>
+                        <h3 class="timeline-title">Verifikasi Berkas &amp; Sertifikat</h3>
+                        <p class="timeline-desc">
+                            Panitia menyeleksi keabsahan sertifikat dan kelengkapan berkas.
+                            Pantau Dashboard Siswa secara berkala.
+                        </p>
+                        <div class="timeline-alert alert-red">
+                            <i class="ph ph-warning-circle"></i>
+                            <span>Jika sertifikat tidak memenuhi kriteria, pendaftaran jalur prestasi
+                            ditolak. Namun Anda bisa langsung mengikuti <b>Jalur Reguler</b>
+                            melalui tombol pengalihan di Dashboard.</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="timeline-item">
                     <div class="timeline-icon icon-pres"><i class="ph ph-envelope-open"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">4. Terima Undangan Tes Pembuktian</h3>
-                        <p class="timeline-desc">Jika berkas Valid, sebuah <b>Undangan Resmi</b> akan otomatis muncul di Dashboard Anda. Cetak undangan tersebut sebagai tiket masuk tahap selanjutnya.</p>
+                    <div class="timeline-box"><span class="step-num">04</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> Setelah Berkas Valid
+                        </span>
+                        <h3 class="timeline-title">Terima Undangan Tes Pembuktian</h3>
+                        <p class="timeline-desc">
+                            Jika berkas Valid, <b>Undangan Resmi</b> otomatis muncul di Dashboard.
+                            Cetak undangan tersebut sebagai tiket masuk ke tahap selanjutnya.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Step 5 -->
                 <div class="timeline-item">
                     <div class="timeline-icon icon-pres"><i class="ph ph-users-three"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">5. Tes Pembuktian Secara Offline</h3>
-                        <p class="timeline-desc">Hadir di kampus MAN 1 Tasikmalaya pada <b>16 April 2026</b> untuk membuktikan prestasi Anda secara langsung (Tes keahlian / Tes Hafalan Juz) di depan tim penguji. <b>Wajib membawa sertifikat fisik asli!</b></p>
+                    <div class="timeline-box"><span class="step-num">05</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> 16 April 2026
+                        </span>
+                        <h3 class="timeline-title">Tes Pembuktian Prestasi (Offline)</h3>
+                        <p class="timeline-desc">
+                            Hadir di kampus MAN 1 Tasikmalaya untuk membuktikan prestasi secara
+                            langsung di depan tim penguji. <b>Wajib membawa sertifikat fisik asli!</b>
+                        </p>
+                        <div class="timeline-alert alert-amber">
+                            <i class="ph ph-warning"></i>
+                            <span>Peserta Tahfidz akan menjalani tes hafalan langsung. Siapkan
+                            diri dengan baik.</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Step 6 -->
                 <div class="timeline-item">
-                    <div class="timeline-icon icon-pres" style="background: #d97706; color: white;"><i class="ph ph-star"></i></div>
-                    <div class="timeline-box">
-                        <h3 class="timeline-title">6. Pengumuman Kelulusan Prestasi</h3>
-                        <p class="timeline-desc">Hasil seleksi jalur Prestasi diumumkan pada <b>18 April 2026</b> di Dashboard Siswa Anda.</p>
-                        
-                        <!-- FITUR SAKTI SYSTEM -->
-                        <div class="berkas-list" style="background: #eff6ff; border-color: #bfdbfe; margin-top: 20px;">
-                            <strong style="color: #1e40af;"><i class="ph ph-magic-wand"></i> Keistimewaan Sistem (Jika Gagal Prestasi):</strong>
-                            <p style="margin: 0; color: #1e3a8a; font-size: 0.9rem; line-height: 1.5;">
-                                Bagi siswa yang lolos tahap berkas namun dinyatakan <b>Tidak Lulus</b> pada saat Tes Pembuktian Offline, sistem akan otomatis menawarkan Anda untuk dialihkan ke <b>Jalur Reguler</b>.<br><br>
-                                Keistimewaannya: Anda ditetapkan sebagai peserta <b>BEBAS TES CBT</b> (Seleksi menggunakan nilai rapor yang sudah Anda kumpulkan). Anda tinggal menunggu di rumah hingga pengumuman reguler dibuka.
-                            </p>
+                    <div class="timeline-icon icon-pres done"><i class="ph ph-star"></i></div>
+                    <div class="timeline-box"><span class="step-num">06</span>
+                        <span class="timeline-date">
+                            <i class="ph ph-calendar"></i> 18 April 2026
+                        </span>
+                        <h3 class="timeline-title">Pengumuman &amp; Lapor Diri</h3>
+                        <p class="timeline-desc">
+                            Hasil seleksi diumumkan melalui Dashboard Siswa. Jika Lulus,
+                            Lapor Diri pada <b>20 – 25 April 2026</b>.
+                        </p>
+                        <div class="timeline-alert alert-green">
+                            <i class="ph ph-info"></i>
+                            <span><b>Keistimewaan sistem:</b> Siswa yang lolos verifikasi berkas
+                            namun tidak lulus tes pembuktian akan otomatis ditawarkan pindah ke
+                            Jalur Reguler sebagai peserta <b>BEBAS TES CBT</b> — seleksi
+                            menggunakan nilai rapor, tanpa perlu ikut ujian CBT.</span>
                         </div>
                     </div>
                 </div>
@@ -299,22 +889,124 @@
             </div>
         </div>
 
-    </div>
+        <!-- ══════════════════════════════════
+             FAQ
+        ══════════════════════════════════ -->
+        <div class="faq-section">
+            <div class="faq-header">
+                <h2>Pertanyaan Umum</h2>
+                <p>Jawaban atas pertanyaan yang sering ditanyakan calon pendaftar</p>
+            </div>
 
-    <!-- SCRIPT LOGIC -->
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        Apakah bisa mendaftar di dua jalur sekaligus?
+                        <i class="ph ph-caret-down faq-chevron"></i>
+                    </div>
+                    <div class="faq-a">
+                        <b>Tidak bisa.</b> Setiap pendaftar hanya dapat memilih satu jalur saat mendaftar.
+                        Namun, jika Anda mendaftar Jalur Prestasi dan tidak lolos, sistem akan
+                        otomatis menawarkan pengalihan ke Jalur Reguler.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        Bagaimana jika saya salah upload berkas atau ingin upload ulang?
+                        <i class="ph ph-caret-down faq-chevron"></i>
+                    </div>
+                    <div class="faq-a">
+                        Login ke <b>Dashboard Siswa</b>, klik tombol <b>Edit &amp; Upload Ulang</b>,
+                        lalu pilih tab <b>Upload Berkas</b>. Anda bisa mengganti file lama kapan saja
+                        selama pendaftaran masih berlangsung.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        Berapa lama proses verifikasi berkas?
+                        <i class="ph ph-caret-down faq-chevron"></i>
+                    </div>
+                    <div class="faq-a">
+                        Proses verifikasi biasanya memakan waktu <b>1–3 hari kerja</b> setelah
+                        pendaftaran diterima. Pantau terus Dashboard Siswa Anda untuk melihat
+                        update status.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        Apa yang terjadi jika berkas saya ditolak/tidak sesuai?
+                        <i class="ph ph-caret-down faq-chevron"></i>
+                    </div>
+                    <div class="faq-a">
+                        Panitia akan menandai berkas yang bermasalah dan mengirim notifikasi
+                        ke nomor WhatsApp orang tua terdaftar. Di Dashboard Siswa akan muncul
+                        peringatan disertai daftar berkas yang perlu diperbaiki. Silakan upload
+                        ulang sesegera mungkin.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        Apakah ada biaya pendaftaran?
+                        <i class="ph ph-caret-down faq-chevron"></i>
+                    </div>
+                    <div class="faq-a">
+                        <b>Pendaftaran tidak dipungut biaya apapun.</b> Proses pendaftaran sepenuhnya
+                        gratis dan dilakukan secara online.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        NISN saya tidak ditemukan atau sudah terdaftar, apa yang harus dilakukan?
+                        <i class="ph ph-caret-down faq-chevron"></i>
+                    </div>
+                    <div class="faq-a">
+                        Jika NISN sudah terdaftar sebelumnya, silakan langsung <b>login ke Dashboard
+                        Siswa</b> menggunakan NISN dan tanggal lahir Anda. Jika ada masalah lain,
+                        hubungi panitia via WhatsApp yang tersedia di halaman utama.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CTA Bottom -->
+        <div class="cta-bottom">
+            <div>
+                <h3>Siap untuk mendaftar?</h3>
+                <p>Daftarkan diri sekarang sebelum kuota habis</p>
+            </div>
+            <a href="index.html" class="btn-cta">
+                <i class="ph ph-arrow-left"></i> Kembali ke Beranda
+            </a>
+        </div>
+
+    </div><!-- /alur-wrap -->
+
     <script>
+        // Tab switcher — fungsi dipertahankan
         function switchAlur(jalur) {
-            // Reset tab button
             document.getElementById('btn-alur-reguler').classList.remove('active');
             document.getElementById('btn-alur-prestasi').classList.remove('active');
-            
-            // Reset content
             document.getElementById('alur-reguler').classList.remove('active');
             document.getElementById('alur-prestasi').classList.remove('active');
+            document.getElementById('btn-alur-' + jalur).classList.add('active');
+            document.getElementById('alur-' + jalur).classList.add('active');
+        }
 
-            // Set active
-            document.getElementById(`btn-alur-${jalur}`).classList.add('active');
-            document.getElementById(`alur-${jalur}`).classList.add('active');
+        // FAQ accordion
+        function toggleFaq(el) {
+            const item = el.closest('.faq-item');
+            const isOpen = item.classList.contains('open');
+            // Close all
+            document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+            // Open clicked if was closed
+            if (!isOpen) item.classList.add('open');
         }
     </script>
 </body>
