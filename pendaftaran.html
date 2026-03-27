@@ -4,92 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Pendaftaran - MAN 1 Tasikmalaya</title>
-    <!-- Favicon -->
     <link rel="icon" href="images/logo.png" type="image/png">
-    
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <style>
-        /* FIX NAVIGASI FORMULIR */
-        .nav-buttons {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            width: 100% !important;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            gap: 10px;
-        }
-        
-        .nav-spacer { flex-grow: 1 !important; }
-
-        /* Warna Section Khusus */
-        .section-box {
-            padding: 20px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            border: 1px solid;
-        }
-        .box-ayah { background: #f0fdf4; border-color: #bbf7d0; }
-        .box-ibu { background: #fff1f2; border-color: #fecdd3; }
-        .box-alamat { background: #f8fafc; border-color: #e2e8f0; margin-top: 20px; }
-
-        .box-title {
-            margin-top: 0; margin-bottom: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; font-size: 1rem;
+        /* ============================================================
+           PAGE TOKENS
+        ============================================================ */
+        :root {
+            --ink:       #0d1b2a;
+            --ink-mid:   #334155;
+            --ink-soft:  #64748b;
+            --ink-faint: #94a3b8;
+            --rule:      #e2e8f0;
+            --rule-dark: #cbd5e1;
+            --surface:   #ffffff;
+            --bg:        #f8fafc;
+            --teal:      #00796b;
+            --teal-dim:  #e0f2f1;
+            --gold:      #d97706;
+            --err:       #dc2626;
+            --err-bg:    #fff5f5;
+            --ok:        #16a34a;
+            --ok-bg:     #f0fdf4;
+            --radius:    10px;
         }
 
-        /* Responsive Mobile Header */
-        @media (max-width: 768px) {
-            header .container { padding: 0 15px !important; }
-            .brand-wrapper { gap: 10px !important; }
-            .kemenag-logo { width: 35px !important; }
-            .brand-title { font-size: 0.9rem !important; white-space: normal !important; line-height: 1.2 !important; }
-            .brand-subtitle { display: none !important; }
-            .nav-actions .btn span { display: none; }
-            .nav-actions .btn { padding: 8px !important; width: 36px; height: 36px; justify-content: center; border-radius: 50%; }
-            .nav-actions .btn i { margin: 0; font-size: 1.2rem; }
-            .page-context { display: none !important; }
+        body {
+            background: var(--bg);
+            background-image: none;
+            padding-top: var(--header-height);
+            color: var(--ink);
         }
 
-        /* ===== PMB PROGRESS BAR ===== */
-        .pmb-progress-wrap {
-            margin-bottom: 28px;
+        /* ── Header ─────────────────────────────────────────────── */
+        header {
+            height: 64px;
+            border-bottom: 1px solid var(--rule);
+            box-shadow: none;
         }
+        :root { --header-height: 64px; }
+        .brand-title  { font-size: 1rem; font-weight: 800; color: var(--ink); }
+        .brand-subtitle { font-size: .72rem; color: var(--ink-soft); }
+        .kemenag-logo { width: 36px; }
+        .nav-actions .btn {
+            border-radius: var(--radius);
+            padding: 8px 16px;
+            font-size: .82rem;
+            font-weight: 700;
+        }
+        .nav-actions .btn-secondary {
+            background: var(--bg);
+            border: 1px solid var(--rule-dark);
+            color: var(--ink-mid);
+        }
+        .nav-actions .btn-secondary:hover { background: var(--rule); transform: none; }
+
+        /* ── Page wrapper ───────────────────────────────────────── */
+        .page-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 36px 20px 80px;
+        }
+
+        /* ── Form card ──────────────────────────────────────────── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 16px;
+            padding: 40px 40px 36px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.04);
+        }
+
+        /* ── Wizard header ──────────────────────────────────────── */
+        .wizard-header { margin-bottom: 28px; }
+        .wizard-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin: 0 0 4px;
+        }
+        .wizard-subtitle {
+            font-size: .8rem;
+            color: var(--ink-faint);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           PROGRESS BAR
+        ============================================================ */
+        .pmb-progress-wrap { margin-bottom: 32px; }
+
         .pmb-progress-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             margin-bottom: 8px;
         }
         .pmb-progress-label {
-            font-size: 0.82rem;
-            color: #64748b;
+            font-size: .78rem;
+            color: var(--ink-soft);
+            font-weight: 500;
         }
-        .pmb-progress-label b { color: var(--primary); }
+        .pmb-progress-label b { color: var(--ink); font-weight: 700; }
         .pmb-progress-pct {
-            font-size: 0.82rem;
+            font-size: .78rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--teal);
         }
+
+        /* Track */
         .pmb-progress-track {
-            height: 7px;
-            background: #e2e8f0;
+            height: 3px;
+            background: var(--rule);
             border-radius: 99px;
             overflow: hidden;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         .pmb-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), #34d399);
+            background: var(--teal);
             border-radius: 99px;
-            transition: width 0.4s cubic-bezier(.4,0,.2,1);
+            transition: width .4s cubic-bezier(.4,0,.2,1);
         }
+
         /* Steps row */
         .pmb-steps-row {
             display: flex;
@@ -101,138 +143,570 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             flex: 1;
-            opacity: 0.4;
-            transition: opacity 0.3s;
+            opacity: .35;
+            transition: opacity .25s;
         }
         .pmb-step.active, .pmb-step.finished { opacity: 1; }
+
         .pmb-step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--rule-dark);
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            color: var(--ink-faint);
+            transition: all .25s;
+        }
+        .pmb-step.active .pmb-step-dot {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(0,121,107,.15);
+        }
+        .pmb-step.finished .pmb-step-dot {
+            background: var(--teal-dim);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        .pmb-step.finished .pmb-step-dot::after { display: none; }
+
+        .pmb-step span {
+            font-size: .65rem;
+            font-weight: 600;
+            color: var(--ink-faint);
+            text-align: center;
+            line-height: 1.3;
+        }
+        .pmb-step.active span { color: var(--teal); font-weight: 700; }
+        .pmb-step.finished span { color: var(--ink-soft); }
+
+        /* ============================================================
+           FORM SECTIONS
+        ============================================================ */
+        .form-section { display: none; animation: fadeInUp .3s ease; }
+        .form-section.active { display: block; }
+
+        .form-section-title {
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--rule);
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Form group ─────────────────────────────────────────── */
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--ink-mid);
+            margin-bottom: 6px;
+            letter-spacing: .2px;
+        }
+        .form-group label .req {
+            color: var(--err);
+            margin-left: 2px;
+        }
+
+        .input-modern-form {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--rule-dark);
+            border-radius: var(--radius);
+            font-size: .9rem;
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .input-modern-form:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(0,121,107,.12);
+        }
+        .input-modern-form:read-only,
+        .input-modern-form[readonly] {
+            background: var(--bg);
+            color: var(--ink-faint);
+            cursor: not-allowed;
+        }
+        select.input-modern-form {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 1em;
+            padding-right: 36px;
+        }
+        textarea.input-modern-form { resize: vertical; min-height: 72px; }
+
+        .field-error {
+            font-size: .74rem;
+            color: var(--err);
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* ── Section box (Ayah / Ibu / Alamat) ──────────────────── */
+        .section-box {
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: var(--bg);
+        }
+        .box-ayah  { border-left: 3px solid var(--teal); }
+        .box-ibu   { border-left: 3px solid var(--ink-faint); }
+        .box-alamat { margin-top: 20px; }
+
+        .box-title {
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .box-ayah .box-title { color: var(--teal); }
+        .box-ibu  .box-title { color: var(--ink-mid); }
+
+        /* ── Pesantren box ──────────────────────────────────────── */
+        .pesantren-box {
+            border: 1px solid var(--rule-dark);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            background: var(--bg);
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .pesantren-box-title {
+            font-size: .78rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pesantren-box-note {
+            font-size: .78rem;
+            color: var(--ink-soft);
+            margin-top: 10px;
+            line-height: 1.5;
+            padding: 10px 12px;
+            background: var(--surface);
+            border-radius: 6px;
+            border: 1px solid var(--rule);
+        }
+        .pesantren-box-note b { color: var(--ink); }
+
+        /* ── Upload info bar ────────────────────────────────────── */
+        .upload-info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .upload-info-cell {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            font-size: .78rem;
+            color: var(--ink-soft);
+            line-height: 1.6;
+        }
+        .upload-info-cell strong { color: var(--ink); }
+        .upload-info-cell a { color: var(--teal); font-weight: 600; }
+
+        /* ── Upload row items ───────────────────────────────────── */
+        .upload-row-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: border-color .2s, background .15s;
+        }
+        .upload-row-item:hover { border-color: var(--teal); background: var(--surface); }
+        .upload-row-item.uploaded { border-color: var(--ok); background: var(--ok-bg); }
+        .upload-row-item.error    { border-color: var(--err); background: var(--err-bg); }
+
+        .upload-row-item input[type="file"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .upload-row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+        .upload-row-icon {
             width: 36px;
             height: 36px;
-            border-radius: 50%;
-            border: 2px solid #cbd5e1;
-            background: white;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--rule);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1rem;
-            color: #94a3b8;
-            transition: all 0.3s;
+            color: var(--ink-mid);
+            flex-shrink: 0;
+        }
+        .upload-row-item.uploaded .upload-row-icon { border-color: var(--ok); color: var(--ok); }
+        .upload-row-item.error    .upload-row-icon { border-color: var(--err); color: var(--err); }
+
+        .upload-row-title {
+            font-size: .84rem;
+            font-weight: 700;
+            color: var(--ink);
+            display: block;
+            margin-bottom: 1px;
+        }
+        .upload-row-hint {
+            font-size: .72rem;
+            color: var(--ink-faint);
+            line-height: 1.4;
+        }
+        .upload-badge-required {
+            font-size: .65rem;
+            background: var(--bg);
+            color: var(--err);
+            border: 1px solid var(--rule-dark);
+            padding: 1px 6px;
+            border-radius: 99px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .upload-row-status {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--ink-faint);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            flex-shrink: 0;
+            width: 72px;
+            text-align: right;
+            line-height: 1.3;
+            word-break: break-all;
+        }
+        .upload-row-item.uploaded .upload-row-status { color: var(--ok); }
+        .upload-row-item.error    .upload-row-status { color: var(--err); }
+
+        /* ── Upload progress ────────────────────────────────────── */
+        #upload-progress-bar {
+            margin-top: 12px;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #upload-progress-bar i { font-size: 1.1rem; color: var(--ink-faint); flex-shrink: 0; }
+        #upload-progress-bar .prog-label {
+            font-size: .75rem;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+        }
+        #upload-progress-bar .prog-track {
+            flex: 1;
+        }
+        #upload-progress-fill {
+            height: 4px;
+            border-radius: 99px;
+            background: var(--teal);
+            width: 0%;
+            transition: width .3s;
+        }
+        .prog-bg {
+            background: var(--rule);
+            border-radius: 99px;
+            height: 4px;
+            overflow: hidden;
+        }
+        #upload-progress-text {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--ink-faint);
+            flex-shrink: 0;
+        }
+
+        /* ── Prestasi section ───────────────────────────────────── */
+        .prestasi-card-item {
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 12px;
             position: relative;
         }
-        .pmb-step.active .pmb-step-dot {
-            background: var(--primary);
-            border-color: var(--primary);
+        .prestasi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        /* Sertifikat box */
+        .sertifikat-box {
+            margin-top: 24px;
+            border: 1px solid var(--rule-dark);
+            border-radius: var(--radius);
+            padding: 18px;
+            background: var(--bg);
+        }
+        .sertifikat-box label {
+            display: block;
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 10px;
+        }
+
+        /* ── Nav buttons ────────────────────────────────────────── */
+        .nav-buttons {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--rule);
+            gap: 10px;
+        }
+        .nav-spacer { flex-grow: 1 !important; }
+
+        .nav-buttons .btn {
+            border-radius: var(--radius);
+            padding: 12px 24px;
+            font-size: .85rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
+        .nav-buttons .btn-secondary {
+            background: var(--bg);
+            border: 1px solid var(--rule-dark);
+            color: var(--ink-mid);
+        }
+        .nav-buttons .btn-secondary:hover { background: var(--rule); transform: none; }
+        .nav-buttons .btn-primary {
+            background: var(--teal);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,121,107,0.3);
-            transform: scale(1.1);
+            box-shadow: 0 4px 14px rgba(0,121,107,.2);
         }
-        .pmb-step.finished .pmb-step-dot {
-            background: #f0fdfa;
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        .pmb-step.finished .pmb-step-dot::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            opacity: 0.3;
-        }
-        .pmb-step span {
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #94a3b8;
-            text-align: center;
-            line-height: 1.2;
-        }
-        .pmb-step.active span { color: var(--primary); font-weight: 700; }
-        .pmb-step.finished span { color: var(--primary); }
+        .nav-buttons .btn-primary:hover { background: var(--teal-dark, #004d40); transform: none; }
 
-        /* ===== MOBILE FORM FIX ===== */
+        /* Submit button — sama tapi beda warna */
+        #btn-submit {
+            background: var(--ink) !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(13,27,42,.2) !important;
+        }
+        #btn-submit:hover { background: #1e293b !important; transform: none !important; }
+
+        /* ── Modal Instruksi ────────────────────────────────────── */
+        .instruction-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            animation: fadeIn .25s ease;
+        }
+        .instruction-box-popup {
+            background: white;
+            width: 90%;
+            max-width: 560px;
+            padding: 36px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.15);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border-top: 3px solid var(--teal);
+        }
+        .instruction-box-popup h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: .5px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--rule);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .instruction-box-popup h3 i { color: var(--teal); }
+        .instruction-list ol {
+            padding-left: 18px;
+            margin-bottom: 16px;
+        }
+        .instruction-list li {
+            margin-bottom: 8px;
+            font-size: .88rem;
+            line-height: 1.6;
+            color: var(--ink-mid);
+        }
+        .instruction-list strong { color: var(--ink); }
+        .instruction-file-list {
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-top: 12px;
+            list-style: none;
+        }
+        .instruction-file-list li {
+            font-size: .84rem;
+            color: var(--ink-mid);
+            padding: 6px 0;
+            border-bottom: 1px solid var(--rule);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+        .instruction-file-list li:last-child { border-bottom: none; }
+        .instruction-file-list li i { color: var(--ink-soft); font-size: .95rem; }
+
+        /* ============================================================
+           MOBILE
+        ============================================================ */
+        @media (max-width: 768px) {
+            .brand-subtitle { display: none; }
+            .page-context   { display: none; }
+        }
+
         @media (max-width: 600px) {
-            /* Form card padding lebih compact */
-            .form-card { padding: 16px !important; border-radius: 16px !important; }
-            .form-section-title { font-size: 1rem; margin-bottom: 16px; }
+            .page-wrap { padding: 16px 12px 60px; }
+            .form-card  { padding: 20px 16px 20px; border-radius: 12px; }
 
-            /* Input tidak overflow */
+            .form-grid  { grid-template-columns: 1fr !important; gap: 12px !important; }
+            .form-group { margin-bottom: 12px !important; }
+            .form-group label { font-size: .76rem !important; }
+
             .input-modern-form {
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-                font-size: 0.9rem !important;
-                padding: 10px 12px !important;
-                /* Cegah zoom otomatis di iOS */
-                font-size: 16px !important;
+                font-size: 16px !important; /* cegah iOS zoom */
+                padding: 11px 12px !important;
             }
             select.input-modern-form { font-size: 16px !important; }
 
-            /* Grid jadi 1 kolom di HP */
-            .form-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+            .section-box { padding: 14px !important; }
+            .box-title   { font-size: .68rem !important; }
 
-            /* Section box margin & padding lebih kecil */
-            .section-box { padding: 14px !important; margin-bottom: 14px !important; border-radius: 12px !important; }
-            .box-title { font-size: 0.9rem !important; margin-bottom: 12px !important; }
-
-            /* Pilihan Tempat Tinggal inline style override */
-            .form-group[style*="background: #f0fdfa"] {
-                padding: 14px !important;
-                border-radius: 10px !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
-
-            /* Info bar upload jadi 1 kolom */
             .upload-info-bar { flex-direction: column !important; }
-            .upload-info-bar > div { min-width: unset !important; width: 100% !important; }
+            .upload-info-cell { min-width: unset !important; width: 100% !important; }
+            .upload-row-hint  { display: none; }
+            .upload-badge-required { display: none; }
 
-            /* Progress bar upload */
-            #upload-progress-bar { padding: 10px 12px !important; }
+            .nav-buttons { padding: 12px 0 0; margin-top: 24px; }
+            .nav-buttons .btn { padding: 11px 18px; font-size: .8rem; }
 
-            /* Form group spacing */
-            .form-group { margin-bottom: 12px !important; }
-            .form-group label { font-size: 0.82rem !important; margin-bottom: 4px !important; display: block; }
+            .pmb-step span { font-size: .6rem; }
+            .pmb-step-dot  { width: 28px; height: 28px; font-size: .8rem; }
+
+            #upload-progress-bar { padding: 10px 12px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
+    <!-- ══════════════════════════════════
+         HEADER
+    ══════════════════════════════════ -->
     <header>
         <div class="container">
             <nav>
                 <div class="brand-wrapper">
-                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
+                    <img src="images/logo.png"
+                         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                         alt="Logo Kemenag" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
-                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
+                        <div class="brand-subtitle">Sukamanah · Sukarame · Kab. Tasikmalaya</div>
                     </div>
                 </div>
                 <div class="nav-actions">
                     <span class="page-context">Formulir Online</span>
                     <a href="index.html" class="btn btn-secondary" title="Kembali ke Beranda">
-                        <i class="ph ph-arrow-left"></i> <span>Batal / Kembali</span>
+                        <i class="ph ph-arrow-left"></i>
+                        <span>Batal / Kembali</span>
                     </a>
                 </div>
             </nav>
         </div>
     </header>
 
-    <div class="container" style="margin-bottom: 80px;">
-        
-        <!-- CARD FORM -->
-        <div class="info-card form-card" style="padding: 50px 40px; border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-            
+    <!-- ══════════════════════════════════
+         MAIN
+    ══════════════════════════════════ -->
+    <div class="page-wrap">
+        <div class="form-card">
+
+            <!-- Header -->
             <div class="wizard-header">
-                <h2 class="wizard-title">FORMULIR PENDAFTARAN</h2>
+                <h2 class="wizard-title">Formulir Pendaftaran</h2>
+                <p class="wizard-subtitle">MAN 1 Tasikmalaya — Tahun Ajaran 2026/2027</p>
             </div>
 
-            <!-- PROGRESS BAR BARU -->
+            <!-- ════ PROGRESS BAR ════ -->
             <div class="pmb-progress-wrap">
                 <div class="pmb-progress-header">
-                    <span class="pmb-progress-label" id="pmb-step-label">Langkah 1 dari 4 &nbsp;·&nbsp; <b>Data Peserta Didik</b></span>
+                    <span class="pmb-progress-label" id="pmb-step-label">
+                        Langkah 1 dari 4 &nbsp;·&nbsp; <b>Data Peserta Didik</b>
+                    </span>
                     <span class="pmb-progress-pct" id="pmb-step-pct">25%</span>
                 </div>
                 <div class="pmb-progress-track">
@@ -263,32 +737,48 @@
             </div>
 
             <form id="pmbForm" onsubmit="return false;">
-                
-                <!-- SECTION 1: DATA PESERTA DIDIK -->
+
+                <!-- ════ SECTION 1: DATA PESERTA DIDIK ════ -->
                 <div class="form-section active" id="section-1">
                     <h3 class="form-section-title">A. Data Peserta Didik</h3>
-                    
+
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>NISN (Otomatis)</label>
-                            <input type="text" id="nisn" readonly class="input-modern-form" style="background: #e2e8f0; cursor: not-allowed;">
+                            <label>NISN <span style="color:var(--ink-faint);font-weight:500;">(Otomatis)</span></label>
+                            <input type="text" id="nisn" readonly class="input-modern-form">
                         </div>
                         <div class="form-group">
-                            <label>NIK Siswa *</label>
-                            <input type="number" id="nik" required class="input-modern-form" placeholder="16 digit NIK"
-                                oninput="validateNIK(this)">
-                            <small id="nik-error" style="color: #dc2626; display: none; margin-top: 4px;">NIK harus tepat 16 digit.</small>
+                            <label>NIK Siswa <span class="req">*</span></label>
+                            <input type="number" id="nik" required class="input-modern-form"
+                                   placeholder="16 digit NIK" oninput="validateNIK(this)">
+                            <small id="nik-error" class="field-error">NIK harus tepat 16 digit.</small>
                         </div>
-                        <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="nama_lengkap" required class="input-modern-form" style="text-transform: uppercase;"></div>
-                        <div class="form-group"><label>Jenis Kelamin *</label>
-                            <select id="jenis_kelamin" required class="input-modern-form"><option value="">- Pilih -</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select>
+                        <div class="form-group">
+                            <label>Nama Lengkap <span class="req">*</span></label>
+                            <input type="text" id="nama_lengkap" required class="input-modern-form"
+                                   style="text-transform:uppercase;">
                         </div>
-                        <div class="form-group"><label>Tempat Lahir *</label><input type="text" id="tempat_lahir" required class="input-modern-form" style="text-transform: uppercase;"></div>
-                        <div class="form-group"><label>Tanggal Lahir *</label><input type="date" id="tanggal_lahir" required class="input-modern-form"></div>
-                        
-                        <div class="form-group"><label>Ukuran Baju *</label>
+                        <div class="form-group">
+                            <label>Jenis Kelamin <span class="req">*</span></label>
+                            <select id="jenis_kelamin" required class="input-modern-form">
+                                <option value="">— Pilih —</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tempat Lahir <span class="req">*</span></label>
+                            <input type="text" id="tempat_lahir" required class="input-modern-form"
+                                   style="text-transform:uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Lahir <span class="req">*</span></label>
+                            <input type="date" id="tanggal_lahir" required class="input-modern-form">
+                        </div>
+                        <div class="form-group">
+                            <label>Ukuran Baju <span class="req">*</span></label>
                             <select id="ukuran_baju" required class="input-modern-form">
-                                <option value="">- Pilih -</option>
+                                <option value="">— Pilih —</option>
                                 <option value="S">S</option>
                                 <option value="M">M</option>
                                 <option value="L">L</option>
@@ -297,61 +787,121 @@
                                 <option value="XXXL">XXXL</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group"><label>Jumlah Saudara *</label><input type="number" id="jumlah_saudara" required class="input-modern-form"></div>
-                        <div class="form-group"><label>Anak Ke- *</label><input type="number" id="anak_ke" required class="input-modern-form"></div>
-                        <div class="form-group"><label>Status Anak *</label>
-                            <select id="status_anak" required class="input-modern-form"><option value="Kandung">Kandung</option><option value="Angkat">Angkat</option></select>
+                        <div class="form-group">
+                            <label>Jumlah Saudara <span class="req">*</span></label>
+                            <input type="number" id="jumlah_saudara" required class="input-modern-form">
+                        </div>
+                        <div class="form-group">
+                            <label>Anak Ke- <span class="req">*</span></label>
+                            <input type="number" id="anak_ke" required class="input-modern-form">
+                        </div>
+                        <div class="form-group">
+                            <label>Status Anak <span class="req">*</span></label>
+                            <select id="status_anak" required class="input-modern-form">
+                                <option value="Kandung">Kandung</option>
+                                <option value="Angkat">Angkat</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- BOX ALAMAT (Style Khusus) -->
+                    <!-- Alamat -->
                     <div class="section-box box-alamat">
-                        <h4 class="box-title" style="color: var(--text-main);">
-                            <i class="ph ph-map-pin" style="color: var(--primary);"></i> Alamat Tempat Tinggal
+                        <h4 class="box-title">
+                            <i class="ph ph-map-pin"></i> Alamat Tempat Tinggal
                         </h4>
                         <div class="form-grid">
-                            <div class="form-group"><label>Provinsi *</label><select id="provinsi" onchange="loadKabupaten()" required class="input-modern-form"><option value="">Loading...</option></select></div>
-                            <div class="form-group"><label>Kabupaten/Kota *</label><select id="kabupaten" onchange="loadKecamatan()" required disabled class="input-modern-form"><option value="">Pilih Provinsi Dulu</option></select></div>
-                            <div class="form-group"><label>Kecamatan *</label><select id="kecamatan" onchange="loadDesa()" required disabled class="input-modern-form"><option value="">Pilih Kabupaten Dulu</option></select></div>
-                            <div class="form-group"><label>Desa/Kelurahan *</label><select id="desa" required disabled class="input-modern-form"><option value="">Pilih Kecamatan Dulu</option></select></div>
-                            <div class="form-group"><label>RT *</label><input type="number" id="rt" required class="input-modern-form"></div>
-                            <div class="form-group"><label>RW *</label><input type="number" id="rw" required class="input-modern-form"></div>
-                            <div class="form-group"><label>Kode Pos *</label><input type="number" id="kode_pos" required class="input-modern-form"></div>
+                            <div class="form-group">
+                                <label>Provinsi <span class="req">*</span></label>
+                                <select id="provinsi" onchange="loadKabupaten()" required class="input-modern-form">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kabupaten/Kota <span class="req">*</span></label>
+                                <select id="kabupaten" onchange="loadKecamatan()" required disabled class="input-modern-form">
+                                    <option value="">Pilih Provinsi Dulu</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kecamatan <span class="req">*</span></label>
+                                <select id="kecamatan" onchange="loadDesa()" required disabled class="input-modern-form">
+                                    <option value="">Pilih Kabupaten Dulu</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Desa/Kelurahan <span class="req">*</span></label>
+                                <select id="desa" required disabled class="input-modern-form">
+                                    <option value="">Pilih Kecamatan Dulu</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>RT <span class="req">*</span></label>
+                                <input type="number" id="rt" required class="input-modern-form">
+                            </div>
+                            <div class="form-group">
+                                <label>RW <span class="req">*</span></label>
+                                <input type="number" id="rw" required class="input-modern-form">
+                            </div>
+                            <div class="form-group">
+                                <label>Kode Pos <span class="req">*</span></label>
+                                <input type="number" id="kode_pos" required class="input-modern-form">
+                            </div>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0;"><label>Alamat Lengkap (Jalan/Kampung) *</label><textarea id="alamat_lengkap" rows="2" required class="input-modern-form" style="text-transform: uppercase;"></textarea></div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Alamat Lengkap (Jalan/Kampung) <span class="req">*</span></label>
+                            <textarea id="alamat_lengkap" rows="2" required class="input-modern-form"
+                                      style="text-transform:uppercase;"></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECTION 2: DATA KELUARGA -->
+                <!-- ════ SECTION 2: DATA KELUARGA ════ -->
                 <div class="form-section" id="section-2">
                     <h3 class="form-section-title">B. Data Keluarga</h3>
-                    <div class="form-group" style="margin-bottom: 30px;">
-                        <label>Nomor Kartu Keluarga (KK) *</label>
-                        <input type="number" id="no_kk" required class="input-modern-form" placeholder="Masukkan 16 digit No. KK" style="font-size: 1.1rem; letter-spacing: 1px;" oninput="validateDigit(this, 16, 'no_kk-error')">
-                        <small id="no_kk-error" style="color: #dc2626; display: none; margin-top: 4px;">Nomor KK harus tepat 16 digit.</small>
+
+                    <div class="form-group" style="margin-bottom:24px;">
+                        <label>Nomor Kartu Keluarga (KK) <span class="req">*</span></label>
+                        <input type="number" id="no_kk" required class="input-modern-form"
+                               placeholder="16 digit Nomor KK"
+                               oninput="validateDigit(this, 16, 'no_kk-error')">
+                        <small id="no_kk-error" class="field-error">Nomor KK harus tepat 16 digit.</small>
                     </div>
 
-                    <!-- DATA AYAH (HIJAU) -->
+                    <!-- Data Ayah -->
                     <div class="section-box box-ayah">
-                        <h4 class="box-title" style="color: #15803d;">
+                        <h4 class="box-title">
                             <i class="ph ph-user"></i> Data Ayah
                         </h4>
                         <div class="form-grid">
-                            <div class="form-group"><label>Nama Ayah *</label><input type="text" id="nama_ayah" required class="input-modern-form" style="text-transform: uppercase;"></div>
-                            <div class="form-group"><label>NIK Ayah *</label><input type="number" id="nik_ayah" required class="input-modern-form" oninput="validateDigit(this, 16, 'nik_ayah-error')"><small id="nik_ayah-error" style="color: #dc2626; display: none; margin-top: 4px;">NIK Ayah harus tepat 16 digit.</small></div>
-                            <div class="form-group"><label>Pendidikan Ayah *</label>
+                            <div class="form-group">
+                                <label>Nama Ayah <span class="req">*</span></label>
+                                <input type="text" id="nama_ayah" required class="input-modern-form"
+                                       style="text-transform:uppercase;">
+                            </div>
+                            <div class="form-group">
+                                <label>NIK Ayah <span class="req">*</span></label>
+                                <input type="number" id="nik_ayah" required class="input-modern-form"
+                                       oninput="validateDigit(this, 16, 'nik_ayah-error')">
+                                <small id="nik_ayah-error" class="field-error">NIK Ayah harus tepat 16 digit.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Pendidikan Ayah <span class="req">*</span></label>
                                 <select id="pendidikan_ayah" required class="input-modern-form">
-                                    <option value="" selected disabled>- Pilih Pendidikan -</option>
+                                    <option value="" selected disabled>— Pilih —</option>
                                     <option value="TIDAK SEKOLAH">TIDAK SEKOLAH</option>
-                                    <option value="SD">SD</option><option value="SLTP">SLTP</option><option value="SLTA">SLTA</option>
-                                    <option value="D3">D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+                                    <option value="SD">SD</option>
+                                    <option value="SLTP">SLTP</option>
+                                    <option value="SLTA">SLTA</option>
+                                    <option value="D3">D3</option>
+                                    <option value="S1">S1</option>
+                                    <option value="S2">S2</option>
+                                    <option value="S3">S3</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group"><label>Pekerjaan Ayah *</label>
+                            <div class="form-group">
+                                <label>Pekerjaan Ayah <span class="req">*</span></label>
                                 <select id="pekerjaan_ayah" required class="input-modern-form">
-                                    <option value="" selected disabled>- Pilih Pekerjaan -</option>
+                                    <option value="" selected disabled>— Pilih —</option>
                                     <option value="TIDAK BEKERJA">TIDAK BEKERJA</option>
                                     <option value="PENSIUNAN">PENSIUNAN</option>
                                     <option value="PNS">PNS</option>
@@ -372,31 +922,49 @@
                                     <option value="LAINNYA">LAINNYA</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group"><label>Penghasilan Ayah (Rp) *</label><input type="number" id="penghasilan_ayah" required class="input-modern-form" placeholder="Contoh: 2000000"></div>
+                            <div class="form-group">
+                                <label>Penghasilan Ayah (Rp) <span class="req">*</span></label>
+                                <input type="number" id="penghasilan_ayah" required class="input-modern-form"
+                                       placeholder="Contoh: 2000000">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- DATA IBU (PINK) -->
+                    <!-- Data Ibu -->
                     <div class="section-box box-ibu">
-                        <h4 class="box-title" style="color: #be123c;">
+                        <h4 class="box-title">
                             <i class="ph ph-user-circle"></i> Data Ibu
                         </h4>
                         <div class="form-grid">
-                            <div class="form-group"><label>Nama Ibu *</label><input type="text" id="nama_ibu" required class="input-modern-form" style="text-transform: uppercase;"></div>
-                            <div class="form-group"><label>NIK Ibu *</label><input type="number" id="nik_ibu" required class="input-modern-form" oninput="validateDigit(this, 16, 'nik_ibu-error')"><small id="nik_ibu-error" style="color: #dc2626; display: none; margin-top: 4px;">NIK Ibu harus tepat 16 digit.</small></div>
-                            <div class="form-group"><label>Pendidikan Ibu *</label>
+                            <div class="form-group">
+                                <label>Nama Ibu <span class="req">*</span></label>
+                                <input type="text" id="nama_ibu" required class="input-modern-form"
+                                       style="text-transform:uppercase;">
+                            </div>
+                            <div class="form-group">
+                                <label>NIK Ibu <span class="req">*</span></label>
+                                <input type="number" id="nik_ibu" required class="input-modern-form"
+                                       oninput="validateDigit(this, 16, 'nik_ibu-error')">
+                                <small id="nik_ibu-error" class="field-error">NIK Ibu harus tepat 16 digit.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Pendidikan Ibu <span class="req">*</span></label>
                                 <select id="pendidikan_ibu" required class="input-modern-form">
-                                    <option value="" selected disabled>- Pilih Pendidikan -</option>
+                                    <option value="" selected disabled>— Pilih —</option>
                                     <option value="TIDAK SEKOLAH">TIDAK SEKOLAH</option>
-                                    <option value="SD">SD</option><option value="SLTP">SLTP</option><option value="SLTA">SLTA</option>
-                                    <option value="D3">D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+                                    <option value="SD">SD</option>
+                                    <option value="SLTP">SLTP</option>
+                                    <option value="SLTA">SLTA</option>
+                                    <option value="D3">D3</option>
+                                    <option value="S1">S1</option>
+                                    <option value="S2">S2</option>
+                                    <option value="S3">S3</option>
                                 </select>
                             </div>
-
-                            <div class="form-group"><label>Pekerjaan Ibu *</label>
+                            <div class="form-group">
+                                <label>Pekerjaan Ibu <span class="req">*</span></label>
                                 <select id="pekerjaan_ibu" required class="input-modern-form">
-                                    <option value="" selected disabled>- Pilih Pekerjaan -</option>
+                                    <option value="" selected disabled>— Pilih —</option>
                                     <option value="TIDAK BEKERJA">TIDAK BEKERJA</option>
                                     <option value="PENSIUNAN">PENSIUNAN</option>
                                     <option value="PNS">PNS</option>
@@ -417,35 +985,62 @@
                                     <option value="LAINNYA">LAINNYA</option>
                                 </select>
                             </div>
-
-                            <div class="form-group"><label>Penghasilan Ibu (Rp) *</label><input type="number" id="penghasilan_ibu" required class="input-modern-form" placeholder="Contoh: 0"></div>
+                            <div class="form-group">
+                                <label>Penghasilan Ibu (Rp) <span class="req">*</span></label>
+                                <input type="number" id="penghasilan_ibu" required class="input-modern-form"
+                                       placeholder="Contoh: 0">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label style="color: var(--primary); font-weight: 700;">No. Telepon Orang Tua/WA (Aktif) *</label>
-                        <input type="number" id="no_telepon_ortu" required class="input-modern-form" placeholder="08xxxxx" style="font-size: 1.1rem; border-color: var(--primary);">
+                    <div class="form-group" style="margin-top:4px;">
+                        <label>No. Telepon Orang Tua / WhatsApp (Aktif) <span class="req">*</span></label>
+                        <input type="number" id="no_telepon_ortu" required class="input-modern-form"
+                               placeholder="08xxxxxxxxxx">
                     </div>
                 </div>
 
-                <!-- SECTION 3: ASAL SEKOLAH -->
+                <!-- ════ SECTION 3: ASAL SEKOLAH ════ -->
                 <div class="form-section" id="section-3">
-                    <h3 class="form-section-title">C. Asal Sekolah & Pesantren</h3>
+                    <h3 class="form-section-title">C. Asal Sekolah &amp; Pesantren</h3>
+
                     <div class="form-grid">
-                        <div class="form-group"><label>Nama Sekolah Asal *</label><input type="text" id="asal_sekolah" required class="input-modern-form" style="text-transform: uppercase;"></div>
-                        <div class="form-group"><label>NPSN *</label><input type="number" id="npsn_sekolah" required class="input-modern-form" oninput="validateDigit(this, 8, 'npsn-error')"><small id="npsn-error" style="color: #dc2626; display: none; margin-top: 4px;">NPSN harus tepat 8 digit.</small></div>
-                        <div class="form-group"><label>Status Sekolah *</label>
-                            <select id="status_sekolah" required class="input-modern-form"><option value="Negeri">Negeri</option><option value="Swasta">Swasta</option></select>
+                        <div class="form-group">
+                            <label>Nama Sekolah Asal <span class="req">*</span></label>
+                            <input type="text" id="asal_sekolah" required class="input-modern-form"
+                                   style="text-transform:uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label>NPSN <span class="req">*</span></label>
+                            <input type="number" id="npsn_sekolah" required class="input-modern-form"
+                                   oninput="validateDigit(this, 8, 'npsn-error')">
+                            <small id="npsn-error" class="field-error">NPSN harus tepat 8 digit.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Status Sekolah <span class="req">*</span></label>
+                            <select id="status_sekolah" required class="input-modern-form">
+                                <option value="Negeri">Negeri</option>
+                                <option value="Swasta">Swasta</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-group"><label>Alamat Sekolah *</label><textarea id="alamat_sekolah" rows="2" required class="input-modern-form" style="text-transform: uppercase;"></textarea></div>
+                    <div class="form-group">
+                        <label>Alamat Sekolah <span class="req">*</span></label>
+                        <textarea id="alamat_sekolah" rows="2" required class="input-modern-form"
+                                  style="text-transform:uppercase;"></textarea>
+                    </div>
 
-                    <div class="form-group" style="background: #f0fdfa; padding: 20px; border-radius: 12px; border: 1px solid var(--primary); margin-top: 20px; box-sizing: border-box; width: 100%;">
-                        <label style="color: var(--primary-dark); font-weight:800; font-size:1.1rem; display: flex; align-items: center; gap: 10px;">
-                            <i class="ph ph-house-line"></i> Pilihan Tempat Tinggal (Pesantren/ Warga Sekitar) *
+                    <!-- Pilihan Pesantren -->
+                    <div class="pesantren-box">
+                        <div class="pesantren-box-title">
+                            <i class="ph ph-house-line"></i>
+                            Pilihan Tempat Tinggal
+                        </div>
+                        <label style="font-size:.78rem;font-weight:700;color:var(--ink-mid);display:block;margin-bottom:6px;">
+                            Pesantren / Warga Sekitar <span class="req">*</span>
                         </label>
-                        <select id="pilihan_pesantren" required class="input-modern-form" style="border-color: var(--primary); margin-top:15px; font-weight: 600;">
-                            <option value="">- Silakan Pilih -</option>
+                        <select id="pilihan_pesantren" required class="input-modern-form">
+                            <option value="">— Silakan Pilih —</option>
                             <option value="Pesantren Sukahideng">Pesantren Sukahideng</option>
                             <option value="Pesantren Sukamanah">Pesantren Sukamanah</option>
                             <option value="Pesantren Rancabolang">Pesantren Rancabolang</option>
@@ -453,46 +1048,42 @@
                             <option value="Penduduk Desa Sukarapih">Penduduk Desa Sukarapih</option>
                             <option value="Penduduk Desa Wargekerta">Penduduk Desa Wargekerta</option>
                         </select>
-                        <small style="display:block; margin-top:10px; color: var(--primary); background: white; padding: 8px 12px; border-radius: 6px; display: inline-block;">
-                            <i class="ph ph-info"></i> Calon murid dari luar Desa Sukarapih/Wargakerta <b>WAJIB</b> memilih Pesantren.
-                        </small>
+                        <div class="pesantren-box-note">
+                            Calon murid dari luar Desa Sukarapih/Wargakerta
+                            <b>wajib</b> memilih salah satu pesantren.
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECTION 4: UPLOAD BERKAS (MODERN GRID) -->
+                <!-- ════ SECTION 4: UPLOAD BERKAS ════ -->
                 <div class="form-section" id="section-4">
                     <h3 class="form-section-title">D. Upload Berkas</h3>
 
-                    <!-- Info Bar -->
-                    <div class="upload-info-bar" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                        <div style="flex:1; min-width:200px; background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:10px;">
-                            <i class="ph ph-info" style="font-size:1.3rem; color:#0d9488; flex-shrink:0;"></i>
-                            <div style="font-size:0.82rem; color:#0f766e; line-height:1.5;">
-                                <b>Format:</b> <span style="background:#e0f2fe; color:#0369a1; padding:1px 6px; border-radius:4px; font-weight:700;">PDF</span> untuk dokumen &nbsp;·&nbsp; <span style="background:#fce7f3; color:#be185d; padding:1px 6px; border-radius:4px; font-weight:700;">JPG/PNG</span> untuk Foto<br>
-                                <b>Maks ukuran:</b> <span style="color:#dc2626; font-weight:700;">2MB</span> per file &nbsp;·&nbsp; Foto dikompres otomatis
-                            </div>
+                    <!-- Info bar -->
+                    <div class="upload-info-bar">
+                        <div class="upload-info-cell">
+                            <strong>Format:</strong> PDF untuk dokumen &nbsp;·&nbsp; JPG/PNG untuk foto<br>
+                            <strong>Maks ukuran:</strong> 2 MB per file &nbsp;·&nbsp; Foto dikompres otomatis
                         </div>
-                        <div style="flex:1; min-width:200px; background:#fffbeb; border:1px solid #fcd34d; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:10px;">
-                            <i class="ph ph-file-pdf" style="font-size:1.3rem; color:#d97706; flex-shrink:0;"></i>
-                            <div style="font-size:0.82rem; color:#92400e; line-height:1.5;">
-                                <b>PDF terlalu besar?</b> Kompres gratis di:<br>
-                                <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#d97706; font-weight:700; text-decoration:underline;">ilovepdf.com</a> &nbsp;·&nbsp;
-                                <a href="https://smallpdf.com/compress-pdf" target="_blank" style="color:#d97706; font-weight:700; text-decoration:underline;">smallpdf.com</a>
-                            </div>
+                        <div class="upload-info-cell">
+                            <strong>PDF terlalu besar?</strong> Kompres gratis di:<br>
+                            <a href="https://www.ilovepdf.com/compress_pdf" target="_blank">ilovepdf.com</a>
+                            &nbsp;·&nbsp;
+                            <a href="https://smallpdf.com/compress-pdf" target="_blank">smallpdf.com</a>
                         </div>
                     </div>
 
-                    <!-- Upload Grid: List Style -->
-                    <div style="display:flex; flex-direction:column; gap:10px;">
+                    <!-- Upload rows -->
+                    <div style="display:flex;flex-direction:column;gap:8px;">
 
-                        <!-- Foto -->
                         <div class="upload-row-item" id="row-file_foto">
-                            <input type="file" id="file_foto" accept="image/png, image/jpeg, image/jpg" required onchange="updateFileName(this)">
+                            <input type="file" id="file_foto" accept="image/png,image/jpeg,image/jpg"
+                                   required onchange="updateFileName(this)">
                             <div class="upload-row-left">
-                                <div class="upload-row-icon" style="background:#fce7f3; color:#be185d;"><i class="ph ph-user-focus"></i></div>
+                                <div class="upload-row-icon"><i class="ph ph-user-focus"></i></div>
                                 <div>
-                                    <div class="upload-row-title">Pas Foto <span class="upload-badge-required">Wajib</span></div>
-                                    <div class="upload-row-hint">JPG/PNG · Maks 2MB · <em>Auto-kompres</em></div>
+                                    <span class="upload-row-title">Pas Foto <span class="upload-badge-required">Wajib</span></span>
+                                    <span class="upload-row-hint">JPG/PNG · Maks 2MB · Auto-kompres</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_foto">
@@ -500,14 +1091,13 @@
                             </div>
                         </div>
 
-                        <!-- KK -->
                         <div class="upload-row-item" id="row-file_kk">
                             <input type="file" id="file_kk" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-row-left">
-                                <div class="upload-row-icon" style="background:#eff6ff; color:#2563eb;"><i class="ph ph-users-three"></i></div>
+                                <div class="upload-row-icon"><i class="ph ph-users-three"></i></div>
                                 <div>
-                                    <div class="upload-row-title">Kartu Keluarga (KK) <span class="upload-badge-required">Wajib</span></div>
-                                    <div class="upload-row-hint">PDF · Maks 2MB</div>
+                                    <span class="upload-row-title">Kartu Keluarga (KK) <span class="upload-badge-required">Wajib</span></span>
+                                    <span class="upload-row-hint">PDF · Maks 2MB</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_kk">
@@ -515,14 +1105,13 @@
                             </div>
                         </div>
 
-                        <!-- Akta -->
                         <div class="upload-row-item" id="row-file_akta">
                             <input type="file" id="file_akta" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-row-left">
-                                <div class="upload-row-icon" style="background:#f0fdf4; color:#16a34a;"><i class="ph ph-scroll"></i></div>
+                                <div class="upload-row-icon"><i class="ph ph-scroll"></i></div>
                                 <div>
-                                    <div class="upload-row-title">Akta Kelahiran <span class="upload-badge-required">Wajib</span></div>
-                                    <div class="upload-row-hint">PDF · Maks 2MB</div>
+                                    <span class="upload-row-title">Akta Kelahiran <span class="upload-badge-required">Wajib</span></span>
+                                    <span class="upload-row-hint">PDF · Maks 2MB</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_akta">
@@ -530,14 +1119,13 @@
                             </div>
                         </div>
 
-                        <!-- SKB -->
                         <div class="upload-row-item" id="row-file_skb">
                             <input type="file" id="file_skb" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-row-left">
-                                <div class="upload-row-icon" style="background:#fdf4ff; color:#9333ea;"><i class="ph ph-certificate"></i></div>
+                                <div class="upload-row-icon"><i class="ph ph-certificate"></i></div>
                                 <div>
-                                    <div class="upload-row-title">Surat Kelakuan Baik <span class="upload-badge-required">Wajib</span></div>
-                                    <div class="upload-row-hint">PDF · Maks 2MB</div>
+                                    <span class="upload-row-title">Surat Kelakuan Baik <span class="upload-badge-required">Wajib</span></span>
+                                    <span class="upload-row-hint">PDF · Maks 2MB</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_skb">
@@ -545,14 +1133,13 @@
                             </div>
                         </div>
 
-                        <!-- KTP Ortu -->
                         <div class="upload-row-item" id="row-file_ktp_ortu">
                             <input type="file" id="file_ktp_ortu" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-row-left">
-                                <div class="upload-row-icon" style="background:#fff7ed; color:#ea580c;"><i class="ph ph-identification-card"></i></div>
+                                <div class="upload-row-icon"><i class="ph ph-identification-card"></i></div>
                                 <div>
-                                    <div class="upload-row-title">KTP Orang Tua <span class="upload-badge-required">Wajib</span></div>
-                                    <div class="upload-row-hint">PDF · Maks 2MB · KTP Ayah & Ibu digabung dalam <b>1 file PDF</b></div>
+                                    <span class="upload-row-title">KTP Orang Tua <span class="upload-badge-required">Wajib</span></span>
+                                    <span class="upload-row-hint">PDF · Maks 2MB · KTP Ayah &amp; Ibu digabung dalam 1 file</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_ktp_ortu">
@@ -560,14 +1147,13 @@
                             </div>
                         </div>
 
-                        <!-- Rapor -->
                         <div class="upload-row-item" id="row-file_rapor">
                             <input type="file" id="file_rapor" accept=".pdf" required onchange="updateFileName(this)">
                             <div class="upload-row-left">
-                                <div class="upload-row-icon" style="background:#f0fdfa; color:#0d9488;"><i class="ph ph-book-open-text"></i></div>
+                                <div class="upload-row-icon"><i class="ph ph-book-open-text"></i></div>
                                 <div>
-                                    <div class="upload-row-title">Scan Rapor <span class="upload-badge-required">Wajib</span></div>
-                                    <div class="upload-row-hint">PDF · Maks 2MB · 5 Semester, gabung 1 file</div>
+                                    <span class="upload-row-title">Scan Rapor <span class="upload-badge-required">Wajib</span></span>
+                                    <span class="upload-row-hint">PDF · Maks 2MB · 5 Semester, gabung 1 file</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_rapor">
@@ -577,56 +1163,56 @@
 
                     </div>
 
-                    <!-- Progress bar upload keseluruhan -->
-                    <div style="margin-top:16px; background:#f1f5f9; border-radius:10px; padding:12px 15px; display:flex; align-items:center; gap:12px;" id="upload-progress-bar">
-                        <i class="ph ph-check-circle" style="font-size:1.3rem; color:#94a3b8;"></i>
-                        <div style="flex:1;">
-                            <div style="font-size:0.8rem; color:#64748b; margin-bottom:4px;">Progress Upload Berkas</div>
-                            <div style="background:#e2e8f0; border-radius:99px; height:6px;">
-                                <div id="upload-progress-fill" style="height:6px; border-radius:99px; background:var(--primary); width:0%; transition:width 0.3s;"></div>
+                    <!-- Upload progress -->
+                    <div id="upload-progress-bar">
+                        <i class="ph ph-check-circle"></i>
+                        <div class="prog-track">
+                            <div class="prog-label">Progress Upload Berkas</div>
+                            <div class="prog-bg">
+                                <div id="upload-progress-fill"></div>
                             </div>
                         </div>
-                        <span id="upload-progress-text" style="font-size:0.85rem; font-weight:700; color:#64748b;">0/6</span>
+                        <span id="upload-progress-text">0/6</span>
                     </div>
-
                 </div>
 
-                <!-- SECTION 5: DATA PRESTASI (KHUSUS JALUR PRESTASI) -->
+                <!-- ════ SECTION 5: DATA PRESTASI ════ -->
                 <div class="form-section" id="section-5">
                     <h3 class="form-section-title">E. Data Prestasi</h3>
-                    <p style="margin-bottom:20px;">Masukkan maksimal 5 prestasi terbaik (Akademik/Non-Akademik). Wajib upload sertifikat.</p>
-                    
+                    <p style="font-size:.88rem;color:var(--ink-soft);margin-bottom:20px;line-height:1.6;">
+                        Masukkan maksimal 5 prestasi terbaik (Akademik/Non-Akademik). Wajib upload sertifikat.
+                    </p>
+
                     <div id="container-prestasi"></div>
 
-                    <button type="button" class="btn btn-secondary" onclick="tambahPrestasi()" style="margin-top:10px; width:100%; border-style:dashed;">
-                        <i class="ph ph-plus-circle"></i> Tambah Prestasi Baru
+                    <button type="button" class="btn btn-secondary" onclick="tambahPrestasi()"
+                            style="margin-top:8px;width:100%;border-style:dashed;border-radius:var(--radius);justify-content:center;">
+                        <i class="ph ph-plus"></i> Tambah Prestasi
                     </button>
 
-                    <div style="margin-top: 30px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fcd34d;">
-                        <label style="font-weight:700; color:#b45309; display:block; margin-bottom:10px;">Upload Bukti Sertifikat (Gabung 1 PDF, Max 2MB) *</label>
-                        <input type="file" id="file_sertifikat" accept=".pdf" class="input-modern-form" style="background:white;" onchange="validateSimpleUpload(this, 2048)">
-                        <small id="lbl-file_sertifikat" style="display:block; margin-top:5px; color:#b45309;">Belum ada file dipilih</small>
+                    <div class="sertifikat-box">
+                        <label>Upload Bukti Sertifikat (Gabung 1 PDF, Maks 2MB) <span class="req">*</span></label>
+                        <input type="file" id="file_sertifikat" accept=".pdf" class="input-modern-form"
+                               style="background:var(--surface);" onchange="validateSimpleUpload(this, 2048)">
+                        <small id="lbl-file_sertifikat" style="display:block;margin-top:5px;font-size:.78rem;color:var(--ink-soft);">
+                            Belum ada file dipilih
+                        </small>
                     </div>
                 </div>
 
-                <!-- TOMBOL NAVIGASI FIXED -->
+                <!-- ════ TOMBOL NAVIGASI ════ -->
                 <div class="nav-buttons">
-                    <!-- Tombol Prev (Kiri) -->
-                    <button type="button" class="btn btn-secondary" id="btn-prev" onclick="prevStep()" style="display:none;">
-                        <i class="ph ph-caret-left"></i> KEMBALI
+                    <button type="button" class="btn btn-secondary" id="btn-prev"
+                            onclick="prevStep()" style="display:none;">
+                        <i class="ph ph-caret-left"></i> Kembali
                     </button>
-                    
-                    <!-- Spacer (Tengah) -->
                     <div class="nav-spacer"></div>
-                    
-                    <!-- Tombol Next (Kanan) -->
                     <button type="button" class="btn btn-primary" id="btn-next" onclick="nextStep()">
-                        SELANJUTNYA <i class="ph ph-caret-right"></i>
+                        Selanjutnya <i class="ph ph-caret-right"></i>
                     </button>
-                    
-                    <!-- Tombol Submit (Kanan, Hidden Default) -->
-                    <button type="button" class="btn btn-primary" id="btn-submit" onclick="submitForm()" style="display:none; background-color: var(--accent); color: #000;">
-                        KIRIM FORMULIR <i class="ph ph-paper-plane-right"></i>
+                    <button type="button" class="btn btn-primary" id="btn-submit"
+                            onclick="submitForm()" style="display:none;">
+                        Kirim Formulir <i class="ph ph-paper-plane-right"></i>
                     </button>
                 </div>
 
@@ -634,36 +1220,41 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP INSTRUKSI -->
+    <!-- ══════════════════════════════════
+         MODAL INSTRUKSI
+    ══════════════════════════════════ -->
     <div class="instruction-overlay" id="instructionModal">
         <div class="instruction-box-popup">
-            <h3><i class="ph ph-info"></i> PETUNJUK PENGISIAN</h3>
+            <h3><i class="ph ph-info"></i> Petunjuk Pengisian</h3>
             <div class="instruction-list">
                 <ol>
-                    <li>GUNAKAN <strong>HURUF KAPITAL</strong> UNTUK SEMUA ISIAN TEKS.</li>
+                    <li>Gunakan <strong>HURUF KAPITAL</strong> untuk semua isian teks.</li>
                     <li>Isi data dengan jujur dan sesuai dokumen asli (KK/Akta/Ijazah).</li>
                     <li>Kolom bertanda bintang (<strong>*</strong>) wajib diisi.</li>
                     <li>Siapkan scan file berikut sebelum melanjutkan pendaftaran:</li>
                 </ol>
-                <div class="instruction-file-list">
-                    <li><i class="ph ph-image"></i> Foto Latar Biru (JPG/PNG - Max 2MB)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan Kartu Keluarga (PDF - <strong>Max 2MB</strong>)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan Akta Kelahiran (PDF - <strong>Max 2MB</strong>)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik (PDF - <strong>Max 2MB</strong>)</li>
-                    <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua Gabung (PDF - <strong>Max 2MB</strong>)</li>
-                    <li><i class="ph ph-book-open-text"></i> Scan Rapor 5 Semester (PDF - <strong>Max 2MB</strong>)</li>
-                    <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (Khusus Jalur Prestasi - PDF Max 2MB)</li>
-                </div>
+                <ul class="instruction-file-list">
+                    <li><i class="ph ph-image"></i> Foto Latar Biru — JPG/PNG, Maks 2MB</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Kartu Keluarga — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Akta Kelahiran — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua (gabung) — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-book-open-text"></i> Scan Rapor 5 Semester — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (khusus Jalur Prestasi) — PDF, Maks 2MB</li>
+                </ul>
             </div>
-            <button class="btn btn-primary" onclick="closeInstruction()" style="width: 100%; margin-top: 20px;">
-                SAYA MENGERTI <i class="ph ph-check"></i>
+            <button class="btn btn-primary" onclick="closeInstruction()"
+                    style="width:100%;margin-top:20px;justify-content:center;border-radius:var(--radius);">
+                Saya Mengerti <i class="ph ph-check"></i>
             </button>
         </div>
     </div>
 
-    <!-- SCRIPT VALIDASI FILE -->
+    <!-- ══════════════════════════════════
+         SCRIPT VALIDASI FILE
+    ══════════════════════════════════ -->
     <script>
-        // VALIDASI DIGIT: Cek jumlah digit sesuai yang disyaratkan
+        // VALIDASI DIGIT
         function validateDigit(input, requiredDigits, errorId) {
             const errorEl = document.getElementById(errorId);
             const val = input.value;
@@ -678,13 +1269,11 @@
             }
         }
 
-        // Tetap sediakan validateNIK untuk field nik siswa (16 digit)
         function validateNIK(input) {
             validateDigit(input, 16, 'nik-error');
         }
 
-        // Validasi untuk Upload Grid (Section 4)
-        // Semua file sekarang batas maksimal 2MB (2048 KB)
+        // UPLOAD PROGRESS
         const UPLOAD_IDS = ['file_foto','file_kk','file_akta','file_skb','file_ktp_ortu','file_rapor'];
 
         function updateUploadProgress() {
@@ -699,30 +1288,28 @@
             if (fill) fill.style.width = pct + '%';
             if (text) {
                 text.innerText = filled + '/' + UPLOAD_IDS.length;
-                text.style.color = filled === UPLOAD_IDS.length ? '#10b981' : '#64748b';
+                text.style.color = filled === UPLOAD_IDS.length ? '#16a34a' : '#64748b';
             }
             if (icon) icon.className = filled === UPLOAD_IDS.length ? 'ph ph-check-circle' : 'ph ph-upload-simple';
-            if (fill) fill.style.background = filled === UPLOAD_IDS.length ? '#10b981' : 'var(--primary)';
+            if (fill) fill.style.background = filled === UPLOAD_IDS.length ? '#16a34a' : 'var(--teal)';
         }
 
         function updateFileName(input) {
             const label = document.getElementById('lbl-' + input.id);
-            const row = document.getElementById('row-' + input.id);
-            const file = input.files[0];
+            const row   = document.getElementById('row-' + input.id);
+            const file  = input.files[0];
 
             if (file) {
-                const limit = 2048;
-                let typeMsg = 'PDF';
-                if (input.id === 'file_foto') typeMsg = 'JPG/PNG';
+                const limit    = 2048;
+                const typeMsg  = input.id === 'file_foto' ? 'JPG/PNG' : 'PDF';
+                const isPdf    = file.type === 'application/pdf';
+                const isImage  = file.type.startsWith('image/');
+                const validFmt = (input.id === 'file_foto') ? isImage : isPdf;
 
-                const isPdf = file.type === 'application/pdf';
-                const isImage = file.type.startsWith('image/');
-                let validFormat = (input.id === 'file_foto') ? isImage : isPdf;
-
-                if (!validFormat) {
+                if (!validFmt) {
                     Swal.fire('Format Salah', `File harus berupa ${typeMsg}.`, 'error');
                     input.value = '';
-                    if (label) label.innerHTML = `<i class="ph ph-x-circle"></i> Format salah! Harus ${typeMsg}`;
+                    if (label) label.innerHTML = `<i class="ph ph-x-circle"></i> Format salah!`;
                     if (row) { row.classList.remove('uploaded'); row.classList.add('error'); }
                     updateUploadProgress();
                     return;
@@ -730,7 +1317,10 @@
 
                 const sizeKB = file.size / 1024;
                 if (sizeKB > limit) {
-                    Swal.fire('File Terlalu Besar', `Ukuran file (${(sizeKB/1024).toFixed(2)} MB) melebihi batas 2 MB.<br><br>Kompres PDF di <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#2563eb;">ilovepdf.com</a>`, 'error');
+                    Swal.fire('File Terlalu Besar',
+                        `Ukuran file (${(sizeKB/1024).toFixed(2)} MB) melebihi batas 2 MB.<br><br>` +
+                        `Kompres PDF di <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#00796b;">ilovepdf.com</a>`,
+                        'error');
                     input.value = '';
                     if (label) label.innerHTML = `<i class="ph ph-x-circle"></i> Terlalu besar!`;
                     if (row) { row.classList.remove('uploaded'); row.classList.add('error'); }
@@ -738,55 +1328,39 @@
                     return;
                 }
 
-                // Valid
-                const ext = file.name.split('.').pop();
+                const ext      = file.name.split('.').pop();
                 const baseName = file.name.replace(/\.[^/.]+$/, '');
                 const shortName = baseName.length > 8 ? baseName.substring(0, 8) + '…' : baseName;
-                const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-                if (label) label.innerHTML = `<i class="ph ph-check-circle"></i> ${shortName}.${ext}<br><span style="color:#94a3b8;font-size:0.68rem;">${sizeMB}MB</span>`;
+                const sizeMB   = (file.size / 1024 / 1024).toFixed(2);
+                if (label) label.innerHTML = `<i class="ph ph-check-circle"></i> ${shortName}.${ext}<br><span style="color:#94a3b8;font-size:.65rem;">${sizeMB} MB</span>`;
                 if (row) { row.classList.remove('error'); row.classList.add('uploaded'); }
                 updateUploadProgress();
             }
         }
 
-        // Validasi untuk Upload Sertifikat Simple (Section 5)
+        // VALIDASI SERTIFIKAT (SECTION 5)
         function validateSimpleUpload(input, limitKB) {
             const label = document.getElementById('lbl-' + input.id);
-            const file = input.files[0];
-
+            const file  = input.files[0];
             if (file) {
-                // Cek Tipe PDF
                 if (file.type !== 'application/pdf') {
                     Swal.fire('Format Salah', 'File sertifikat harus berupa PDF.', 'error');
                     input.value = '';
-                    if(label) {
-                        label.innerText = 'Format salah! Harus PDF';
-                        label.style.color = '#dc2626';
-                    }
+                    if (label) { label.innerText = 'Format salah! Harus PDF'; label.style.color = '#dc2626'; }
                     return;
                 }
-
-                // Cek Ukuran
                 const sizeKB = file.size / 1024;
                 if (sizeKB > limitKB) {
-                    Swal.fire('File Terlalu Besar', `Ukuran file (${(sizeKB/1024).toFixed(2)} MB) melebihi batas maksimal 2 MB.`, 'error');
+                    Swal.fire('File Terlalu Besar', `Ukuran (${(sizeKB/1024).toFixed(2)} MB) melebihi batas 2 MB.`, 'error');
                     input.value = '';
-                    if(label) {
-                        label.innerText = `Terlalu Besar! Max 2MB`;
-                        label.style.color = '#dc2626';
-                    }
+                    if (label) { label.innerText = 'Terlalu besar! Maks 2MB'; label.style.color = '#dc2626'; }
                     return;
                 }
-
-                // Valid
-                if(label) {
-                    label.innerText = "File terpilih: " + file.name;
-                    label.style.color = 'var(--primary)';
-                }
+                if (label) { label.innerText = 'File terpilih: ' + file.name; label.style.color = '#00796b'; }
             }
         }
 
-        // Logic Modal Instruksi
+        // MODAL INSTRUKSI
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('instructionModal').style.display = 'flex';
         });
@@ -794,9 +1368,8 @@
         function closeInstruction() {
             const modal = document.getElementById('instructionModal');
             modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+            modal.style.transition = 'opacity .25s';
+            setTimeout(() => { modal.style.display = 'none'; }, 260);
         }
     </script>
 

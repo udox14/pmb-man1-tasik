@@ -8,223 +8,1496 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* ================================================================
+           PAGE TOKENS
+        ================================================================ */
+        :root {
+            --ink:        #0d1b2a;
+            --ink-mid:    #334155;
+            --ink-soft:   #64748b;
+            --ink-faint:  #94a3b8;
+            --rule:       #e2e8f0;
+            --rule-dark:  #cbd5e1;
+            --surface:    #ffffff;
+            --bg:         #f8fafc;
+            --teal:       #00796b;
+            --teal-dark:  #004d40;
+            --teal-dim:   rgba(0,121,107,.12);
+            --gold:       #d97706;
+            --gold-light: #fef3c7;
+            --radius-sm:  8px;
+            --radius-md:  14px;
+            --radius-lg:  22px;
+        }
+
+        /* ================================================================
+           RESET THIS PAGE
+        ================================================================ */
+        body {
+            background: var(--surface);
+            background-image: none;
+        }
+
+        /* ================================================================
+           HEADER OVERRIDE
+        ================================================================ */
+        header {
+            height: 68px;
+            border-bottom: 1px solid var(--rule);
+            box-shadow: 0 1px 0 var(--rule);
+            background: rgba(255,255,255,.97);
+            backdrop-filter: blur(12px);
+        }
+        :root { --header-height: 68px; }
+
+        body { padding-top: 68px; }
+
+        .brand-title  { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
+        .brand-subtitle { font-size: .73rem; color: var(--ink-soft); }
+        .kemenag-logo { width: 38px; }
+
+        .nav-actions { gap: 8px; }
+
+        /* Nav buttons — flat, no pill exaggeration */
+        .nav-actions .btn {
+            border-radius: var(--radius-sm);
+            padding: 9px 18px;
+            font-size: .82rem;
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+        .nav-actions .btn-secondary {
+            background: var(--bg);
+            border: 1px solid var(--rule-dark);
+            color: var(--ink-mid);
+        }
+        .nav-actions .btn-secondary:hover {
+            background: var(--rule);
+            border-color: var(--rule-dark);
+            transform: none;
+        }
+        .nav-actions .btn-outline {
+            background: var(--ink);
+            border: none;
+            color: white;
+        }
+        .nav-actions .btn-outline:hover {
+            background: var(--teal-dark);
+            transform: none;
+        }
+
+        /* ================================================================
+           HERO
+        ================================================================ */
+        .hero-root {
+            background: var(--ink);
+            position: relative;
+            overflow: hidden;
+            min-height: calc(100vh - 68px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Background slideshow ── */
+        .hero-photo-panel {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 55%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* Gradasi TIDAK di panel lagi — dipindah ke hero-root::after */
+        .hero-photo-panel::before { display: none; }
+        /* Gradient bawah: transisi ke stats strip */
+        .hero-photo-panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--ink) 0%, transparent 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Subtle cross-hatch pattern */
+        .hero-root::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+        }
+
+        /* Teal glow — bottom left only, very subtle */
+        .hero-root::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            /* Gradasi dari kiri (solid) ke kanan (transparan) — full lebar */
+            background: linear-gradient(
+                to right,
+                var(--ink)              0%,
+                var(--ink)             35%,
+                rgba(13,27,42,.92)     45%,
+                rgba(13,27,42,.55)     58%,
+                rgba(13,27,42,.15)     75%,
+                transparent           100%
+            );
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Thin top accent line */
+        .hero-accent-line {
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal) 0%, transparent 60%);
+            flex-shrink: 0;
+        }
+
+        /* Main grid */
+        .hero-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 64px 0;
+            position: relative;
+            z-index: 3;
+        }
+        /* Container harus full-width agar hero-grid bisa rata kiri */
+        .hero-body > .container {
+            width: 100%;
+        }
+
+        .hero-grid {
+            max-width: 520px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* ── LEFT ── */
+        /* "Penerimaan Murid Baru" — teks utama, besar */
+        .headline-sub {
+            display: block;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            color: white;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        /* "MAN 1 Tasikmalaya 2026/2027" — sub, lebih kecil & redup */
+        .hero-headline {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 0;
+        }
+
+        /* "Penerimaan Murid Baru" — gaya headline putih besar */
+        .hl-pmb {
+            font-size: clamp(1.8rem, 3.5vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            color: white;
+            margin: 0;
+        }
+
+        /* "MAN 1 TASIKMALAYA" — putih besar, paksa satu baris */
+        .hl-school {
+            font-size: clamp(1.8rem, 3.5vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            color: white;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        /* "Tahun Ajaran 2026/2027" — teal, 1.5rem */
+        .hl-ta {
+            font-size: clamp(1rem, 2.2vw, 1.5rem);
+            font-weight: 700;
+            color: var(--teal);
+            letter-spacing: .5px;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        .hero-ta {
+            font-size: 1rem;
+            color: rgba(255,255,255,.38);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 28px;
+            display: block;
+        }
+
+        .hero-desc {
+            font-size: .88rem;
+            color: rgba(255,255,255,.5);
+            line-height: 1.8;
+            max-width: 420px;
+            margin-bottom: 20px;
+        }
+
+        /* Divider */
+        .hero-divider {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,.15);
+            margin: 20px 0;
+        }
+
+        /* ── Jalur selector ── */
+        .jalur-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding: 0;
+            background: transparent;
+            border: none;
+            max-width: 520px;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        .jalur-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 16px;
+            border-radius: var(--radius-sm);
+            font-size: .88rem;
+            font-weight: 700;
+            color: rgba(255,255,255,.42);
+            cursor: pointer;
+            transition: all .2s;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.08);
+            letter-spacing: .2px;
+        }
+        .jalur-tab:hover:not(.disabled) {
+            background: rgba(255,255,255,.1);
+            color: rgba(255,255,255,.8);
+        }
+
+        #tab-reguler.active {
+            background: var(--teal) !important;
+            color: white !important;
+            border-color: var(--teal) !important;
+            box-shadow: 0 4px 20px rgba(0,121,107,.45) !important;
+            transform: none !important;
+        }
+        #tab-prestasi.active {
+            background: var(--gold) !important;
+            color: white !important;
+            border-color: var(--gold) !important;
+            box-shadow: 0 4px 20px rgba(217,119,6,.4) !important;
+            transform: none !important;
+        }
+        .jalur-tab.disabled {
+            opacity: .3 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            filter: none !important;
+            background: rgba(255,255,255,.04) !important;
+            color: rgba(255,255,255,.25) !important;
+            box-shadow: none !important;
+            border-color: rgba(255,255,255,.06) !important;
+        }
+
+        /* ── NISN input row ── */
+        .compact-action {
+            display: flex !important;
+            gap: 8px !important;
+            max-width: 520px !important;
+            width: 100% !important;
+            flex-wrap: nowrap !important;
+            align-items: stretch !important;
+            margin-bottom: 16px !important;
+            max-width: 520px !important;
+        }
+
+        .compact-action .input-modern {
+            flex: 1 !important;
+            min-width: 0 !important;
+            background: rgba(255,255,255,.08) !important;
+            border: 1px solid rgba(255,255,255,.14) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 13px 18px !important;
+            font-size: .95rem !important;
+            color: white !important;
+            font-weight: 500 !important;
+            box-shadow: none !important;
+            transition: border-color .2s, background .2s !important;
+        }
+        .compact-action .input-modern::placeholder {
+            color: rgba(255,255,255,.3) !important;
+            font-weight: 400 !important;
+        }
+        .compact-action .input-modern:focus {
+            background: rgba(255,255,255,.12) !important;
+            border-color: var(--teal) !important;
+            box-shadow: 0 0 0 3px rgba(0,121,107,.35) !important;
+            outline: none !important;
+        }
+
+        .compact-action .btn {
+            flex-shrink: 0 !important;
+            background: white !important;
+            color: var(--ink) !important;
+            font-weight: 800 !important;
+            font-size: .88rem !important;
+            padding: 13px 22px !important;
+            border-radius: var(--radius-sm) !important;
+            border: none !important;
+            box-shadow: none !important;
+            letter-spacing: .2px !important;
+            white-space: nowrap !important;
+            transition: background .2s, transform .15s !important;
+        }
+        .compact-action .btn:hover {
+            background: #f1f5f9 !important;
+            transform: none !important;
+        }
+        .compact-action .btn:disabled {
+            background: rgba(255,255,255,.2) !important;
+            color: rgba(255,255,255,.5) !important;
+        }
+
+        /* Link Alur Pendaftaran — hanya tampil di mobile */
+        .alur-link-mobile {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: var(--radius-sm);
+            color: rgba(255,255,255,.65);
+            font-size: .84rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: border-color .2s, color .2s;
+        }
+        .alur-link-mobile i:last-child { margin-left: auto; }
+        .alur-link-mobile:hover {
+            border-color: rgba(255,255,255,.3);
+            color: white;
+        }
+        .login-link-container {
+            font-size: .83rem !important;
+            color: rgba(255,255,255,.38) !important;
+        }
+        .login-link-container a {
+            color: rgba(255,255,255,.75) !important;
+            font-weight: 600 !important;
+            text-decoration: underline !important;
+            text-underline-offset: 3px !important;
+            text-decoration-color: rgba(255,255,255,.25) !important;
+        }
+        .login-link-container a:hover {
+            color: white !important;
+            text-decoration-color: rgba(255,255,255,.6) !important;
+        }
+
+        /* ── Slideshow container fill ── */
+
+        /* slide classes preserved for JS */
+        .slideshow-container { width: 100%; height: 100%; }
+        .slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1.04);
+            transition: opacity 1.2s ease, transform 6s linear;
+        }
+
+        /* Overlay handled by ::before / ::after on hero-photo-panel */
+        .hero-photo-overlay { display: none; }
+
+        /* Nav buttons — hidden, auto-advance handles it */
+        .slider-nav { display: none; }
+        .nav-btn { display: none; }
+
+        /* Mobile photo strip */
+        .hero-mobile-strip {
+            display: none;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 24px 20px 8px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .hero-mobile-strip::-webkit-scrollbar { display: none; }
+        .hero-mobile-strip img {
+            width: 200px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            border: 1px solid rgba(255,255,255,.12);
+        }
+
+        /* ── Bottom rule ── */
+        .hero-bottom-rule {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,.07);
+            margin: 0;
+        }
+
+        /* ── Stats strip ── */
+        .hero-stats {
+            position: relative;
+            z-index: 2;
+        }
+        .hero-stats-inner {
+            display: flex;
+            border-top: 1px solid rgba(255,255,255,.07);
+        }
+        .h-stat {
+            flex: 1;
+            padding: 20px 24px;
+            border-right: 1px solid rgba(255,255,255,.07);
+        }
+        .h-stat:last-child { border-right: none; }
+        .h-stat-num {
+            display: block;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            margin-bottom: 5px;
+            letter-spacing: -.5px;
+        }
+        .h-stat-label {
+            font-size: .7rem;
+            color: rgba(255,255,255,.35);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+
+        /* ================================================================
+           INFO SECTION
+        ================================================================ */
+        .info-root {
+            background: var(--bg);
+            padding: 100px 0 96px;
+        }
+
+        /* Two-col layout: nav left + content right */
+        .info-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 64px;
+            align-items: start;
+        }
+
+        /* ── Left nav ── */
+        .info-nav {
+            position: sticky;
+            top: calc(68px + 32px);
+        }
+
+        .info-nav-label {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-nav-label::before {
+            content: '';
+            display: block;
+            width: 16px;
+            height: 1.5px;
+            background: var(--ink-faint);
+        }
+
+        .info-nav-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+        }
+
+        .info-nav-sub {
+            font-size: .88rem;
+            color: var(--ink-soft);
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .info-nav-ctas {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-cta-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: .83rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background .2s, border-color .2s;
+            letter-spacing: .1px;
+        }
+        .nav-cta-btn i { font-size: 1.05rem; flex-shrink: 0; }
+
+        .nav-cta-btn--primary {
+            background: var(--ink);
+            color: white;
+            border: 1px solid var(--ink);
+        }
+        .nav-cta-btn--primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
+
+        .nav-cta-btn--ghost {
+            background: transparent;
+            color: var(--ink-mid);
+            border: 1px solid var(--rule-dark);
+        }
+        .nav-cta-btn--ghost:hover { background: var(--rule); }
+
+        /* ── Right content ── */
+        .info-panels { display: flex; flex-direction: column; gap: 2px; }
+
+        /* Each accordion panel */
+        .info-panel {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: box-shadow .2s;
+        }
+        .info-panel:hover {
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        }
+        .info-panel + .info-panel { margin-top: 12px; }
+
+        /* Panel header */
+        .panel-head {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 22px 26px;
+            cursor: default;
+        }
+
+        .panel-num {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--rule-dark);
+            line-height: 1;
+            letter-spacing: -2px;
+            flex-shrink: 0;
+            width: 56px;
+            text-align: right;
+            user-select: none;
+        }
+
+        .panel-title-group { flex: 1; }
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        .panel-subtitle {
+            font-size: .78rem;
+            color: var(--ink-faint);
+            font-weight: 600;
+        }
+
+        /* Panel body */
+        .panel-body {
+            padding: 0 26px 26px;
+        }
+
+        /* Divider inside panel */
+        .panel-rule {
+            height: 1px;
+            background: var(--rule);
+            margin-bottom: 22px;
+        }
+
+        /* ── Timeline rows ── */
+        .tl-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tl-table tr { border-bottom: 1px solid var(--rule); }
+        .tl-table tr:last-child { border-bottom: none; }
+
+        .tl-table td {
+            padding: 14px 0;
+            vertical-align: top;
+        }
+
+        .td-date {
+            width: 190px;
+            min-width: 160px;
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            letter-spacing: .1px;
+            padding-right: 20px;
+            white-space: nowrap;
+        }
+        .td-dot {
+            width: 20px;
+            padding-right: 14px;
+            vertical-align: middle;
+        }
+        .td-dot-inner {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--rule-dark);
+            margin-top: 5px;
+        }
+        .td-event {
+            font-size: .92rem;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.5;
+        }
+        .td-event small {
+            display: block;
+            font-size: .78rem;
+            color: var(--ink-soft);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ── Syarat box inside Prestasi ── */
+        .syarat-inline {
+            background: #fafafa;
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--gold);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            margin-bottom: 20px;
+        }
+        .syarat-inline-title {
+            font-size: .75rem;
+            font-weight: 800;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 10px;
+        }
+        .syarat-inline ul {
+            padding-left: 16px;
+            margin: 0;
+            font-size: .86rem;
+            color: var(--ink-mid);
+            line-height: 1.8;
+        }
+        .syarat-inline ul li + li { margin-top: 4px; }
+
+        /* ── Berkas grid ── */
+        .berkas-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .berkas-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            transition: border-color .15s;
+        }
+        .berkas-row:hover { border-color: var(--teal); }
+
+        .berkas-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--rule);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .95rem;
+            color: var(--ink-mid);
+            flex-shrink: 0;
+        }
+        .berkas-name {
+            font-size: .84rem;
+            font-weight: 600;
+            color: var(--ink);
+            flex: 1;
+            line-height: 1.3;
+        }
+        .berkas-meta {
+            font-size: .72rem;
+            color: var(--ink-faint);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* ── Agenda ── */
+        .agenda-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            padding: 18px;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            margin-bottom: 16px;
+        }
+        .agenda-date-box {
+            width: 52px;
+            height: 52px;
+            background: var(--ink);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            line-height: 1.1;
+        }
+        .agenda-date-day {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: white;
+        }
+        .agenda-date-month {
+            font-size: .62rem;
+            font-weight: 700;
+            color: rgba(255,255,255,.55);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+        .agenda-title {
+            font-size: .93rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 3px;
+        }
+        .agenda-desc {
+            font-size: .8rem;
+            color: var(--ink-soft);
+            line-height: 1.5;
+        }
+
+        /* WA contact button */
+        .wa-contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 18px;
+            background: var(--surface);
+            border: 1px solid var(--rule-dark);
+            border-radius: var(--radius-sm);
+            font-size: .86rem;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            width: 100%;
+            text-align: left;
+        }
+        .wa-contact-btn i { font-size: 1.1rem; color: #16a34a; }
+        .wa-contact-btn:hover {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+
+        /* ================================================================
+           FOOTER
+        ================================================================ */
+        .footer-root {
+            background: var(--ink);
+            padding: 52px 0 36px;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding-bottom: 36px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+
+        .footer-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 12px;
+        }
+        .footer-logo-row img { width: 40px; }
+        .footer-school-name {
+            font-size: .95rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+        }
+        .footer-addr {
+            font-size: .78rem;
+            color: rgba(255,255,255,.35);
+            line-height: 1.7;
+        }
+
+        .footer-links-col { min-width: 160px; }
+        .footer-links-label {
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.25);
+            margin-bottom: 14px;
+        }
+        .footer-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: rgba(255,255,255,.45);
+            text-decoration: none;
+            font-size: .82rem;
+            font-weight: 600;
+            padding: 5px 0;
+            transition: color .15s;
+        }
+        .footer-link:hover { color: rgba(255,255,255,.85); }
+        .footer-link i { font-size: .95rem; }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: .75rem;
+            color: rgba(255,255,255,.22);
+        }
+
+
+        /* ================================================================
+           HELP WIDGET — no overrides needed, global CSS works
+        ================================================================ */
+
+
+        /* ================================================================
+           MOBILE RESPONSIVE
+        ================================================================ */
+        @media (max-width: 900px) {
+            .hero-grid {
+                text-align: left;
+                max-width: 100%;
+                grid-template-columns: 1fr;
+            }
+
+            /* Mobile: sembunyikan panel background */
+            .hero-photo-panel {
+                display: none;
+            }
+            .hero-root::after { display: none; }
+
+            .hero-headline { letter-spacing: -1px; }
+            .hero-desc { max-width: 100%; }
+
+            .alur-link-mobile { display: flex; }
+            .hero-mobile-strip { display: flex; }
+
+            /* Konsistensi spacing mobile — semua 20px */
+            .hero-headline { margin-bottom: 0; }
+            .hero-divider  { margin: 18px 0; }
+            .hero-desc     { margin-bottom: 20px; }
+            .jalur-tabs    { margin-bottom: 10px; }
+            .compact-action { margin-bottom: 16px !important; }
+            .login-link-container { margin-bottom: 0; }
+
+            .jalur-tabs {
+                max-width: 100%;
+                justify-content: flex-start;
+            }
+
+            .compact-action {
+                max-width: 100% !important;
+            }
+
+            .hero-stats-inner { flex-wrap: wrap; }
+            .h-stat {
+                flex: 1 1 48%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,.07);
+            }
+            .h-stat:nth-child(odd) {
+                border-right: 1px solid rgba(255,255,255,.07);
+            }
+            .h-stat:last-child,
+            .h-stat:nth-last-child(2):nth-child(odd) {
+                border-bottom: none;
+            }
+
+            /* Info section: single column */
+            .info-root { padding: 64px 0 72px; }
+            .info-layout {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .info-nav { position: static; }
+            .info-nav-title { font-size: 1.6rem; }
+
+            .info-nav-ctas { flex-direction: row; flex-wrap: wrap; }
+            .nav-cta-btn { flex: 1 1 140px; justify-content: center; }
+
+            .berkas-grid { grid-template-columns: 1fr; }
+
+            .footer-inner { gap: 28px; }
+        }
+
+        @media (max-width: 600px) {
+            .hero-body { padding: 44px 0; }
+
+            .jalur-tab { font-size: .82rem; padding: 11px 10px; }
+            .jalur-tab i { display: none; }
+
+            .compact-action {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            .compact-action .input-modern { width: 100% !important; }
+            .compact-action .btn {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+
+            .h-stat-num { font-size: 1.1rem; }
+
+            .panel-head { padding: 18px 20px; }
+            .panel-body { padding: 0 20px 22px; }
+
+            /* Timeline mobile: tetap tabel tapi ultra-compact */
+            .tl-table { font-size: .82rem; }
+            .tl-table td { padding: 9px 0; }
+            .td-date {
+                width: 130px !important;
+                min-width: 0 !important;
+                font-size: .74rem;
+                padding-right: 10px;
+                white-space: normal;
+                line-height: 1.3;
+            }
+            .td-dot { display: none; }
+            .td-event { font-size: .85rem; }
+
+            .footer-inner { flex-direction: column; gap: 28px; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header>
-        <div class="container">
-            <nav>
-                <div class="brand-wrapper">
-                    <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo Kemenag" class="kemenag-logo">
-                    <div class="brand-text">
-                        <div class="brand-title">MAN 1 TASIKMALAYA</div>
-                        <div class="brand-subtitle">Sukamanah - Sukarame - Kab. Tasikmalaya</div>
-                    </div>
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<header>
+    <div class="container">
+        <nav>
+            <div class="brand-wrapper">
+                <img src="images/logo.png"
+                     onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                     alt="Logo MAN 1 Tasikmalaya" class="kemenag-logo">
+                <div class="brand-text">
+                    <div class="brand-title">MAN 1 TASIKMALAYA</div>
+                    <div class="brand-subtitle">Sukamanah · Sukarame · Kab. Tasikmalaya</div>
                 </div>
-                <div class="nav-actions" style="display: flex; gap: 10px;">
-                     <a href="alur.html" class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.9rem;" title="Lihat Alur Pendaftaran">
-                         <i class="ph ph-info"></i> <span class="hide-mobile">Alur Pendaftaran</span>
-                    </a>
-                     <a href="login.html" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;" title="Login Dashboard">
-                         <i class="ph ph-sign-in"></i> <span class="hide-mobile">LOGIN</span>
-                     </a>
-                </div>
-            </nav>
-        </div>
-    </header>
+            </div>
+            <div class="nav-actions">
+                <a href="alur.html" class="btn btn-secondary" title="Alur Pendaftaran">
+                    <i class="ph ph-info"></i>
+                    <span class="hide-mobile">Alur Pendaftaran</span>
+                </a>
+                <a href="login.html" class="btn btn-outline" title="Login">
+                    <i class="ph ph-sign-in"></i>
+                    <span class="hide-mobile">Login</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+</header>
 
-    <!-- MODERN HERO SECTION -->
-    <section class="hero-modern">
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="hero-root">
+    <div class="hero-accent-line"></div>
+
+    <!-- Slideshow background — absolute desktop, block mobile -->
+    <div class="hero-photo-panel">
+        <div class="slideshow-container" id="slideshow">
+            <img src="images/slide1.jpeg" class="slide active" alt="MAN 1 Tasikmalaya"
+                 onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1200&auto=format&fit=crop'">
+            <img data-src="images/slide2.jpeg" class="slide" alt=""
+                 onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop'">
+            <img data-src="images/slide3.jpeg" class="slide" alt=""
+                 onerror="this.src='https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1200&auto=format&fit=crop'">
+            <img data-src="images/slide4.jpeg" class="slide" alt=""
+                 onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1200&auto=format&fit=crop'">
+            <img data-src="images/slide5.jpeg" class="slide" alt=""
+                 onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=1200&auto=format&fit=crop'">
+            <div class="hero-photo-overlay"></div>
+        </div>
+    </div>
+
+    <div class="hero-body">
         <div class="container">
             <div class="hero-grid">
-                
-                <!-- KIRI: Text & Actions -->
-                <div class="hero-content">
-                    <h1 class="hero-title-custom">
-                        <span class="line-1">Penerimaan Murid</span>
-                        <span class="line-2">Baru (PMB)</span>
-                        <span class="line-3">MAN 1 Tasikmalaya</span>
-                    </h1>
-                    <span class="hero-subtitle-ta">Tahun Ajaran 2026/2027</span>
+
+                <!-- Content -->
+                <div>
+                    <div class="hero-headline">
+                        <p class="hl-pmb">Penerimaan<br>Murid Baru</p>
+                        <p class="hl-school">MAN 1 TASIKMALAYA</p>
+                        <p class="hl-ta">Tahun Ajaran 2026/2027</p>
+                    </div>
+
+                    <div class="hero-divider"></div>
 
                     <p class="hero-desc">
-                        Ayo bergabung di MAN 1 Tasikmalaya, menjadi pribadi berprestasi, berakhlak, dan mandiri!
+                        Ayo bergabung dan menjadi bagian dari keluarga besar
+                        MAN 1 Tasikmalaya — berprestasi, berakhlak, dan mandiri.
                     </p>
 
+                    <!-- Jalur tabs — id & class dipertahankan untuk JS -->
                     <div class="jalur-tabs">
-                        <div class="jalur-tab active" onclick="selectTab('REGULER')" id="tab-reguler">
-                            <i class="ph ph-student"></i> Jalur Reguler
+                        <div class="jalur-tab active"
+                             onclick="selectTab('REGULER')"
+                             id="tab-reguler">
+                            <i class="ph ph-student"></i>
+                            Jalur Reguler
                         </div>
-                        <div class="jalur-tab" onclick="selectTab('PRESTASI')" id="tab-prestasi">
-                            <i class="ph ph-trophy"></i> Jalur Prestasi
+                        <div class="jalur-tab"
+                             onclick="selectTab('PRESTASI')"
+                             id="tab-prestasi">
+                            <i class="ph ph-trophy"></i>
+                            Jalur Prestasi
                         </div>
                     </div>
 
+                    <!-- NISN input — id & class dipertahankan untuk JS -->
                     <div class="compact-action">
-                        <input type="number" id="input-nisn" class="input-modern" placeholder="Masukkan 10 Digit NISN">
-                        <button class="btn btn-primary" onclick="cekNisnDanDaftar()">
-                            Cek & Daftar <i class="ph ph-arrow-right"></i>
+                        <input type="number"
+                               id="input-nisn"
+                               class="input-modern"
+                               placeholder="Masukkan 10 Digit NISN">
+                        <button class="btn btn-primary"
+                                onclick="cekNisnDanDaftar()">
+                            Cek &amp; Daftar
+                            <i class="ph ph-arrow-right"></i>
                         </button>
                     </div>
 
                     <div class="login-link-container">
-                        Sudah mendaftar? <a href="login.html">Login Siswa Disini</a>
+                        Sudah mendaftar?
+                        <a href="login.html">Login Siswa</a>
+                    </div>
+                    <a href="alur.html" class="alur-link-mobile">
+                        <i class="ph ph-map-trifold"></i>
+                        Lihat Alur Pendaftaran
+                        <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+
+            </div><!-- /hero-grid -->
+        </div><!-- /container -->
+    </div><!-- /hero-body -->
+
+    <!-- Mobile photo strip — hanya tampil di mobile via CSS -->
+    <div class="hero-mobile-strip" aria-hidden="true">
+        <img src="images/slide1.jpeg" loading="eager" alt=""
+             onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=400&auto=format&fit=crop'">
+        <img src="images/slide2.jpeg" loading="lazy" alt=""
+             onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=400&auto=format&fit=crop'">
+        <img src="images/slide3.jpeg" loading="lazy" alt=""
+             onerror="this.src='https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=400&auto=format&fit=crop'">
+        <img src="images/slide4.jpeg" loading="lazy" alt=""
+             onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=400&auto=format&fit=crop'">
+        <img src="images/slide5.jpeg" loading="lazy" alt=""
+             onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=400&auto=format&fit=crop'">
+    </div>
+
+    <!-- Stats strip -->
+    <div class="hero-stats">
+        <div class="container">
+            <div class="hero-stats-inner">
+                <div class="h-stat">
+                    <span class="h-stat-num">6 – 14 April</span>
+                    <span class="h-stat-label">Pendaftaran Jalur Prestasi</span>
+                </div>
+                <div class="h-stat">
+                    <span class="h-stat-num">16 April</span>
+                    <span class="h-stat-label">Tes Pembuktian Prestasi</span>
+                </div>
+                <div class="h-stat">
+                    <span class="h-stat-num">20 Apr – 20 Mei</span>
+                    <span class="h-stat-label">Pendaftaran Jalur Reguler</span>
+                </div>
+                <div class="h-stat">
+                    <span class="h-stat-num">21 – 23 Mei</span>
+                    <span class="h-stat-label">Tes Seleksi CBT Reguler</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section><!-- /hero-root -->
+
+
+<!-- ══════════════════════════════════════════
+     INFO SECTION
+══════════════════════════════════════════ -->
+<section class="info-root">
+    <div class="container">
+        <div class="info-layout">
+
+            <!-- Left navigation -->
+            <aside class="info-nav">
+                <p class="info-nav-label">Informasi PMB</p>
+                <h2 class="info-nav-title">Jadwal &amp; Persyaratan</h2>
+                <p class="info-nav-sub">
+                    Semua yang perlu kamu siapkan sebelum mendaftar.
+                </p>
+                <nav class="info-nav-ctas">
+                    <a href="https://drive.google.com/file/d/1ZqXaVPpOlJDh64Nb0R0vskJ-CjCQYfd7"
+                       target="_blank" class="nav-cta-btn nav-cta-btn--primary">
+                        <i class="ph ph-file-pdf"></i>
+                        Download Brosur
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1-WegW3eWontmts--8Jide5hpMdI3Qf39"
+                       target="_blank" class="nav-cta-btn nav-cta-btn--ghost">
+                        <i class="ph ph-t-shirt"></i>
+                        Contoh Seragam
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Right panels -->
+            <div class="info-panels">
+
+                <!-- Panel 1: Jalur Prestasi -->
+                <div class="info-panel">
+                    <div class="panel-head">
+                        <div class="panel-num">01</div>
+                        <div class="panel-title-group">
+                            <div class="panel-title">Jalur Prestasi</div>
+                            <div class="panel-subtitle">6 April – 25 April 2026</div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-rule"></div>
+
+                        <div class="syarat-inline">
+                            <div class="syarat-inline-title">Kriteria Penerimaan</div>
+                            <ul>
+                                <li>Prestasi Akademik, Non-Akademik, atau Keagamaan minimal
+                                    <strong>Tingkat Provinsi</strong> — dibuktikan scan sertifikat asli</li>
+                                <li>Hafalan Al-Quran (Tahfidz) <strong>minimal 10 Juz</strong></li>
+                            </ul>
+                        </div>
+
+                        <table class="tl-table">
+                            <tbody>
+                                <tr>
+                                    <td class="td-date">6 – 14 April 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#d97706;"></div></td>
+                                    <td class="td-event">Pendaftaran Online</td>
+                                </tr>
+                                <tr>
+                                    <td class="td-date">16 April 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#d97706;"></div></td>
+                                    <td class="td-event">Pelaksanaan Tes Pembuktian Prestasi</td>
+                                </tr>
+                                <tr>
+                                    <td class="td-date">18 April 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#d97706;"></div></td>
+                                    <td class="td-event">Pengumuman Kelulusan</td>
+                                </tr>
+                                <tr>
+                                    <td class="td-date">20 – 25 April 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#d97706;"></div></td>
+                                    <td class="td-event">Lapor Diri / Daftar Ulang</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- KANAN: Slideshow Foto Sekolah -->
-                <div class="hero-visual">
-                    <div class="slideshow-container" id="slideshow">
-                        <img src="images/slide1.jpeg" class="slide active" onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide2.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide3.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide4.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop'">
-                        <img data-src="images/slide5.jpeg" class="slide" onerror="this.src='https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=1000&auto=format&fit=crop'">
-                        
-                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 30%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
-                        
-                        <div class="slider-nav">
-                            <button class="nav-btn" onclick="moveSlide(-1)"><i class="ph ph-caret-left"></i></button>
-                            <button class="nav-btn" onclick="moveSlide(1)"><i class="ph ph-caret-right"></i></button>
+                <!-- Panel 2: Jalur Reguler -->
+                <div class="info-panel">
+                    <div class="panel-head">
+                        <div class="panel-num">02</div>
+                        <div class="panel-title-group">
+                            <div class="panel-title">Jalur Reguler</div>
+                            <div class="panel-subtitle">20 April – 20 Juni 2026</div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-rule"></div>
+                        <table class="tl-table">
+                            <tbody>
+                                <tr>
+                                    <td class="td-date">20 April – 20 Mei 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#00796b;"></div></td>
+                                    <td class="td-event">Pendaftaran Online</td>
+                                </tr>
+                                <tr>
+                                    <td class="td-date">21 – 23 Mei 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#00796b;"></div></td>
+                                    <td class="td-event">
+                                        Tes Seleksi CBT
+                                        <small>Computer Based Test</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-date">25 Mei 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#00796b;"></div></td>
+                                    <td class="td-event">Pengumuman Kelulusan</td>
+                                </tr>
+                                <tr>
+                                    <td class="td-date">13 – 20 Juni 2026</td>
+                                    <td class="td-dot"><div class="td-dot-inner" style="background:#00796b;"></div></td>
+                                    <td class="td-event">Lapor Diri / Daftar Ulang</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Syarat Berkas -->
+                <div class="info-panel">
+                    <div class="panel-head">
+                        <div class="panel-num">03</div>
+                        <div class="panel-title-group">
+                            <div class="panel-title">Syarat Berkas</div>
+                            <div class="panel-subtitle">Siapkan file scan dokumen berikut ini</div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-rule"></div>
+                        <div class="berkas-grid">
+                            <div class="berkas-row">
+                                <div class="berkas-icon"><i class="ph ph-image-square"></i></div>
+                                <span class="berkas-name">Foto Latar Biru</span>
+                                <span class="berkas-meta">JPG/PNG · 1MB</span>
+                            </div>
+                            <div class="berkas-row">
+                                <div class="berkas-icon"><i class="ph ph-file-pdf"></i></div>
+                                <span class="berkas-name">Kartu Keluarga</span>
+                                <span class="berkas-meta">PDF · 1MB</span>
+                            </div>
+                            <div class="berkas-row">
+                                <div class="berkas-icon"><i class="ph ph-file-pdf"></i></div>
+                                <span class="berkas-name">Akta Kelahiran</span>
+                                <span class="berkas-meta">PDF · 1MB</span>
+                            </div>
+                            <div class="berkas-row">
+                                <div class="berkas-icon"><i class="ph ph-file-pdf"></i></div>
+                                <span class="berkas-name">Surat Kelakuan Baik</span>
+                                <span class="berkas-meta">PDF · 1MB</span>
+                            </div>
+                            <div class="berkas-row">
+                                <div class="berkas-icon"><i class="ph ph-file-pdf"></i></div>
+                                <span class="berkas-name">KTP Orang Tua (Ayah &amp; Ibu)</span>
+                                <span class="berkas-meta">PDF · 1MB</span>
+                            </div>
+                            <div class="berkas-row">
+                                <div class="berkas-icon"><i class="ph ph-file-pdf"></i></div>
+                                <span class="berkas-name">Rapor (5 Semester)</span>
+                                <span class="berkas-meta">PDF · 1MB</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-            </div>
-        </div>
-    </section>
-
-    <!-- INFO PMB SECTION -->
-    <section class="info-section-new">
-        <div class="container">
-            <div class="section-header">
-                <h2>Informasi PMB</h2>
-                <p>Jadwal Penting & Dokumen</p>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;">
-                    <a href="https://drive.google.com/file/d/1ZqXaVPpOlJDh64Nb0R0vskJ-CjCQYfd7" target="_blank" class="btn btn-primary" style="box-shadow: 0 5px 15px rgba(0,121,107,0.3);">
-                        <i class="ph ph-file-pdf"></i> Download Brosur PMB
-                    </a>
-                    <a href="https://drive.google.com/drive/folders/1-WegW3eWontmts--8Jide5hpMdI3Qf39" target="_blank" class="btn btn-secondary" style="box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
-                        <i class="ph ph-t-shirt"></i> Lihat Contoh Seragam
-                    </a>
-                </div>
-            </div>
-
-            <div class="info-cards-grid">
-                <!-- Card 1: Jalur Prestasi (UPDATED WITH REQUIREMENTS) -->
-                <div class="info-card-modern">
-                    <h3><i class="ph ph-trophy" style="color: var(--accent);"></i> Jalur Prestasi</h3>
-                    
-                    <!-- Syarat Tambahan -->
-                    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed #e2e8f0;">
-                        <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: var(--text-main);">Kriteria / Syarat:</h4>
-                        <ul style="padding-left: 20px; margin: 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
-                            <li style="margin-bottom: 8px;">Prestasi Akademik/ Non Akademik/ Keagamaan, minimal <b>Tingkat Provinsi</b> (Dibuktikan scan sertifikat asli)</li>
-                            <li>Prestasi Hafalan Al-Quran (Tahfidz) <b>Minimal 10 Juz</b></li>
-                        </ul>
+                <!-- Panel 4: Agenda & Bantuan -->
+                <div class="info-panel">
+                    <div class="panel-head">
+                        <div class="panel-num">04</div>
+                        <div class="panel-title-group">
+                            <div class="panel-title">Agenda &amp; Bantuan</div>
+                            <div class="panel-subtitle">Orang tua dan kontak panitia PMB</div>
+                        </div>
                     </div>
-
-                    <ul class="timeline-list">
-                        <li><span class="timeline-date">6 - 14 April 2026</span> Pendaftaran Online</li>
-                        <li><span class="timeline-date">16 April 2026</span> Pelaksanaan Tes Pembuktian Prestasi</li>
-                        <li><span class="timeline-date">18 April 2026</span> Pengumuman Kelulusan</li>
-                        <li><span class="timeline-date">20 - 25 April 2026</span> Lapor Diri / Daftar Ulang</li>
-                    </ul>
-                </div>
-
-                <!-- Card 2: Jalur Reguler -->
-                <div class="info-card-modern" style="border-top-color: var(--primary-dark);">
-                    <h3><i class="ph ph-student"></i> Jalur Reguler</h3>
-                    <ul class="timeline-list">
-                        <li><span class="timeline-date">20 April - 20 Mei 2026</span> Pendaftaran Online</li>
-                        <li><span class="timeline-date">21 - 23 Mei 2026</span> Tes Seleksi CBT (Computer Based Test)</li>
-                        <li><span class="timeline-date">25 Mei 2026</span> Pengumuman Kelulusan</li>
-                        <li><span class="timeline-date">13 - 20 Juni 2026</span> Lapor Diri / Daftar Ulang</li>
-                    </ul>
-                </div>
-
-                <!-- Card 3: Syarat Berkas -->
-                <div class="info-card-modern" style="border-top-color: #2563eb;">
-                    <h3><i class="ph ph-folder-notch-open" style="color: #2563eb;"></i> Syarat Berkas</h3>
-                    <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted);">Siapkan file scan berikut:</p>
-                    <ul class="timeline-list">
-                        <li><span class="timeline-date" style="color: #334155;">Foto Latar Biru</span> Format JPG/PNG (Max 1MB)</li>
-                        <li><span class="timeline-date" style="color: #334155;">Kartu Keluarga (KK)</span> Format PDF (Max 1MB)</li>
-                        <li><span class="timeline-date" style="color: #334155;">Akta Kelahiran</span> Format PDF (Max 1MB)</li>
-                        <li><span class="timeline-date" style="color: #334155;">Surat Kelakuan Baik</span> Format PDF (Max 1MB)</li>
-                        <li><span class="timeline-date" style="color: #334155;">KTP Orang Tua (Ayah+Ibu)</span> Format PDF (Max 1MB)</li>
-                        <li><span class="timeline-date" style="color: #334155;">Rapor (5 Semester)</span> Format PDF (Max 1MB)</li>
-                    </ul>
-                </div>
-
-                <!-- Card 4: Agenda Orang Tua -->
-                <div class="info-card-modern" style="border-top-color: var(--accent);">
-                    <h3><i class="ph ph-users-three"></i> Agenda Orang Tua</h3>
-                    <ul class="timeline-list">
-                        <li><span class="timeline-date" style="color: var(--primary);">13 Juni 2026</span> Rapat Orang Tua / Wali Murid Baru</li>
-                    </ul>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center;">
-                        <p style="font-size: 0.9rem; margin-bottom: 10px; color: var(--text-muted);">Butuh bantuan teknis?</p>
-                        <button onclick="toggleHelp()" class="btn btn-secondary" style="width: 100%; justify-content: center; font-size: 0.85rem;">
-                            <i class="ph ph-whatsapp-logo"></i> Chat Panitia
+                    <div class="panel-body">
+                        <div class="panel-rule"></div>
+                        <div class="agenda-row">
+                            <div class="agenda-date-box">
+                                <span class="agenda-date-day">13</span>
+                                <span class="agenda-date-month">Juni</span>
+                            </div>
+                            <div class="agenda-info">
+                                <div class="agenda-title">Rapat Orang Tua / Wali Murid Baru</div>
+                                <div class="agenda-desc">
+                                    Wajib dihadiri oleh orang tua atau wali murid yang dinyatakan diterima.
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="toggleHelp()" class="wa-contact-btn">
+                            <i class="ph ph-whatsapp-logo"></i>
+                            Butuh bantuan? Hubungi panitia via WhatsApp
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="container footer-flex">
-            <div class="footer-brand">
-                <img src="images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" alt="Logo">
-                <div>
-                    <strong style="color: white; letter-spacing: 0.5px;">MAN 1 TASIKMALAYA</strong><br>
-                    <small style="opacity: 0.7;">Sukamanah, Tasikmalaya</small>
+            </div><!-- /info-panels -->
+        </div><!-- /info-layout -->
+    </div><!-- /container -->
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer class="footer-root">
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <div class="footer-logo-row">
+                    <img src="images/logo.png"
+                         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                         alt="Logo MAN 1 Tasikmalaya">
+                    <div class="footer-school-name">MAN 1 TASIKMALAYA</div>
                 </div>
+                <p class="footer-addr">
+                    Jalan Pahlawan KH.Z Musthafa<br>
+                    Sukamanah, Kec. Sukarame<br>
+                    Kabupaten Tasikmalaya
+                </p>
             </div>
-            
-            <div class="footer-info">
-                <p>Jalan Pahlawan KH.Z Musthafa, Sukamanah, Kec. Sukarame</p>
-                <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 5px;">&copy; 2026 DRUDOX. All Rights Reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- WIDGET CONTACT -->
-    <div class="help-widget">
-        <div class="help-popup" id="helpPopup">
-            <div class="help-header">
-                <h4>Hubungi Panitia</h4>
-                <p>Klik nama untuk chat via WhatsApp</p>
-            </div>
-            <div class="help-list">
-                <a href="https://wa.me/6281323325771" target="_blank" class="help-item">
-                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
-                    <div class="contact-info"><span class="contact-name">Dede Fathul Umam</span><span class="contact-role">Panitia PMB</span></div>
+            <div class="footer-links-col">
+                <p class="footer-links-label">Tautan</p>
+                <a href="alur.html" class="footer-link">
+                    <i class="ph ph-map-trifold"></i> Alur Pendaftaran
                 </a>
-                <a href="https://wa.me/6281220338298" target="_blank" class="help-item">
-                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
-                    <div class="contact-info"><span class="contact-name">H. Undang Kurniawan</span><span class="contact-role">Panitia PMB</span></div>
+                <a href="login.html" class="footer-link">
+                    <i class="ph ph-sign-in"></i> Login Siswa
                 </a>
-                <a href="https://wa.me/6281287722857" target="_blank" class="help-item">
-                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
-                    <div class="contact-info"><span class="contact-name">M. Rofiq Najib</span><span class="contact-role">Panitia PMB</span></div>
+                <a href="https://drive.google.com/file/d/1ZqXaVPpOlJDh64Nb0R0vskJ-CjCQYfd7"
+                   target="_blank" class="footer-link">
+                    <i class="ph ph-file-pdf"></i> Download Brosur
                 </a>
-                <a href="https://wa.me/6282218943383" target="_blank" class="help-item">
-                    <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
-                    <div class="contact-info"><span class="contact-name">M. Iqbal Abdul Wakil</span><span class="contact-role">Panitia PMB</span></div>
+                <a href="https://drive.google.com/drive/folders/1-WegW3eWontmts--8Jide5hpMdI3Qf39"
+                   target="_blank" class="footer-link">
+                    <i class="ph ph-t-shirt"></i> Contoh Seragam
                 </a>
             </div>
         </div>
-        <button class="help-toggle" id="helpBtn" onclick="toggleHelp()">
-            <i class="ph ph-chat-teardrop-text"></i><span>Butuh Bantuan?</span>
-        </button>
+        <div class="footer-bottom">
+            <span>PMB MAN 1 Tasikmalaya &mdash; Tahun Ajaran 2026/2027</span>
+            <span>&copy; 2026 DRUDOX. All Rights Reserved.</span>
+        </div>
     </div>
+</footer>
 
-    <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
+
+<!-- ══════════════════════════════════════════
+     WIDGET KONTAK — id & class dipertahankan
+══════════════════════════════════════════ -->
+<div class="help-widget">
+    <div class="help-popup" id="helpPopup">
+        <div class="help-header">
+            <h4>Hubungi Panitia</h4>
+            <p>Klik nama untuk chat via WhatsApp</p>
+        </div>
+        <div class="help-list">
+            <a href="https://wa.me/6281323325771" target="_blank" class="help-item">
+                <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                <div class="contact-info">
+                    <span class="contact-name">Dede Fathul Umam</span>
+                    <span class="contact-role">Panitia PMB</span>
+                </div>
+            </a>
+            <a href="https://wa.me/6281220338298" target="_blank" class="help-item">
+                <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                <div class="contact-info">
+                    <span class="contact-name">H. Undang Kurniawan</span>
+                    <span class="contact-role">Panitia PMB</span>
+                </div>
+            </a>
+            <a href="https://wa.me/6281287722857" target="_blank" class="help-item">
+                <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                <div class="contact-info">
+                    <span class="contact-name">M. Rofiq Najib</span>
+                    <span class="contact-role">Panitia PMB</span>
+                </div>
+            </a>
+            <a href="https://wa.me/6282218943383" target="_blank" class="help-item">
+                <div class="wa-icon"><i class="ph ph-whatsapp-logo"></i></div>
+                <div class="contact-info">
+                    <span class="contact-name">M. Iqbal Abdul Wakil</span>
+                    <span class="contact-role">Panitia PMB</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    <button class="help-toggle" id="helpBtn" onclick="toggleHelp()">
+        <i class="ph ph-chat-teardrop-text"></i>
+        <span>Butuh Bantuan?</span>
+    </button>
+</div>
+
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+    /* Auto-advance slideshow */
+    (function () {
+        let t = setInterval(() => moveSlide(1), 5000);
+        const panel = document.querySelector('.hero-photo-panel');
+        if (panel) {
+            panel.addEventListener('mouseenter', () => clearInterval(t));
+            panel.addEventListener('mouseleave', () => {
+                t = setInterval(() => moveSlide(1), 5000);
+            });
+        }
+    })();
+</script>
 </body>
 </html>
