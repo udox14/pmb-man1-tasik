@@ -765,10 +765,15 @@ window.viewDetail = async function(id) {
         const p = await apiGet('pendaftar', { id });
         if (p.error || !p.id) throw new Error('Data tidak ditemukan');
 
+        // Parse berkas_ditolak — simpan sebagai Set untuk lookup cepat
+        let berkasArr = [];
+        try { berkasArr = p.berkas_ditolak ? JSON.parse(p.berkas_ditolak) : []; } catch(e) {}
+
         editState = { 
             id: p.id, 
             status_verifikasi: p.status_verifikasi, 
-            status_kelulusan: p.status_kelulusan || 'PENDING' 
+            status_kelulusan: p.status_kelulusan || 'PENDING',
+            berkas_ditolak: berkasArr,
         };
 
         let prestasiHtml = '';
@@ -945,6 +950,42 @@ window.viewDetail = async function(id) {
                     }
                     .file-btn.fv-active { border-color: #00796b; background: #f0fdf4; color: #00796b; }
                     .file-btn.fv-active i { color: #00796b; }
+
+                    /* ── Flagging berkas ── */
+                    .flag-section { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+                    .flag-section-label {
+                        font-size: 0.62rem; font-weight: 800; letter-spacing: 1.5px;
+                        text-transform: uppercase; color: #94a3b8; display: block; margin-bottom: 8px;
+                    }
+                    .flag-list { display: flex; flex-direction: column; gap: 5px; }
+                    .flag-item {
+                        display: flex; align-items: center; gap: 8px;
+                        padding: 7px 10px; border-radius: 7px;
+                        border: 1px solid #e2e8f0; background: #f8fafc;
+                        cursor: pointer; transition: background .15s, border-color .15s;
+                        font-size: 0.75rem; font-weight: 600; color: #334155;
+                        user-select: none;
+                    }
+                    .flag-item:hover { background: #fff1f2; border-color: #fecaca; }
+                    .flag-item.flagged { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
+                    .flag-item input[type="checkbox"] {
+                        width: 14px; height: 14px; accent-color: #dc2626;
+                        flex-shrink: 0; cursor: pointer;
+                    }
+                    .flag-item i { font-size: 0.88rem; flex-shrink: 0; }
+
+                    /* ── WA button ── */
+                    .wa-notify-btn {
+                        display: flex; align-items: center; gap: 7px;
+                        width: 100%; margin-top: 10px;
+                        padding: 9px 12px; border-radius: 7px;
+                        background: #dcfce7; border: 1px solid #bbf7d0;
+                        color: #166534; font-size: 0.75rem; font-weight: 700;
+                        cursor: pointer; font-family: inherit;
+                        transition: background .15s;
+                    }
+                    .wa-notify-btn:hover { background: #bbf7d0; }
+                    .wa-notify-btn i { font-size: 1rem; }
                 </style>
 
                 <div class="d-wrapper">
@@ -970,6 +1011,25 @@ window.viewDetail = async function(id) {
                             <i class="ph ph-book-open-text"></i> Rapor
                         </a>
                         ${p.scan_sertifikat_prestasi_url ? `<a href="#" onclick="openFileViewer(6);return false;" class="file-btn" id="fb-6"><i class="ph ph-trophy"></i> Sertifikat Prestasi</a>` : ''}
+
+                        <!-- FLAG BERKAS BERMASALAH -->
+                        <div class="flag-section">
+                            <span class="flag-section-label">Tandai Berkas Bermasalah</span>
+                            <div class="flag-list">
+                                ${buildFlagItem('foto_url',                    'Pas Foto',              'ph-user-focus',         berkasArr)}
+                                ${buildFlagItem('scan_kk_url',                 'Kartu Keluarga',        'ph-file-pdf',           berkasArr)}
+                                ${buildFlagItem('scan_akta_url',               'Akta Kelahiran',        'ph-file-pdf',           berkasArr)}
+                                ${buildFlagItem('scan_kelakuan_baik_url',      'Surat Kelakuan Baik',   'ph-certificate',        berkasArr)}
+                                ${buildFlagItem('scan_ktp_ortu_url',           'KTP Orang Tua',         'ph-identification-card',berkasArr)}
+                                ${buildFlagItem('scan_rapor_url',              'Rapor',                 'ph-book-open-text',     berkasArr)}
+                                ${p.scan_sertifikat_prestasi_url ? buildFlagItem('scan_sertifikat_prestasi_url','Sertifikat Prestasi','ph-trophy',berkasArr) : ''}
+                            </div>
+                            ${p.no_telepon_ortu ? `
+                            <button class="wa-notify-btn" onclick="sendWaNotif()">
+                                <i class="ph ph-whatsapp-logo"></i>
+                                Beritahu via WhatsApp
+                            </button>` : ''}
+                        </div>
                     </div>
 
                     <!-- KANAN: header + body -->
@@ -1112,6 +1172,60 @@ window.viewDetail = async function(id) {
 
         let fvCurrent = 0;
 
+        // ── Helper: build flag checkbox item ────────────────────────────
+        function buildFlagItem(fieldKey, label, icon, flaggedArr) {
+            const checked = flaggedArr.includes(fieldKey) ? 'checked' : '';
+            const flaggedClass = flaggedArr.includes(fieldKey) ? 'flagged' : '';
+            return `<label class="flag-item ${flaggedClass}" id="fi-${fieldKey}">
+                <input type="checkbox" value="${fieldKey}" ${checked}
+                       onchange="toggleFlag(this)">
+                <i class="ph ${icon}"></i> ${label}
+            </label>`;
+        }
+
+        // Toggle flag state
+        window.toggleFlag = function(cb) {
+            const key = cb.value;
+            const item = document.getElementById('fi-' + key);
+            if (cb.checked) {
+                if (!editState.berkas_ditolak.includes(key))
+                    editState.berkas_ditolak.push(key);
+                if (item) item.classList.add('flagged');
+            } else {
+                editState.berkas_ditolak = editState.berkas_ditolak.filter(k => k !== key);
+                if (item) item.classList.remove('flagged');
+            }
+            triggerSaveAnim();
+        };
+
+        // Kirim WA notifikasi berkas bermasalah
+        window.sendWaNotif = function() {
+            if (editState.berkas_ditolak.length === 0) {
+                Swal.fire('Info', 'Belum ada berkas yang ditandai bermasalah.', 'info');
+                return;
+            }
+            const labelMap = {
+                'foto_url':                     'Pas Foto',
+                'scan_kk_url':                  'Kartu Keluarga',
+                'scan_akta_url':                'Akta Kelahiran',
+                'scan_kelakuan_baik_url':       'Surat Kelakuan Baik',
+                'scan_ktp_ortu_url':            'KTP Orang Tua',
+                'scan_rapor_url':               'Rapor',
+                'scan_sertifikat_prestasi_url': 'Sertifikat Prestasi',
+            };
+            const berkasNames = editState.berkas_ditolak
+                .map(k => '- ' + (labelMap[k] || k))
+                .join('%0A');
+            const phone = (p.no_telepon_ortu || '').replace(/^0/, '62').replace(/[^0-9]/g, '');
+            const msg = encodeURIComponent(
+                `Halo ${p.nama_lengkap}, salam dari Panitia PMB MAN 1 Tasikmalaya.`
+            ) + '%0A%0A' +
+            encodeURIComponent('Berkas pendaftaran Anda perlu diperbaiki. Berkas berikut perlu diupload ulang:') + '%0A' +
+            berkasNames + '%0A%0A' +
+            encodeURIComponent('Silakan login ke portal PMB dan upload ulang berkas tersebut. Terima kasih.');
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        };
+
         // ── Inject overlay ke document.body agar lepas dari Swal ──────
         let fvEl = document.getElementById('fv-overlay-body');
         if (!fvEl) {
@@ -1251,7 +1365,10 @@ window.saveDetailChanges = async function() {
     
     let payload = { 
         status_verifikasi: editState.status_verifikasi, 
-        status_kelulusan: editState.status_kelulusan 
+        status_kelulusan: editState.status_kelulusan,
+        berkas_ditolak: editState.berkas_ditolak && editState.berkas_ditolak.length > 0
+            ? JSON.stringify(editState.berkas_ditolak)
+            : null,
     };
     
     const elTgl = document.getElementById('input-tgl'); 
@@ -1270,7 +1387,8 @@ window.saveDetailChanges = async function() {
         const index = allPendaftar.findIndex(x => x.id === editState.id);
         if (index !== -1) { 
             allPendaftar[index].status_verifikasi = payload.status_verifikasi; 
-            allPendaftar[index].status_kelulusan = payload.status_kelulusan; 
+            allPendaftar[index].status_kelulusan = payload.status_kelulusan;
+            allPendaftar[index].berkas_ditolak = payload.berkas_ditolak; 
             
             if(elTgl) { 
                 allPendaftar[index].tanggal_tes = payload.tanggal_tes; 

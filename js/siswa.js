@@ -89,6 +89,7 @@ function renderProfile(data) {
   }
 
   renderFileButtons(data);
+  renderBerkasDitolak(data);
 }
 
 function renderFileButtons(data) {
@@ -110,6 +111,64 @@ function renderFileButtons(data) {
   addBtn(data.scan_rapor_url,                 'Rapor',              'ph-book-open-text');
   if (data.scan_sertifikat_prestasi_url)
     addBtn(data.scan_sertifikat_prestasi_url, 'Sertifikat Prestasi','ph-trophy');
+}
+
+// ===========================================================
+// RENDER WARNING BERKAS DITOLAK
+// ===========================================================
+function renderBerkasDitolak(data) {
+  // Hapus warning lama dulu
+  const old = document.getElementById('berkas-ditolak-warning');
+  if (old) old.remove();
+
+  let berkasArr = [];
+  try {
+    berkasArr = data.berkas_ditolak ? JSON.parse(data.berkas_ditolak) : [];
+  } catch(e) {}
+
+  if (berkasArr.length === 0) return;
+
+  const labelMap = {
+    'foto_url':                     'Pas Foto',
+    'scan_kk_url':                  'Kartu Keluarga',
+    'scan_akta_url':                'Akta Kelahiran',
+    'scan_kelakuan_baik_url':       'Surat Kelakuan Baik',
+    'scan_ktp_ortu_url':            'KTP Orang Tua',
+    'scan_rapor_url':               'Rapor',
+    'scan_sertifikat_prestasi_url': 'Sertifikat Prestasi',
+  };
+
+  const berkasList = berkasArr
+    .map(k => `<li style="margin-bottom:4px;">${labelMap[k] || k}</li>`)
+    .join('');
+
+  const warning = document.createElement('div');
+  warning.id = 'berkas-ditolak-warning';
+  warning.style.cssText =
+    'background:#fef2f2; border:1px solid #fca5a5; border-left:4px solid #dc2626;' +
+    'border-radius:12px; padding:16px 18px; margin-bottom:14px;';
+  warning.innerHTML = `
+    <h4 style="font-size:.88rem; font-weight:800; color:#b91c1c; margin:0 0 8px;
+               display:flex; align-items:center; gap:7px;">
+      <i class="ph ph-warning-circle"></i> Berkas Perlu Diupload Ulang
+    </h4>
+    <p style="font-size:.8rem; color:#7f1d1d; margin:0 0 10px; line-height:1.6;">
+      Admin telah menandai berkas berikut tidak sesuai dan perlu diupload ulang:
+    </p>
+    <ul style="padding-left:18px; margin:0 0 12px; font-size:.82rem;
+               color:#b91c1c; font-weight:700; line-height:1.8;">
+      ${berkasList}
+    </ul>
+    <button onclick="editData();switchEoTab('eo-upload');"
+            style="padding:9px 16px; background:#dc2626; color:white; border:none;
+                   border-radius:8px; font-size:.8rem; font-weight:700;
+                   cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+      <i class="ph ph-upload-simple"></i> Upload Ulang Sekarang
+    </button>`;
+
+  // Tampilkan di atas status cards
+  const statusGrid = document.querySelector('.status-main-grid');
+  if (statusGrid) statusGrid.parentNode.insertBefore(warning, statusGrid);
 }
 
 // ===========================================================
