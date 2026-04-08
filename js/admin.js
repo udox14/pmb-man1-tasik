@@ -334,6 +334,18 @@ function updateBulkUI() {
             bar.appendChild(btnJadwal);
         }
 
+        // Buat tombol Alihkan ke Reguler massal jika belum ada
+        if (!document.getElementById('btn-bulk-reguler')) {
+            const btnReguler = document.createElement('button');
+            btnReguler.id = 'btn-bulk-reguler';
+            btnReguler.className = 'btn btn-primary';
+            btnReguler.style.background = '#7c3aed';
+            btnReguler.style.borderColor = '#7c3aed';
+            btnReguler.innerHTML = '<i class="ph ph-arrows-left-right"></i> Alih ke Reguler';
+            btnReguler.onclick = () => window.bulkAction('ALIH_REGULER');
+            bar.appendChild(btnReguler);
+        }
+
         // Buat tombol download ZIP massal jika belum ada
         if (!document.getElementById('btn-bulk-zip')) {
             const btnZip = document.createElement('button');
@@ -431,7 +443,58 @@ window.bulkAction = async function(action) {
         } else { 
             return; 
         }
+    } else if (action === 'ALIH_REGULER') {
+        // Filter: hanya yang masih PRESTASI
+        const prestasiIds = ids.filter(id => {
+            const p = allPendaftar.find(x => x.id === id);
+            return p && p.jalur === 'PRESTASI';
+        });
+
+        if (prestasiIds.length === 0) {
+            Swal.fire('Info', 'Tidak ada siswa Jalur Prestasi di antara yang dipilih.', 'info');
+            return;
+        }
+
+        const confirm = await Swal.fire({
+            title: 'Alihkan ke Jalur Reguler?',
+            html: `<span style="color:#7c3aed; font-weight:700;">${prestasiIds.length}</span> dari ${ids.length} siswa terpilih adalah Jalur Prestasi dan akan dipindahkan ke Jalur Reguler.<br><br>
+                   Mereka akan <strong>wajib mengikuti Tes CBT</strong> dan status verifikasi direset ke <em>menunggu</em>.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Alihkan',
+            confirmButtonColor: '#7c3aed',
+            cancelButtonText: 'Batal'
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        Swal.showLoading();
+        const result = await apiPost('admin?action=alih-reguler', { ids: prestasiIds });
+        if (!result.error) {
+            // Update local state
+            prestasiIds.forEach(id => {
+                const idx = allPendaftar.findIndex(x => x.id === id);
+                if (idx !== -1) {
+                    allPendaftar[idx].jalur = 'REGULER';
+                    allPendaftar[idx].status_verifikasi = null;
+                    allPendaftar[idx].status_kelulusan = 'PENDING';
+                    allPendaftar[idx].ruang_tes = null;
+                    allPendaftar[idx].tanggal_tes = null;
+                    allPendaftar[idx].sesi_tes = null;
+                }
+            });
+            selectedIds.clear();
+            updateStats(allPendaftar);
+            renderTable();
+            Swal.fire('Berhasil', `${prestasiIds.length} siswa berhasil dialihkan ke Jalur Reguler.`, 'success');
+        } else {
+            Swal.fire('Gagal', result.error, 'error');
+        }
+        return;
     }
+
+    // Aksi lainnya (VERIFY, GRADUATE, JADWAL) perlu konfirmasi + API verifikasi
+    if (!confirmText) return;
 
     const confirm = await Swal.fire({ 
         title: 'Konfirmasi', 
@@ -1061,6 +1124,14 @@ window.viewDetail = async function(id) {
                                 <button id="btn-save-changes" onclick="saveDetailChanges()" class="btn-act">
                                     <i class="ph ph-floppy-disk"></i> Simpan
                                 </button>
+                                ${p.jalur === 'PRESTASI' ? `
+                                <button onclick="alihkanSatuKeReguler('${p.id}', '${p.nama_lengkap.replace(/'/g, "\\'")}')"
+                                    style="border:none; padding:5px 10px; border-radius:4px; font-size:0.7rem;
+                                           font-weight:700; cursor:pointer; color:white; opacity:1;
+                                           background:#7c3aed; margin-left:4px;"
+                                    title="Alihkan siswa ini dari Jalur Prestasi ke Jalur Reguler">
+                                    <i class="ph ph-arrows-left-right"></i> Alih ke Reguler
+                                </button>` : ''}
                             </div>
                         </div>
 
@@ -1419,6 +1490,42 @@ window.saveDetailChanges = async function() {
         toast.fire({ icon: 'success', title: 'Tersimpan' });
     } else { 
         toast.fire({ icon: 'error', title: 'Gagal: ' + result.error }); 
+    }
+}
+
+window.alihkanSatuKeReguler = async function(id, name) {
+    const confirm = await Swal.fire({
+        title: 'Alihkan ke Jalur Reguler?',
+        html: `Anda akan memindahkan <strong>${name}</strong> dari Jalur Prestasi ke Jalur Reguler.<br><br>
+               Siswa ini otomatis diwajibkan mengikuti Tes CBT dan status verifikasi dikembalikan ke <em>menunggu</em>.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Alihkan',
+        confirmButtonColor: '#7c3aed',
+        cancelButtonText: 'Batal'
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    Swal.showLoading();
+    const result = await apiPost('admin?action=alih-reguler', { ids: [id] });
+    
+    if (!result.error) {
+        const idx = allPendaftar.findIndex(x => x.id === id);
+        if (idx !== -1) {
+            allPendaftar[idx].jalur = 'REGULER';
+            allPendaftar[idx].status_verifikasi = null;
+            allPendaftar[idx].status_kelulusan = 'PENDING';
+            allPendaftar[idx].ruang_tes = null;
+            allPendaftar[idx].tanggal_tes = null;
+            allPendaftar[idx].sesi_tes = null;
+        }
+        updateStats(allPendaftar);
+        renderTable();
+        closeDetail();
+        Swal.fire('Berhasil', `${name} telah dialihkan ke Jalur Reguler.`, 'success');
+    } else {
+        Swal.fire('Gagal', result.error, 'error');
     }
 }
 

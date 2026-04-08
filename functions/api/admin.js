@@ -136,6 +136,28 @@ export async function onRequestPost(context) {
       return Response.json({ success: true }, { headers: CORS });
     }
 
+    // Alihkan batch pendaftar PRESTASI ke REGULER (oleh admin)
+    if (action === 'alih-reguler') {
+      const { ids } = body;
+      if (!ids || !Array.isArray(ids) || ids.length === 0)
+        return Response.json({ error: 'ids required' }, { status: 400, headers: CORS });
+
+      const stmts = ids.map(id =>
+        env.DB.prepare(`
+          UPDATE pendaftar SET
+            jalur = 'REGULER',
+            status_kelulusan = 'PENDING',
+            status_verifikasi = NULL,
+            ruang_tes = NULL,
+            tanggal_tes = NULL,
+            sesi_tes = NULL
+          WHERE id = ?
+        `).bind(id)
+      );
+      await env.DB.batch(stmts);
+      return Response.json({ success: true, updated: ids.length }, { headers: CORS });
+    }
+
     return Response.json({ error: 'Action tidak dikenal.' }, { status: 400, headers: CORS });
 
   } catch (err) {
