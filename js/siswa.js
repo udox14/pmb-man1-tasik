@@ -834,9 +834,9 @@ window.editData = function() {
       </p>
       <table style="width:100%; border-collapse:collapse; font-size:0.83rem; margin-bottom:14px;">
         <thead><tr style="background:#f1f5f9;">
-          <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0;">Semester</th>
-          <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0;">Rata-rata Nilai <span style="color:#ef4444">*</span></th>
-          <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0; color:#94a3b8;">Ranking</th>
+          <th style="width:30%; padding:8px 10px; text-align:left; border:1px solid #e2e8f0;">Semester</th>
+          <th style="width:45%; padding:8px 10px; text-align:left; border:1px solid #e2e8f0;">Rata-rata Nilai <span style="color:#ef4444">*</span></th>
+          <th style="width:25%; padding:8px 10px; text-align:left; border:1px solid #e2e8f0; color:#94a3b8;">Ranking</th>
         </tr></thead>
         <tbody>
           ${semLabels.map(([k,l], i) => `
@@ -845,14 +845,14 @@ window.editData = function() {
             <td style="padding:6px 8px; border:1px solid #e2e8f0;">
               <input type="number" class="eo-input eo-rapor-nilai" data-key="${k}"
                      value="${rObjEdit[k]?.rata ?? ''}"
-                     placeholder="contoh: 85.5" min="0" max="100" step="0.1"
+                     placeholder="cth: 85.5" min="0" max="100" step="0.1"
                      oninput="hitungRataRaporEdit()"
                      style="padding:7px 10px; font-size:0.82rem;">
             </td>
             <td style="padding:6px 8px; border:1px solid #e2e8f0;">
               <input type="number" class="eo-input eo-rapor-rank" data-key="${k}"
                      value="${rObjEdit[k]?.rank ?? ''}"
-                     placeholder="contoh: 3" min="1"
+                     placeholder="cth: 3" min="1"
                      style="padding:7px 10px; font-size:0.82rem;">
             </td>
           </tr>`).join('')}
