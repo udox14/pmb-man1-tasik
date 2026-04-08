@@ -301,8 +301,8 @@ function renderStatus(data) {
         </h3>
         <p style="font-size:.84rem; color:#1e3a8a; margin-bottom:12px; line-height:1.6;">
           Mohon maaf, Anda belum lolos di Jalur Prestasi.<br>
-          Namun, Anda <strong>OTOMATIS BERHAK</strong> mengikuti seleksi Jalur Reguler
-          menggunakan nilai Rapor (Tanpa Tes Tulis).
+          Namun, Anda <strong>masih dapat mendaftar</strong> melalui Jalur Reguler
+          dengan <strong>wajib mengikuti Tes CBT</strong>.
         </p>
         <button onclick="prosesPengalihanReguler('${data.id}')"
           style="background:#2563eb; color:white; border:none; padding:10px 18px; border-radius:8px;
@@ -356,7 +356,7 @@ function renderStatus(data) {
             </h4>
             <p style="margin:0; font-size:.82rem; color:#1e40af; line-height:1.5;">
               Status Anda: <strong>Jalur Reguler</strong>. Anda dinyatakan
-              <strong>BEBAS TES TULIS (CBT)</strong> sebagai bentuk pengalihan dari Jalur Prestasi.
+              <strong>BEBAS TES TULIS (CBT)</strong> karena memiliki sertifikat prestasi.
             </p>`;
         } else {
           infoBox.id             = 'info-tunggu-jadwal';
@@ -990,7 +990,7 @@ window.switchTab = function(tabId) {
 window.prosesPengalihanReguler = async function(id) {
   const confirm = await Swal.fire({
     title: 'Lanjut Jalur Reguler?',
-    text: 'Data Anda akan dipindahkan ke Jalur Reguler.',
+    html: 'Data Anda akan dipindahkan ke <b>Jalur Reguler</b>.<br>Anda <b>wajib mengikuti Tes CBT</b> setelah pengalihan ini.',
     icon: 'question', showCancelButton: true,
     confirmButtonText: 'Ya, Lanjutkan', cancelButtonText: 'Batal'
   });
@@ -999,12 +999,21 @@ window.prosesPengalihanReguler = async function(id) {
     try {
       const result = await apiPost('pendaftar/alih-reguler', { id });
       if (result.error) throw new Error(result.error);
-      Swal.fire('Berhasil', 'Status Anda telah dialihkan ke Jalur Reguler.', 'success')
+      Swal.fire('Berhasil', 'Status Anda telah dialihkan ke Jalur Reguler. Tunggu informasi jadwal Tes CBT.', 'success')
         .then(() => location.reload());
     } catch (e) {
       Swal.fire('Gagal', e.message, 'error');
     }
   }
+};
+
+// Wrapper untuk tombol di notif HTML statis (alert-gagal-prestasi)
+window.pindahKeRegulerTrigger = function() {
+  if (!_cachedData || !_cachedData.id) {
+    Swal.fire('Tunggu sebentar', 'Data sedang dimuat.', 'info');
+    return;
+  }
+  prosesPengalihanReguler(_cachedData.id);
 };
 
 // ===========================================================

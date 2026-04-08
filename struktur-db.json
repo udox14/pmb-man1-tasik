@@ -1,0 +1,39 @@
+[
+  {
+    "results": [
+      {
+        "sql": "CREATE TABLE _cf_KV (\n        key TEXT PRIMARY KEY,\n        value BLOB\n      ) WITHOUT ROWID"
+      },
+      {
+        "sql": "CREATE TABLE admins (\r\n  id          TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),\r\n  username    TEXT NOT NULL UNIQUE,\r\n  password    TEXT NOT NULL,\r\n  nama_lengkap TEXT,\r\n  created_at  TEXT DEFAULT (datetime('now'))\r\n)"
+      },
+      {
+        "sql": "CREATE TABLE pendaftar (\r\n  id                          TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),\r\n  created_at                  TEXT DEFAULT (datetime('now')),\r\n  no_pendaftaran              TEXT,\r\n  ruang_tes                   TEXT,\r\n  status_kelulusan            TEXT DEFAULT 'PENDING',  -- PENDING | DITERIMA | TIDAK DITERIMA\r\n  status_verifikasi           INTEGER,                 -- NULL=pending, 1=diterima, 0=ditolak\r\n  jalur                       TEXT NOT NULL,           -- REGULER | PRESTASI\r\n  nisn                        TEXT NOT NULL,\r\n  nik                         TEXT NOT NULL,\r\n  nama_lengkap                TEXT NOT NULL,\r\n  jenis_kelamin               TEXT,\r\n  tempat_lahir                TEXT,\r\n  tanggal_lahir               TEXT,\r\n  ukuran_baju                 TEXT,\r\n  agama                       TEXT DEFAULT 'Islam',\r\n  jumlah_saudara              INTEGER,\r\n  anak_ke                     INTEGER,\r\n  status_anak                 TEXT,\r\n  provinsi                    TEXT,\r\n  kabupaten_kota              TEXT,\r\n  kecamatan                   TEXT,\r\n  desa_kelurahan              TEXT,\r\n  rt                          TEXT,\r\n  rw                          TEXT,\r\n  alamat_lengkap              TEXT,\r\n  kode_pos                    TEXT,\r\n  no_kk                       TEXT,\r\n  nama_ayah                   TEXT,\r\n  nik_ayah                    TEXT,\r\n  tempat_lahir_ayah           TEXT,\r\n  tanggal_lahir_ayah          TEXT,\r\n  status_ayah                 TEXT,\r\n  pendidikan_ayah             TEXT,\r\n  pekerjaan_ayah              TEXT,\r\n  penghasilan_ayah            REAL,\r\n  nama_ibu                    TEXT,\r\n  nik_ibu                     TEXT,\r\n  tempat_lahir_ibu            TEXT,\r\n  tanggal_lahir_ibu           TEXT,\r\n  status_ibu                  TEXT,\r\n  pendidikan_ibu              TEXT,\r\n  pekerjaan_ibu               TEXT,\r\n  penghasilan_ibu             REAL,\r\n  no_telepon_ortu             TEXT,\r\n  nama_wali                   TEXT,\r\n  nik_wali                    TEXT,\r\n  tempat_lahir_wali           TEXT,\r\n  tanggal_lahir_wali          TEXT,\r\n  pendidikan_wali             TEXT,\r\n  pekerjaan_wali              TEXT,\r\n  penghasilan_wali            REAL,\r\n  no_telepon_wali             TEXT,\r\n  asal_sekolah                TEXT,\r\n  npsn_sekolah                TEXT,\r\n  status_sekolah              TEXT,\r\n  alamat_sekolah              TEXT,\r\n  pilihan_pesantren           TEXT,\r\n  foto_url                    TEXT,\r\n  scan_kk_url                 TEXT,\r\n  scan_akta_url               TEXT,\r\n  scan_kelakuan_baik_url      TEXT,\r\n  scan_ktp_ortu_url           TEXT,\r\n  scan_sertifikat_prestasi_url TEXT,\r\n  scan_rapor_url              TEXT,\r\n  tanggal_tes                 TEXT,\r\n  sesi_tes                    TEXT\r\n, berkas_ditolak TEXT DEFAULT NULL)"
+      },
+      {
+        "sql": "CREATE TABLE prestasi (\r\n  id              TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),\r\n  pendaftar_id    TEXT,\r\n  kategori        TEXT,\r\n  nama_lomba      TEXT,\r\n  penyelenggara   TEXT,\r\n  tingkat         TEXT,\r\n  tahun_perolehan TEXT,\r\n  FOREIGN KEY (pendaftar_id) REFERENCES pendaftar(id)\r\n)"
+      },
+      {
+        "sql": "CREATE TABLE pengaturan (\r\n  key       TEXT PRIMARY KEY,\r\n  value     TEXT,\r\n  is_active INTEGER DEFAULT 1\r\n)"
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "SIN",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.2178
+      },
+      "duration": 0.2178,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 49152,
+      "rows_read": 10,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]

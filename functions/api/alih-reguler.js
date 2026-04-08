@@ -16,7 +16,7 @@ export async function onRequestPost(context) {
       UPDATE pendaftar SET
         jalur = 'REGULER',
         status_kelulusan = 'PENDING',
-        status_verifikasi = 1,
+        status_verifikasi = NULL,
         ruang_tes = NULL,
         tanggal_tes = NULL,
         sesi_tes = NULL
