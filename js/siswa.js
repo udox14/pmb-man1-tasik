@@ -1047,7 +1047,13 @@ window.cetakUndangan = function() {
   setEl('und-no',      v(p.no_pendaftaran));
   setEl('und-nama',    v(p.nama_lengkap));
   setEl('und-nisn',    v(p.nisn));
+  setEl('und-jk',      v(p.jenis_kelamin));
   setEl('und-sekolah', v(p.asal_sekolah));
+  
+  const fotoEl = document.getElementById('und-foto');
+  if (fotoEl) {
+    fotoEl.src = p.foto_url ? p.foto_url : 'https://via.placeholder.com/150?text=FOTO';
+  }
 
   const now  = new Date();
   const opts = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
