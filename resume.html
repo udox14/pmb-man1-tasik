@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,18 @@
     <style>
         /* ── Tokens ─────────────────────────────────────────────── */
         :root {
-            --ink:       #0d1b2a;
-            --ink-mid:   #334155;
-            --ink-soft:  #64748b;
+            --ink: #0d1b2a;
+            --ink-mid: #334155;
+            --ink-soft: #64748b;
             --ink-faint: #94a3b8;
-            --rule:      #e2e8f0;
+            --rule: #e2e8f0;
             --rule-dark: #cbd5e1;
-            --surface:   #ffffff;
-            --bg:        #f1f5f9;
-            --teal:      #00796b;
+            --surface: #ffffff;
+            --bg: #f1f5f9;
+            --teal: #00796b;
             --teal-dark: #004d40;
-            --teal-dim:  #e0f2f1;
-            --radius:    10px;
+            --teal-dim: #e0f2f1;
+            --radius: 10px;
             --header-height: 64px;
         }
 
@@ -38,14 +39,27 @@
         /* ── Header ─────────────────────────────────────────────── */
         header {
             height: var(--header-height);
-            background: rgba(255,255,255,.97);
+            background: rgba(255, 255, 255, .97);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--rule);
             box-shadow: none;
         }
-        .brand-title    { font-size: 1rem; font-weight: 800; color: var(--ink); }
-        .brand-subtitle { font-size: .72rem; color: var(--ink-soft); }
-        .kemenag-logo   { width: 36px; }
+
+        .brand-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .brand-subtitle {
+            font-size: .72rem;
+            color: var(--ink-soft);
+        }
+
+        .kemenag-logo {
+            width: 36px;
+        }
+
         .nav-actions .btn {
             border-radius: var(--radius);
             padding: 8px 16px;
@@ -65,6 +79,7 @@
             text-align: center;
             margin-bottom: 24px;
         }
+
         .success-icon {
             width: 64px;
             height: 64px;
@@ -78,12 +93,14 @@
             margin-bottom: 14px;
             box-shadow: 0 0 0 8px #f0fdf4;
         }
+
         .success-wrap h2 {
             font-size: 1.3rem;
             font-weight: 800;
             color: var(--ink);
             margin: 0 0 6px;
         }
+
         .success-wrap p {
             font-size: .84rem;
             color: var(--ink-soft);
@@ -98,11 +115,13 @@
             overflow: hidden;
             margin-bottom: 12px;
         }
+
         .card-head {
             padding: 14px 20px;
             border-bottom: 1px solid var(--rule);
             background: var(--bg);
         }
+
         .card-head-label {
             font-size: .62rem;
             font-weight: 800;
@@ -110,7 +129,10 @@
             text-transform: uppercase;
             color: var(--ink-faint);
         }
-        .card-body { padding: 20px; }
+
+        .card-body {
+            padding: 20px;
+        }
 
         /* ── Account box ─────────────────────────────────────────── */
         .account-box {
@@ -121,44 +143,57 @@
             overflow: hidden;
             margin-bottom: 12px;
         }
+
         .account-box::before {
             content: '';
             position: absolute;
-            right: -20px; top: -20px;
-            width: 120px; height: 120px;
+            right: -20px;
+            top: -20px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: rgba(255,255,255,.04);
+            background: rgba(255, 255, 255, .04);
         }
+
         .account-box::after {
             content: '';
             position: absolute;
-            right: 20px; bottom: -30px;
-            width: 80px; height: 80px;
+            right: 20px;
+            bottom: -30px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            background: rgba(255,255,255,.03);
+            background: rgba(255, 255, 255, .03);
         }
+
         .account-label {
             font-size: .62rem;
             font-weight: 800;
             letter-spacing: 1.8px;
             text-transform: uppercase;
-            color: rgba(255,255,255,.4);
+            color: rgba(255, 255, 255, .4);
             display: block;
             margin-bottom: 14px;
         }
+
         .cred-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,.08);
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
         }
-        .cred-row:last-of-type { border-bottom: none; }
+
+        .cred-row:last-of-type {
+            border-bottom: none;
+        }
+
         .cred-label {
             font-size: .78rem;
-            color: rgba(255,255,255,.45);
+            color: rgba(255, 255, 255, .45);
             font-weight: 500;
         }
+
         .cred-val {
             font-size: 1rem;
             font-weight: 800;
@@ -171,21 +206,34 @@
         .cbt-notice {
             margin-top: 14px;
             padding: 10px 14px;
-            background: rgba(255,255,255,.07);
+            background: rgba(255, 255, 255, .07);
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,.1);
+            border: 1px solid rgba(255, 255, 255, .1);
             font-size: .75rem;
-            color: rgba(255,255,255,.6);
+            color: rgba(255, 255, 255, .6);
             line-height: 1.6;
             display: flex;
             gap: 8px;
             align-items: flex-start;
         }
-        .cbt-notice i { font-size: .9rem; flex-shrink: 0; margin-top: 1px; color: var(--teal); }
-        .cbt-notice b { color: rgba(255,255,255,.85); }
+
+        .cbt-notice i {
+            font-size: .9rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+            color: var(--teal);
+        }
+
+        .cbt-notice b {
+            color: rgba(255, 255, 255, .85);
+        }
 
         /* ── Summary rows ────────────────────────────────────────── */
-        .summary-list { display: flex; flex-direction: column; }
+        .summary-list {
+            display: flex;
+            flex-direction: column;
+        }
+
         .summary-item {
             display: flex;
             justify-content: space-between;
@@ -195,9 +243,21 @@
             border-bottom: 1px solid var(--rule);
             font-size: .84rem;
         }
-        .summary-item:last-child { border-bottom: none; }
-        .sum-label { color: var(--ink-soft); flex-shrink: 0; }
-        .sum-val   { font-weight: 700; color: var(--ink); text-align: right; }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .sum-label {
+            color: var(--ink-soft);
+            flex-shrink: 0;
+        }
+
+        .sum-val {
+            font-weight: 700;
+            color: var(--ink);
+            text-align: right;
+        }
 
         /* ── Action buttons ──────────────────────────────────────── */
         .action-row {
@@ -205,6 +265,7 @@
             gap: 10px;
             margin-top: 20px;
         }
+
         .action-row .btn {
             flex: 1;
             justify-content: center;
@@ -216,38 +277,58 @@
             align-items: center;
             gap: 7px;
         }
+
         .btn-outline-dark {
             background: var(--surface);
             border: 1px solid var(--rule-dark);
             color: var(--ink-mid);
         }
-        .btn-outline-dark:hover { background: var(--bg); transform: none; }
+
+        .btn-outline-dark:hover {
+            background: var(--bg);
+            transform: none;
+        }
+
         .btn-primary {
             background: var(--teal);
             color: white;
             border: none;
             box-shadow: none;
         }
-        .btn-primary:hover { background: var(--teal-dark); transform: none; }
+
+        .btn-primary:hover {
+            background: var(--teal-dark);
+            transform: none;
+        }
 
         /* ── PRINT STYLES ─────────────────────────────────────────── */
         @media print {
-            body > *:not(#print-layout) { display: none !important; }
+            body>*:not(#print-layout) {
+                display: none !important;
+            }
+
             body {
                 background: white !important;
-                margin: 0; padding: 0;
+                margin: 0;
+                padding: 0;
                 font-family: 'Times New Roman', serif !important;
                 color: black !important;
             }
+
             #print-layout {
                 display: block !important;
                 position: absolute;
-                left: 0; top: 0;
+                left: 0;
+                top: 0;
                 width: 100%;
                 padding: 20px 40px;
                 box-sizing: border-box;
             }
-            #print-layout * { visibility: visible !important; }
+
+            #print-layout * {
+                visibility: visible !important;
+            }
+
             .print-row {
                 display: flex;
                 justify-content: space-between;
@@ -255,8 +336,17 @@
                 border-bottom: 1px dotted #ccc;
                 font-size: 14px;
             }
-            .print-label { font-weight: bold; width: 200px; flex-shrink: 0; }
-            .print-val   { flex: 1; }
+
+            .print-label {
+                font-weight: bold;
+                width: 200px;
+                flex-shrink: 0;
+            }
+
+            .print-val {
+                flex: 1;
+            }
+
             .print-kop {
                 border-bottom: 3px double black;
                 padding-bottom: 15px;
@@ -268,11 +358,13 @@
                 text-align: center;
                 line-height: 1.2;
             }
+
             .print-account {
                 border: 2px solid black;
                 padding: 15px 20px;
                 margin: 20px 0;
             }
+
             .print-account-title {
                 text-align: center;
                 font-weight: bold;
@@ -281,6 +373,7 @@
                 padding-bottom: 8px;
                 margin-bottom: 12px;
             }
+
             .print-cbt-notice {
                 margin-top: 10px;
                 padding: 8px 12px;
@@ -290,17 +383,30 @@
                 font-style: italic;
                 line-height: 1.5;
             }
-            @page { size: A4; margin: 1.5cm; }
+
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
         }
 
         /* ── Mobile ──────────────────────────────────────────────── */
         @media (max-width: 480px) {
-            .brand-subtitle { display: none; }
-            .resume-container { padding: 20px 14px 48px; }
-            .action-row { flex-direction: column; }
+            .brand-subtitle {
+                display: none;
+            }
+
+            .resume-container {
+                padding: 20px 14px 48px;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- HEADER -->
@@ -309,8 +415,8 @@
             <nav>
                 <div class="brand-wrapper">
                     <img src="images/logo.png"
-                         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
-                         alt="Logo" class="kemenag-logo">
+                        onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                        alt="Logo" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
                         <div class="brand-subtitle">Sukamanah · Sukarame · Kab. Tasikmalaya</div>
@@ -350,7 +456,7 @@
                 <i class="ph ph-monitor"></i>
                 <span>
                     <b>Penting:</b> Akun ini juga akan digunakan untuk mengikuti
-                    <b>Tes Masuk CBT (Computer Based Test)</b> nanti. Harap simpan
+                    <b>Tes Seleksi CBT (Computer Based Test)</b> nanti. Harap simpan
                     baik-baik dan jangan bagikan kepada siapapun.
                 </span>
             </div>
@@ -542,7 +648,7 @@
                 if (data.created_at)
                     tglDaftar = new Date(data.created_at)
                         .toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
-            } catch(e) {}
+            } catch (e) { }
 
             const tglCetak = new Date().toLocaleDateString('id-ID',
                 { year: 'numeric', month: 'long', day: 'numeric' });
@@ -554,7 +660,7 @@
                     const parts = data.tanggal_lahir.split('-');
                     if (parts.length === 3)
                         passDisplay = parts[2] + parts[1] + parts[0];
-                } catch(e) {}
+                } catch (e) { }
             }
 
             const setText = (id, val) => {
@@ -563,39 +669,39 @@
             };
 
             // ── Web ──────────────────────────────────────
-            setText('res-nisn',      getVal('nisn'));
-            setText('res-pass',      passDisplay);
+            setText('res-nisn', getVal('nisn'));
+            setText('res-pass', passDisplay);
             setText('res-no-daftar', getVal('no_pendaftaran'));
-            setText('res-nama',      getVal('nama_lengkap'));
-            setText('res-jalur',     getVal('jalur'));
-            setText('res-sekolah',   getVal('asal_sekolah'));
-            setText('res-waktu',     tglDaftar);
+            setText('res-nama', getVal('nama_lengkap'));
+            setText('res-jalur', getVal('jalur'));
+            setText('res-sekolah', getVal('asal_sekolah'));
+            setText('res-waktu', tglDaftar);
 
             const rowRuang = document.getElementById('row-ruangan');
-            const elRuang  = document.getElementById('res-ruang');
+            const elRuang = document.getElementById('res-ruang');
             if (data.jalur === 'REGULER') {
                 if (elRuang) {
-                    elRuang.innerText    = getVal('ruang_tes', 'Belum Ditentukan');
-                    elRuang.style.color  = 'var(--teal)';
+                    elRuang.innerText = getVal('ruang_tes', 'Belum Ditentukan');
+                    elRuang.style.color = 'var(--teal)';
                 }
             } else {
                 if (rowRuang) rowRuang.style.display = 'none';
             }
 
             // ── Print ─────────────────────────────────────
-            setText('p-no',       getVal('no_pendaftaran'));
-            setText('p-tgl',      tglDaftar);
-            setText('p-jalur',    getVal('jalur'));
-            setText('p-nisn',     getVal('nisn'));
-            setText('p-nama',     getVal('nama_lengkap').toUpperCase());
-            setText('p-sekolah',  getVal('asal_sekolah'));
-            setText('p-user',     getVal('nisn'));
-            setText('p-pass',     passDisplay);
+            setText('p-no', getVal('no_pendaftaran'));
+            setText('p-tgl', tglDaftar);
+            setText('p-jalur', getVal('jalur'));
+            setText('p-nisn', getVal('nisn'));
+            setText('p-nama', getVal('nama_lengkap').toUpperCase());
+            setText('p-sekolah', getVal('asal_sekolah'));
+            setText('p-user', getVal('nisn'));
+            setText('p-pass', passDisplay);
             setText('p-ttd-nama', getVal('nama_lengkap').toUpperCase());
-            setText('p-cetak-tgl',tglCetak);
+            setText('p-cetak-tgl', tglCetak);
 
             const rowRuangPrint = document.getElementById('row-ruangan-print');
-            const elRuangPrint  = document.getElementById('p-ruang');
+            const elRuangPrint = document.getElementById('p-ruang');
             if (data.jalur === 'REGULER') {
                 if (elRuangPrint) elRuangPrint.innerText = getVal('ruang_tes', '-');
             } else {
@@ -604,4 +710,5 @@
         });
     </script>
 </body>
+
 </html>
