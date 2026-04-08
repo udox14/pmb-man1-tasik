@@ -1017,15 +1017,47 @@ window.pindahKeRegulerTrigger = function() {
 };
 
 // ===========================================================
-// CETAK KARTU
+// CETAK KARTU CBT
 // ===========================================================
 function cetakKartu() {
   const now = new Date();
   const opts = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   const el = document.getElementById('print-date');
   if (el) el.innerText = now.toLocaleDateString('id-ID', opts) + ' WIB';
+
+  document.body.classList.remove('print-undangan');
+  document.body.classList.add('print-kartu');
   window.print();
+  setTimeout(() => document.body.classList.remove('print-kartu'), 1000);
 }
+
+// ===========================================================
+// CETAK UNDANGAN TES PEMBUKTIAN PRESTASI
+// ===========================================================
+window.cetakUndangan = function() {
+  if (!_cachedData) {
+    Swal.fire('Tunggu sebentar', 'Data sedang dimuat.', 'info');
+    return;
+  }
+  const p = _cachedData;
+  const v = (val) => val || '-';
+
+  // Isi data siswa ke elemen undangan
+  const setEl = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
+  setEl('und-no',      v(p.no_pendaftaran));
+  setEl('und-nama',    v(p.nama_lengkap));
+  setEl('und-nisn',    v(p.nisn));
+  setEl('und-sekolah', v(p.asal_sekolah));
+
+  const now  = new Date();
+  const opts = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  setEl('und-print-date', now.toLocaleDateString('id-ID', opts) + ' WIB');
+
+  document.body.classList.remove('print-kartu');
+  document.body.classList.add('print-undangan');
+  window.print();
+  setTimeout(() => document.body.classList.remove('print-undangan'), 1000);
+};
 
 // ===========================================================
 // SMART COUNTDOWN
