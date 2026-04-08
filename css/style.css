@@ -607,11 +607,16 @@ input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-colo
 @media (max-width: 600px) {
     /* Cegah semua elemen overflow horizontal */
     * { max-width: 100%; }
-    input, select, textarea { 
+    input:not([type="checkbox"]):not([type="radio"]), select, textarea { 
         box-sizing: border-box !important; 
         width: 100% !important;
         /* Cegah iOS zoom saat focus */
         font-size: 16px !important;
+    }
+    input[type="checkbox"], input[type="radio"] { 
+        width: auto !important; 
+        height: auto !important; 
+        max-width: none !important; 
     }
     /* Input number — sembunyikan spinner */
     input[type=number]::-webkit-inner-spin-button,

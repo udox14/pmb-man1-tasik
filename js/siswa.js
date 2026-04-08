@@ -386,36 +386,20 @@ function renderStatus(data) {
     if (data.status_verifikasi === true) {
       if (data.ruang_tes && data.tanggal_tes && data.sesi_tes) {
         showPrint(true);
-      } else {
         showPrint(false);
-        const isBebasTes = !!data.scan_sertifikat_prestasi_url;
         const infoBox = document.createElement('div');
         infoBox.style.cssText = 'padding:16px 18px; border-radius:12px; margin-bottom:14px;';
-        if (isBebasTes) {
-          infoBox.id             = 'info-bebas-tes';
-          infoBox.style.background = '#eff6ff';
-          infoBox.style.border     = '1px solid #bfdbfe';
-          infoBox.innerHTML = `
-            <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#1e40af;">
-              <i class="ph ph-info"></i> Informasi Ujian
-            </h4>
-            <p style="margin:0; font-size:.82rem; color:#1e40af; line-height:1.5;">
-              Status Anda: <strong>Jalur Reguler</strong>. Anda dinyatakan
-              <strong>BEBAS TES TULIS (CBT)</strong> karena memiliki sertifikat prestasi.
-            </p>`;
-        } else {
-          infoBox.id             = 'info-tunggu-jadwal';
-          infoBox.style.background = '#fffbeb';
-          infoBox.style.border     = '1px solid #fcd34d';
-          infoBox.innerHTML = `
-            <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#b45309;">
-              <i class="ph ph-calendar-blank"></i> Jadwal CBT Belum Tersedia
-            </h4>
-            <p style="margin:0; font-size:.82rem; color:#b45309; line-height:1.5;">
-              Berkas Anda sudah <strong>VALID</strong>, namun jadwal ujian belum diatur.
-              Tombol Cetak Kartu akan muncul setelah jadwal tersedia.
-            </p>`;
-        }
+        infoBox.id             = 'info-tunggu-jadwal';
+        infoBox.style.background = '#fffbeb';
+        infoBox.style.border     = '1px solid #fcd34d';
+        infoBox.innerHTML = `
+          <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#b45309;">
+            <i class="ph ph-calendar-blank"></i> Jadwal Akademik (CBT) Belum Tersedia
+          </h4>
+          <p style="margin:0; font-size:.82rem; color:#b45309; line-height:1.5;">
+            Berkas Anda sudah <strong>VALID</strong>, namun jadwal ujian Akademik/CBT belum diatur panitia.
+            Tombol Cetak Kartu Ujian akan muncul setelah jadwal Anda tersedia.
+          </p>`;
         if (timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
       }
     } else {
@@ -1274,28 +1258,22 @@ async function setupSmartCountdown(pendaftar) {
       subText    = 'Hasil Seleksi Jalur Prestasi';
     }
   } else if (pendaftar.jalur === 'REGULER') {
-    if (isBebasTes) {
-      targetDate = new Date(tglReg).getTime();
-      titleText  = 'Menuju Pengumuman Kelulusan Akhir';
-      subText    = 'Seleksi Menggunakan Nilai Rapor (Bebas Tes)';
-    } else {
-      if (pendaftar.tanggal_tes && pendaftar.sesi_tes) {
-        const examDateStr = parseExamDate(pendaftar.tanggal_tes, pendaftar.sesi_tes);
-        const examTime    = examDateStr ? new Date(examDateStr).getTime() : 0;
-        if (examTime > now) {
-          targetDate = examTime;
-          titleText  = 'Menuju Ujian CBT Anda';
-          subText    = `${pendaftar.tanggal_tes} — ${pendaftar.sesi_tes.split('(')[0].trim()}`;
-        } else {
-          targetDate = new Date(tglReg).getTime();
-          titleText  = 'Menuju Pengumuman Kelulusan Akhir';
-          subText    = 'Hasil Seleksi Jalur Reguler';
-        }
+    if (pendaftar.tanggal_tes && pendaftar.sesi_tes) {
+      const examDateStr = parseExamDate(pendaftar.tanggal_tes, pendaftar.sesi_tes);
+      const examTime    = examDateStr ? new Date(examDateStr).getTime() : 0;
+      if (examTime > now) {
+        targetDate = examTime;
+        titleText  = 'Menuju Ujian CBT Anda';
+        subText    = `${pendaftar.tanggal_tes} — ${pendaftar.sesi_tes.split('(')[0].trim()}`;
       } else {
         targetDate = new Date(tglReg).getTime();
         titleText  = 'Menuju Pengumuman Kelulusan Akhir';
-        subText    = 'Jadwal ujian belum tersedia, pantau terus';
+        subText    = 'Hasil Seleksi Jalur Reguler';
       }
+    } else {
+      targetDate = new Date(tglReg).getTime();
+      titleText  = 'Menuju Pengumuman Kelulusan Akhir';
+      subText    = 'Jadwal ujian belum tersedia, pantau terus';
     }
   }
 

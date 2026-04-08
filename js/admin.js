@@ -591,11 +591,10 @@ function renderPlottingTable() {
     const fSesi = document.getElementById('filterPlotSesi')?.value || "";
     const fRuang = document.getElementById('filterPlotRuang')?.value || "";
 
-    // FILTER SAKTI: HANYA Murni Reguler (Yang sertifikatnya KOSONG / NULL)
+    // FILTER MURNI REGULER: Semua pendaftar Reguler wajib CBT
     let targetStudents = allPendaftar.filter(p => 
         p.jalur === 'REGULER' && 
-        p.status_verifikasi === true && 
-        (!p.scan_sertifikat_prestasi_url || p.scan_sertifikat_prestasi_url === "")
+        p.status_verifikasi === true
     );
     
     if (fTgl) {
@@ -1069,10 +1068,12 @@ window.viewDetail = async function(id) {
                     .flag-item:hover { background: #fff1f2; border-color: #fecaca; }
                     .flag-item.flagged { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
                     .flag-item input[type="checkbox"] {
-                        width: 14px; height: 14px; accent-color: #dc2626;
-                        flex-shrink: 0; cursor: pointer;
+                        width: 16px !important; height: 16px !important; 
+                        max-width: 16px !important;
+                        accent-color: #dc2626;
+                        flex-shrink: 0; cursor: pointer; margin: 0;
                     }
-                    .flag-item i { font-size: 0.88rem; flex-shrink: 0; }
+                    .flag-item i { font-size: 1.1rem; flex-shrink: 0; }
 
                     /* ── WA button ── */
                     .wa-notify-btn {
@@ -1584,9 +1585,9 @@ window.exportToExcel = function() {
         
         let ketUjian = "-";
         if (p.jalur === 'PRESTASI') { 
-            ketUjian = "Ujian Offline (Cek Bukti Sertifikat)"; 
+            ketUjian = "Tes Pembuktian (Offline)"; 
         } else if (p.jalur === 'REGULER') { 
-            ketUjian = p.scan_sertifikat_prestasi_url ? "BEBAS TES CBT (Limpahan)" : "WAJIB TES CBT"; 
+            ketUjian = "WAJIB TES CBT"; 
         }
 
         // SEMUA DATA FORMULIR MASUK DI SINI
