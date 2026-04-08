@@ -393,16 +393,55 @@ function initPrestasiUI() {
             <button class="btn-add-pres" onclick="addPrestasiRow('keagamaan')">+ Tambah (Maks 3)</button>
         </div>
         <div class="pres-category-box">
-            <div class="pres-cat-header"><span>Tahfidz Al-Qur'an</span><small style="font-weight:400; color:#64748b;">(Min. 10 Juz)</small></div>
+            <div class="pres-cat-header"><span>Tahfidz Al-Qur'an</span><small style="font-weight:400; color:#64748b;">(Opsional)</small></div>
             <div id="list-tahfidz">
                 <div class="pres-row-tahfidz">
-                    <div><label class="pres-label">Jumlah Hafalan (Juz)</label><input type="number" class="input-modern-form tahfidz-juz" placeholder="Min. 10"></div>
+                    <div><label class="pres-label">Jumlah Hafalan (Juz)</label><input type="number" class="input-modern-form tahfidz-juz" placeholder="Contoh: 15" min="1" max="30"></div>
                     <div><label class="pres-label">Tahun Selesai</label><input type="number" class="input-modern-form tahfidz-tahun" placeholder="YYYY"></div>
                     <div><label class="pres-label">Status Mutqin</label><select class="input-modern-form tahfidz-mutqin"><option value="">- Pilih -</option><option value="Mutqin">Mutqin</option><option value="Belum Mutqin">Belum Mutqin</option></select></div>
                 </div>
             </div>
         </div>
-        
+
+        <!-- NILAI RAPOR -->
+        <div class="pres-category-box" id="box-nilai-rapor">
+            <div class="pres-cat-header">
+                <span><i class="ph ph-book-open-text" style="margin-right:6px;"></i>Nilai Rapor</span>
+                <small style="font-weight:400; color:#64748b;">Kelas 7–9 (5 Semester)</small>
+            </div>
+            <p style="font-size:0.78rem; color:#64748b; margin:0 0 12px; line-height:1.5;">Isi rata-rata nilai rapor tiap semester (bukan per pelajaran). Ranking bersifat opsional.</p>
+            <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                <thead>
+                    <tr style="background:#f1f5f9;">
+                        <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0; font-weight:700; color:#475569;">Semester</th>
+                        <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0; font-weight:700; color:#475569;">Rata-rata Nilai <span style="color:#ef4444;">*</span></th>
+                        <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0; font-weight:700; color:#94a3b8;">Ranking (opsional)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[['7_1','Kelas 7 Sem. 1'],['7_2','Kelas 7 Sem. 2'],['8_1','Kelas 8 Sem. 1'],['8_2','Kelas 8 Sem. 2'],['9_1','Kelas 9 Sem. 1']].map(([key, lbl], i) => `
+                    <tr style="background:${i%2===0?'white':'#f8fafc'}">
+                        <td style="padding:8px 10px; border:1px solid #e2e8f0; font-weight:600; color:#334155;">${lbl}</td>
+                        <td style="padding:6px 8px; border:1px solid #e2e8f0;">
+                            <input type="number" class="input-modern-form rapor-nilai" data-key="${key}"
+                                   placeholder="mis. 85.5" min="0" max="100" step="0.1"
+                                   oninput="hitungRataRapor()"
+                                   style="margin:0; padding:6px 10px; font-size:0.82rem;">
+                        </td>
+                        <td style="padding:6px 8px; border:1px solid #e2e8f0;">
+                            <input type="number" class="input-modern-form rapor-rank" data-key="${key}"
+                                   placeholder="mis. 3" min="1"
+                                   style="margin:0; padding:6px 10px; font-size:0.82rem;">
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+            <div id="rapor-rata-display" style="margin-top:12px; padding:10px 14px; border-radius:8px; background:#f0fdf4; border:1px solid #bbf7d0; display:none;">
+                <span style="font-size:0.78rem; color:#166534; font-weight:700;">Rata-rata keseluruhan:</span>
+                <span id="rapor-rata-val" style="font-size:1.1rem; font-weight:800; color:#15803d; margin-left:8px;"></span>
+            </div>
+        </div>
+
         <!-- UPLOAD SERTIFIKAT: 2MB -->
         <div class="upload-grid-modern" style="margin-top: 30px;">
             <div class="upload-card-item" style="grid-column: 1 / -1;">
@@ -417,6 +456,22 @@ function initPrestasiUI() {
     // Sembunyikan elemen upload statis jika ada (untuk mencegah duplikat)
     const oldFile = document.querySelector('#section-5 > div[style*="background"]');
     if(oldFile) oldFile.style.display = 'none';
+}
+
+// Hitung rata-rata rapor otomatis
+window.hitungRataRapor = function() {
+    const inputs = document.querySelectorAll('.rapor-nilai');
+    const vals = Array.from(inputs).map(i => parseFloat(i.value)).filter(v => !isNaN(v) && v >= 0);
+    const display = document.getElementById('rapor-rata-display');
+    const valEl   = document.getElementById('rapor-rata-val');
+    if (vals.length > 0) {
+        const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
+        if (display) display.style.display = 'block';
+        if (valEl)   valEl.textContent = avg;
+        if (valEl) valEl.style.color = parseFloat(avg) >= 90 ? '#15803d' : '#b45309';
+    } else {
+        if (display) display.style.display = 'none';
+    }
 }
 
 window.addPrestasiRow = function(category) {
@@ -524,24 +579,14 @@ window.submitForm = async function() {
         }
         const rows = document.querySelectorAll('.pres-row');
         const tahfidzJuz = document.querySelector('.tahfidz-juz');
-        const tahfidzVal = tahfidzJuz ? tahfidzJuz.value : '';
+        const tahfidzVal = tahfidzJuz ? tahfidzJuz.value.trim() : '';
 
         // Cek apakah ada minimal 1 baris prestasi yang namanya terisi
         const hasFilledPrestasi = Array.from(rows).some(row => row.querySelector('.pres-nama')?.value.trim() !== '');
-
-        // Cek tahfidz
-        const isTahfidzFilled = tahfidzVal !== '' && parseInt(tahfidzVal) >= 10;
-        const isTahfidzBelowMin = tahfidzVal !== '' && parseInt(tahfidzVal) < 10;
-
-        if (isTahfidzBelowMin) {
-            Swal.fire({icon: 'warning', title: 'Tahfidz Tidak Memenuhi Syarat', text: 'Hafalan Tahfidz minimal 10 Juz untuk dapat didaftarkan.'});
-            tahfidzJuz.style.borderColor = '#ef4444';
-            tahfidzJuz.style.backgroundColor = '#fff5f5';
-            return;
-        }
+        const isTahfidzFilled   = tahfidzVal !== '';
 
         if (!hasFilledPrestasi && !isTahfidzFilled) {
-            Swal.fire({icon: 'warning', title: 'Data Prestasi Kosong', text: 'Wajib mengisi minimal 1 prestasi (Akademik/Non-Akademik/Keagamaan) atau Tahfidz minimal 10 Juz.'});
+            Swal.fire({icon: 'warning', title: 'Data Prestasi Kosong', text: 'Wajib mengisi minimal 1 prestasi (Akademik/Non-Akademik/Keagamaan) atau isian Tahfidz.'});
             return;
         }
     }
@@ -650,7 +695,21 @@ window.submitForm = async function() {
             scan_kelakuan_baik_url: skbUrl,
             scan_ktp_ortu_url: ktpOrtuUrl,
             scan_rapor_url: raporUrl,
-            scan_sertifikat_prestasi_url: sertifUrl
+            scan_sertifikat_prestasi_url: sertifUrl,
+            nilai_rapor: (function() {
+                const raporData = {};
+                document.querySelectorAll('.rapor-nilai').forEach(inp => {
+                    const key = inp.dataset.key;
+                    const val = parseFloat(inp.value);
+                    if (!isNaN(val)) raporData[key] = { rata: val };
+                });
+                document.querySelectorAll('.rapor-rank').forEach(inp => {
+                    const key = inp.dataset.key;
+                    const val = parseInt(inp.value);
+                    if (!isNaN(val) && raporData[key]) raporData[key].rank = val;
+                });
+                return Object.keys(raporData).length > 0 ? JSON.stringify(raporData) : null;
+            })()
         };
 
         const pendaftarData = await apiPost('pendaftar', formData);
@@ -681,7 +740,7 @@ window.submitForm = async function() {
             });
 
             const juz = document.querySelector('.tahfidz-juz').value;
-            if (juz && parseInt(juz) >= 10) {
+            if (juz && juz.trim() !== '') {
                 prestasiList.push({
                     pendaftar_id: pendaftarId,
                     kategori: 'Tahfidz',

@@ -212,6 +212,51 @@ function renderFullData(data) {
   setTxt('d-alamat-sek',   val(data.alamat_sekolah));
   setTxt('d-pesantren',    val(data.pilihan_pesantren));
 
+  // Render nilai rapor (hanya untuk jalur PRESTASI)
+  const raporContainer = document.getElementById('d-nilai-rapor-section');
+  if (raporContainer) {
+    if (data.jalur === 'PRESTASI' && data.nilai_rapor) {
+      try {
+        const rObj = JSON.parse(data.nilai_rapor);
+        const labels = { '7_1':'Kelas 7 Sem. 1','7_2':'Kelas 7 Sem. 2','8_1':'Kelas 8 Sem. 1','8_2':'Kelas 8 Sem. 2','9_1':'Kelas 9 Sem. 1' };
+        const vals = Object.entries(labels)
+          .map(([k,l]) => rObj[k] ? { label:l, ...rObj[k] } : null)
+          .filter(Boolean);
+        if (vals.length > 0) {
+          const avg = (vals.reduce((s,v) => s + v.rata, 0) / vals.length).toFixed(2);
+          const avgColor = parseFloat(avg) >= 90 ? '#15803d' : '#b45309';
+          let rows = vals.map(v =>
+            `<tr>
+              <td style="padding:5px 8px; border:1px solid #e2e8f0;">${v.label}</td>
+              <td style="padding:5px 8px; border:1px solid #e2e8f0; font-weight:600;">${v.rata}</td>
+              <td style="padding:5px 8px; border:1px solid #e2e8f0; color:#94a3b8;">${v.rank ? 'Ke-' + v.rank : '-'}</td>
+            </tr>`).join('');
+          raporContainer.innerHTML = `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px; margin-top:12px;">
+              <div style="font-size:.78rem; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px;">
+                <i class="ph ph-book-open-text" style="margin-right:5px;"></i>Nilai Rapor
+              </div>
+              <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+                <thead><tr style="background:#f1f5f9;">
+                  <th style="padding:5px 8px; text-align:left; border:1px solid #e2e8f0;">Semester</th>
+                  <th style="padding:5px 8px; text-align:left; border:1px solid #e2e8f0;">Rata-rata</th>
+                  <th style="padding:5px 8px; text-align:left; border:1px solid #e2e8f0;">Ranking</th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+              <div style="margin-top:10px; padding:8px 10px; background:white; border-radius:6px; border:1px solid #e2e8f0;">
+                <span style="font-size:.75rem; color:#64748b;">Rata-rata keseluruhan:</span>
+                <span style="font-size:1rem; font-weight:800; color:${avgColor}; margin-left:8px;">${avg}</span>
+              </div>
+            </div>`;
+          raporContainer.style.display = 'block';
+        } else { raporContainer.style.display = 'none'; }
+      } catch(e) { raporContainer.style.display = 'none'; }
+    } else {
+      raporContainer.style.display = 'none';
+    }
+  }
+
   setTxt('print-no',       data.no_pendaftaran);
   setTxt('print-nama',     data.nama_lengkap);
   setTxt('print-nisn',     data.nisn);
@@ -552,6 +597,7 @@ window.editData = function() {
         <button class="eo-tab" onclick="switchEoTab('eo-keluarga')">Keluarga</button>
         <button class="eo-tab" onclick="switchEoTab('eo-sekolah')">Sekolah</button>
         <button class="eo-tab" onclick="switchEoTab('eo-upload')">Upload Berkas</button>
+        ${p.jalur === 'PRESTASI' ? `<button class="eo-tab" onclick="switchEoTab('eo-rapor')"><i class="ph ph-book-open-text" style="margin-right:4px;"></i>Nilai Rapor</button>` : ''}
       </div>
 
       <div class="eo-body">
@@ -772,6 +818,61 @@ window.editData = function() {
       </div>
     </div>`;
 
+  // Inject tab nilai rapor setelah overlay dibuat (khusus jalur PRESTASI)
+  if (p.jalur === 'PRESTASI') {
+    const eoBody = overlay.querySelector('.eo-body');
+    let rObjEdit = {};
+    try { rObjEdit = JSON.parse(p.nilai_rapor || '{}'); } catch(e) {}
+    const semLabels = [['7_1','Kelas 7 Sem. 1'],['7_2','Kelas 7 Sem. 2'],['8_1','Kelas 8 Sem. 1'],['8_2','Kelas 8 Sem. 2'],['9_1','Kelas 9 Sem. 1']];
+    const raporTab = document.createElement('div');
+    raporTab.className = 'eo-section';
+    raporTab.id = 'eo-rapor';
+    raporTab.innerHTML = `
+      <p style="font-size:.78rem; color:#64748b; margin:0 0 14px; line-height:1.5;">
+        Isi rata-rata nilai rapor dari kelas 7 semester 1 hingga kelas 9 semester 1.
+        Ranking tiap semester bersifat opsional.
+      </p>
+      <table style="width:100%; border-collapse:collapse; font-size:0.83rem; margin-bottom:14px;">
+        <thead><tr style="background:#f1f5f9;">
+          <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0;">Semester</th>
+          <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0;">Rata-rata Nilai <span style="color:#ef4444">*</span></th>
+          <th style="padding:8px 10px; text-align:left; border:1px solid #e2e8f0; color:#94a3b8;">Ranking</th>
+        </tr></thead>
+        <tbody>
+          ${semLabels.map(([k,l], i) => `
+          <tr style="background:${i%2===0?'white':'#f8fafc'}">
+            <td style="padding:8px 10px; border:1px solid #e2e8f0; font-weight:600;">${l}</td>
+            <td style="padding:6px 8px; border:1px solid #e2e8f0;">
+              <input type="number" class="eo-input eo-rapor-nilai" data-key="${k}"
+                     value="${rObjEdit[k]?.rata ?? ''}"
+                     placeholder="mis. 85.5" min="0" max="100" step="0.1"
+                     oninput="hitungRataRaporEdit()"
+                     style="padding:7px 10px; font-size:0.82rem;">
+            </td>
+            <td style="padding:6px 8px; border:1px solid #e2e8f0;">
+              <input type="number" class="eo-input eo-rapor-rank" data-key="${k}"
+                     value="${rObjEdit[k]?.rank ?? ''}"
+                     placeholder="mis. 3" min="1"
+                     style="padding:7px 10px; font-size:0.82rem;">
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div id="eo-rapor-avg-display" style="padding:10px 14px; border-radius:8px; background:#f0fdf4; border:1px solid #bbf7d0; display:none;">
+        <span style="font-size:.78rem; color:#166534; font-weight:700;">Rata-rata keseluruhan:</span>
+        <span id="eo-rapor-avg-val" style="font-size:1.1rem; font-weight:800; color:#15803d; margin-left:8px;"></span>
+      </div>
+      <button onclick="saveNilaiRapor()"
+              style="margin-top:14px; width:100%; padding:11px; background:#0d1b2a; color:white;
+                     border:none; border-radius:8px; font-size:.83rem; font-weight:700; cursor:pointer;
+                     display:flex; align-items:center; justify-content:center; gap:7px;">
+        <i class="ph ph-floppy-disk"></i> Simpan Nilai Rapor
+      </button>`;
+    eoBody.appendChild(raporTab);
+    // Hitung awal jika sudah ada data
+    setTimeout(() => hitungRataRaporEdit(), 100);
+  }
+
   overlay.style.display = 'flex';
 };
 
@@ -816,6 +917,52 @@ window.switchEoTab = function(sectionId) {
 window.closeEditOverlay = function() {
   const ov = document.getElementById('edit-overlay');
   if (ov) ov.style.display = 'none';
+};
+
+window.hitungRataRaporEdit = function() {
+  const inputs = document.querySelectorAll('.eo-rapor-nilai');
+  const vals = Array.from(inputs).map(i => parseFloat(i.value)).filter(v => !isNaN(v) && v >= 0);
+  const display = document.getElementById('eo-rapor-avg-display');
+  const valEl   = document.getElementById('eo-rapor-avg-val');
+  if (vals.length > 0) {
+    const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
+    if (display) display.style.display = 'block';
+    if (valEl)   { valEl.textContent = avg; valEl.style.color = parseFloat(avg) >= 90 ? '#15803d' : '#b45309'; }
+  } else {
+    if (display) display.style.display = 'none';
+  }
+};
+
+window.saveNilaiRapor = async function() {
+  const raporData = {};
+  document.querySelectorAll('.eo-rapor-nilai').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = parseFloat(inp.value);
+    if (!isNaN(val)) raporData[key] = { rata: val };
+  });
+  document.querySelectorAll('.eo-rapor-rank').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = parseInt(inp.value);
+    if (!isNaN(val) && raporData[key]) raporData[key].rank = val;
+  });
+
+  const nilaiRaporJson = Object.keys(raporData).length > 0 ? JSON.stringify(raporData) : null;
+
+  try {
+    const res = await fetch('/api/pendaftar?action=update-rapor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: userSession.id, nilai_rapor: nilaiRaporJson }),
+    });
+    const result = await res.json();
+    if (!res.ok || result.error) throw new Error(result.error || 'Gagal menyimpan.');
+    _cachedData.nilai_rapor = nilaiRaporJson;
+    renderFullData(_cachedData);
+    const toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+    toast.fire({ icon: 'success', title: 'Nilai rapor berhasil disimpan' });
+  } catch(err) {
+    Swal.fire('Gagal', err.message, 'error');
+  }
 };
 
 // Upload ulang individual file

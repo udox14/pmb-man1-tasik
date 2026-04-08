@@ -855,6 +855,43 @@ window.viewDetail = async function(id) {
             }
         }
 
+        // Build nilai rapor html
+        let raporHtml = '';
+        if (p.jalur === 'PRESTASI' && p.nilai_rapor) {
+            try {
+                const rObj = JSON.parse(p.nilai_rapor);
+                const semLabels = [['7_1','Kelas 7 Sem. 1'],['7_2','Kelas 7 Sem. 2'],['8_1','Kelas 8 Sem. 1'],['8_2','Kelas 8 Sem. 2'],['9_1','Kelas 9 Sem. 1']];
+                const vals = semLabels.map(([k,l]) => rObj[k] ? { label:l, ...rObj[k] } : null).filter(Boolean);
+                if (vals.length > 0) {
+                    const avg = (vals.reduce((s,v) => s + v.rata, 0) / vals.length).toFixed(2);
+                    const isUnggul = parseFloat(avg) >= 90;
+                    const avgColor = isUnggul ? '#15803d' : '#b45309';
+                    const avgBg    = isUnggul ? '#f0fdf4' : '#fffbeb';
+                    const rows = vals.map(v =>
+                        `<tr>
+                            <td style="padding:5px 8px; border:1px solid #e2e8f0;">${v.label}</td>
+                            <td style="padding:5px 8px; border:1px solid #e2e8f0; font-weight:600;">${v.rata}</td>
+                            <td style="padding:5px 8px; border:1px solid #e2e8f0; color:#94a3b8;">${v.rank ? 'Ke-' + v.rank : '-'}</td>
+                        </tr>`).join('');
+                    raporHtml = `
+                    <div class="detail-title">Nilai Rapor</div>
+                    <table style="width:100%; border-collapse:collapse; font-size:0.79rem; margin-bottom:10px;">
+                        <thead><tr style="background:#f1f5f9;">
+                            <th style="padding:5px 8px; text-align:left; border:1px solid #e2e8f0;">Semester</th>
+                            <th style="padding:5px 8px; text-align:left; border:1px solid #e2e8f0;">Rata-rata</th>
+                            <th style="padding:5px 8px; text-align:left; border:1px solid #e2e8f0;">Ranking</th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <div style="padding:8px 12px; border-radius:7px; background:${avgBg}; border:1px solid ${isUnggul?'#bbf7d0':'#fde68a'}; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:.74rem; color:${avgColor}; font-weight:700;">Rata-rata Keseluruhan:</span>
+                        <span style="font-size:1.05rem; font-weight:800; color:${avgColor};">${avg}</span>
+                        ${isUnggul ? '<span style="font-size:.7rem; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:99px; font-weight:800;">★ Unggul ≥ 90</span>' : ''}
+                    </div>`;
+                }
+            } catch(e) { raporHtml = ''; }
+        }
+
         const val = (v) => v ? v : '-';
         const money = (v) => v ? 'Rp ' + parseInt(v).toLocaleString('id-ID') : '-';
         
@@ -1221,6 +1258,8 @@ window.viewDetail = async function(id) {
                                 <label style="font-size:0.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;display:block;margin-bottom:4px;">Pilihan Tempat Tinggal</label>
                                 <b style="font-size:0.88rem;color:#0d1b2a;">${val(p.pilihan_pesantren)}</b>
                             </div>
+
+                            ${raporHtml}
 
                             ${prestasiHtml}
                         </div>

@@ -1,6 +1,7 @@
 // functions/api/pendaftar.js
-// GET  /api/pendaftar?id=xxx    — ambil data satu pendaftar (untuk dashboard siswa)
-// POST /api/pendaftar           — submit pendaftaran baru
+// GET  /api/pendaftar?id=xxx               — ambil data satu pendaftar (untuk dashboard siswa)
+// POST /api/pendaftar                      — submit pendaftaran baru
+// POST /api/pendaftar?action=update-rapor  — update nilai rapor
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -38,10 +39,21 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const url = new URL(request.url);
+  const action = url.searchParams.get('action');
 
   try {
     const body = await request.json();
 
+    // UPDATE NILAI RAPOR
+    if (action === 'update-rapor') {
+      const { id, nilai_rapor } = body;
+      if (!id) return Response.json({ error: 'id required' }, { status: 400, headers: CORS });
+      await env.DB.prepare(
+        'UPDATE pendaftar SET nilai_rapor = ? WHERE id = ?'
+      ).bind(nilai_rapor ?? null, id).run();
+      return Response.json({ success: true }, { headers: CORS });
+    }
     // Generate no_pendaftaran format 2627XXX — berurutan
     // 26 = tahun masuk, 27 = tahun lulus, XXX = nomor urut 3 digit
     const countRow = await env.DB.prepare(
@@ -67,7 +79,7 @@ export async function onRequestPost(context) {
         pendidikan_wali, pekerjaan_wali, penghasilan_wali, no_telepon_wali,
         asal_sekolah, npsn_sekolah, status_sekolah, alamat_sekolah, pilihan_pesantren,
         foto_url, scan_kk_url, scan_akta_url, scan_kelakuan_baik_url,
-        scan_ktp_ortu_url, scan_sertifikat_prestasi_url, scan_rapor_url
+        scan_ktp_ortu_url, scan_sertifikat_prestasi_url, scan_rapor_url, nilai_rapor
       ) VALUES (
         ?,?,?,?,?,?,?,
         ?,?,?,?,?,?,?,
@@ -78,7 +90,7 @@ export async function onRequestPost(context) {
         ?,
         ?,?,?,?,?,?,?,?,
         ?,?,?,?,?,
-        ?,?,?,?,?,?,?
+        ?,?,?,?,?,?,?,?
       )
     `).bind(
       id, no_pendaftaran, body.jalur, body.nisn, body.nik, body.nama_lengkap, body.jenis_kelamin,
@@ -98,7 +110,8 @@ export async function onRequestPost(context) {
       body.asal_sekolah, body.npsn_sekolah, body.status_sekolah, body.alamat_sekolah, body.pilihan_pesantren,
       body.foto_url ?? null, body.scan_kk_url ?? null, body.scan_akta_url ?? null,
       body.scan_kelakuan_baik_url ?? null, body.scan_ktp_ortu_url ?? null,
-      body.scan_sertifikat_prestasi_url ?? null, body.scan_rapor_url ?? null
+      body.scan_sertifikat_prestasi_url ?? null, body.scan_rapor_url ?? null,
+      body.nilai_rapor ?? null
     ).run();
 
     const inserted = await env.DB.prepare(
