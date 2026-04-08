@@ -473,10 +473,16 @@
             body.print-undangan #undangan-cetak,
             body.print-undangan #undangan-cetak * { visibility: visible; }
             body.print-undangan #undangan-cetak {
-                position: absolute; left: 0; top: 0;
-                width: 100%; margin: 0; padding: 0;
+                position: fixed;
+                left: 0; top: 0;
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
                 display: block !important;
                 background: white;
+                overflow: hidden;
+                transform-origin: top left;
             }
 
             /* Fallback: jika tidak ada class, cetak kartu (perilaku lama) */
@@ -812,91 +818,96 @@
     </div><!-- /dash-wrap -->
 
     <!-- UNDANGAN TES PEMBUKTIAN PRESTASI (PRINT) -->
-    <div id="undangan-cetak" style="display:none; font-family:'Times New Roman',serif; background:white; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0;">
-        <div style="padding:30px 35px; position:relative;">
+    <style>
+        @media print {
+            #undangan-cetak { transform: scale(0.95); transform-origin: top center; }
+        }
+    </style>
+    <div id="undangan-cetak" style="display:none; font-family:'Times New Roman',serif; background:white; width:210mm; box-sizing:border-box; padding:0;">
+        <div style="padding:18px 24px; position:relative;">
 
             <!-- KOP SURAT -->
-            <div style="border-bottom:4px double black; padding-bottom:14px; margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:20px;">
-                <img src="../images/logo.png" style="width:90px; height:auto;" onerror="this.style.display='none'">
-                <div style="text-align:center; line-height:1.2; color:#000;">
-                    <p style="margin:0; font-size:13px; letter-spacing:.5px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</p>
-                    <p style="margin:0; font-size:13px; letter-spacing:.5px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</p>
-                    <h3 style="margin:4px 0; font-size:20px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
-                    <p style="margin:0; font-size:11px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
-                    <p style="margin:0; font-size:11px;">Kode Pos 46461 &nbsp;|&nbsp; Telp/Fax. (0265) 545719</p>
+            <div style="border-bottom:3px double black; padding-bottom:8px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:14px;">
+                <img src="../images/logo.png" style="width:70px; height:auto;" onerror="this.style.display='none'">
+                <div style="text-align:center; line-height:1.15; color:#000;">
+                    <p style="margin:0; font-size:11px; letter-spacing:.3px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</p>
+                    <p style="margin:0; font-size:11px; letter-spacing:.3px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</p>
+                    <h3 style="margin:3px 0; font-size:16px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                    <p style="margin:0; font-size:10px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                    <p style="margin:0; font-size:10px;">Kode Pos 46461 &nbsp;|&nbsp; Telp/Fax. (0265) 545719</p>
                 </div>
             </div>
 
             <!-- JUDUL -->
-            <div style="text-align:center; margin-bottom:24px;">
-                <h4 style="margin:0 0 4px; font-size:15px; font-weight:bold; letter-spacing:.5px; text-decoration:underline;">SURAT UNDANGAN</h4>
-                <p style="margin:0; font-size:13px;">Tes Pembuktian Prestasi — PMB MAN 1 Tasikmalaya T.A. 2026/2027</p>
+            <div style="text-align:center; margin-bottom:12px;">
+                <h4 style="margin:0 0 2px; font-size:13px; font-weight:bold; letter-spacing:.5px; text-decoration:underline;">SURAT UNDANGAN</h4>
+                <p style="margin:0; font-size:11px;">Tes Pembuktian Prestasi &mdash; PMB MAN 1 Tasikmalaya T.A. 2026/2027</p>
             </div>
 
             <!-- SALAM PEMBUKA -->
-            <p style="font-size:13px; line-height:1.8; margin:0 0 16px;">Dengan hormat,<br>
+            <p style="font-size:11px; line-height:1.6; margin:0 0 10px;">Dengan hormat,<br>
             Kami mengundang Ananda yang tersebut di bawah ini untuk mengikuti <strong>Tes Pembuktian Prestasi</strong>
             dalam rangka Penerimaan Murid Baru (PMB) MAN 1 Tasikmalaya Tahun Ajaran 2026/2027.</p>
 
             <!-- DATA SISWA -->
-            <table style="width:100%; font-size:13px; border-collapse:collapse; margin-bottom:20px; border:1px solid #999;">
+            <table style="width:100%; font-size:11px; border-collapse:collapse; margin-bottom:10px; border:1px solid #999;">
                 <thead>
                     <tr style="background:#eee;">
-                        <th colspan="3" style="padding:8px 12px; text-align:left; border:1px solid #999; font-size:13px;">Data Peserta</th>
+                        <th colspan="3" style="padding:5px 10px; text-align:left; border:1px solid #999; font-size:11px;">Data Peserta</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="padding:7px 12px; border:1px solid #ccc; width:160px;">Nomor Pendaftaran</td>
-                        <td style="padding:7px 4px; border:1px solid #ccc; width:12px;">:</td>
-                        <td style="padding:7px 12px; border:1px solid #ccc; font-weight:bold;" id="und-no"></td>
+                        <td style="padding:4px 10px; border:1px solid #ccc; width:145px;">Nomor Pendaftaran</td>
+                        <td style="padding:4px 4px; border:1px solid #ccc; width:10px;">:</td>
+                        <td style="padding:4px 10px; border:1px solid #ccc; font-weight:bold;" id="und-no"></td>
                     </tr>
                     <tr style="background:#fafafa;">
-                        <td style="padding:7px 12px; border:1px solid #ccc;">Nama Lengkap</td>
-                        <td style="padding:7px 4px; border:1px solid #ccc;">:</td>
-                        <td style="padding:7px 12px; border:1px solid #ccc; font-weight:bold; text-transform:uppercase;" id="und-nama"></td>
+                        <td style="padding:4px 10px; border:1px solid #ccc;">Nama Lengkap</td>
+                        <td style="padding:4px 4px; border:1px solid #ccc;">:</td>
+                        <td style="padding:4px 10px; border:1px solid #ccc; font-weight:bold; text-transform:uppercase;" id="und-nama"></td>
                     </tr>
                     <tr>
-                        <td style="padding:7px 12px; border:1px solid #ccc;">NISN</td>
-                        <td style="padding:7px 4px; border:1px solid #ccc;">:</td>
-                        <td style="padding:7px 12px; border:1px solid #ccc;" id="und-nisn"></td>
+                        <td style="padding:4px 10px; border:1px solid #ccc;">NISN</td>
+                        <td style="padding:4px 4px; border:1px solid #ccc;">:</td>
+                        <td style="padding:4px 10px; border:1px solid #ccc;" id="und-nisn"></td>
                     </tr>
                     <tr style="background:#fafafa;">
-                        <td style="padding:7px 12px; border:1px solid #ccc;">Asal Sekolah</td>
-                        <td style="padding:7px 4px; border:1px solid #ccc;">:</td>
-                        <td style="padding:7px 12px; border:1px solid #ccc;" id="und-sekolah"></td>
+                        <td style="padding:4px 10px; border:1px solid #ccc;">Asal Sekolah</td>
+                        <td style="padding:4px 4px; border:1px solid #ccc;">:</td>
+                        <td style="padding:4px 10px; border:1px solid #ccc;" id="und-sekolah"></td>
                     </tr>
                 </tbody>
             </table>
 
             <!-- INFO TES -->
-            <p style="font-size:13px; margin:0 0 8px; font-weight:bold;">Informasi Pelaksanaan Tes:</p>
-            <table style="font-size:13px; border-collapse:collapse; margin-bottom:20px; border:2px solid #333; width:auto;">
+            <p style="font-size:11px; margin:0 0 5px; font-weight:bold;">Informasi Pelaksanaan Tes:</p>
+            <table style="font-size:11px; border-collapse:collapse; margin-bottom:10px; border:1.5px solid #333; width:auto;">
                 <tr style="background:#efefef;">
-                    <td style="padding:8px 14px; border:1px solid #aaa; font-weight:bold;">Hari / Tanggal</td>
-                    <td style="padding:8px 8px;">:</td>
-                    <td style="padding:8px 14px; border:1px solid #aaa;">Rabu, 16 April 2026</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa; font-weight:bold;">Hari / Tanggal</td>
+                    <td style="padding:5px 6px;">:</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa;">Rabu, 16 April 2026</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px 14px; border:1px solid #aaa; font-weight:bold;">Waktu</td>
-                    <td style="padding:8px 8px;">:</td>
-                    <td style="padding:8px 14px; border:1px solid #aaa;">07.30 WIB s.d. selesai</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa; font-weight:bold;">Waktu</td>
+                    <td style="padding:5px 6px;">:</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa;">07.30 WIB s.d. selesai</td>
                 </tr>
                 <tr style="background:#efefef;">
-                    <td style="padding:8px 14px; border:1px solid #aaa; font-weight:bold;">Tempat</td>
-                    <td style="padding:8px 8px;">:</td>
-                    <td style="padding:8px 14px; border:1px solid #aaa;">Kampus MAN 1 Tasikmalaya (Aula / Ruang yang ditentukan)</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa; font-weight:bold;">Tempat</td>
+                    <td style="padding:5px 6px;">:</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa;">Kampus MAN 1 Tasikmalaya (Aula / Ruang yang ditentukan)</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px 14px; border:1px solid #aaa; font-weight:bold;">Pakaian</td>
-                    <td style="padding:8px 8px;">:</td>
-                    <td style="padding:8px 14px; border:1px solid #aaa;">Seragam sekolah asal, rapi & bersepatu</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa; font-weight:bold;">Pakaian</td>
+                    <td style="padding:5px 6px;">:</td>
+                    <td style="padding:5px 12px; border:1px solid #aaa;">Seragam sekolah asal, rapi &amp; bersepatu</td>
                 </tr>
             </table>
 
             <!-- KETENTUAN -->
-            <p style="font-size:13px; margin:0 0 4px; font-weight:bold;">Ketentuan & Hal yang Harus Dibawa:</p>
-            <ol style="font-size:13px; margin:4px 0 20px; padding-left:20px; line-height:1.8;">
+            <p style="font-size:11px; margin:0 0 3px; font-weight:bold;">Ketentuan &amp; Hal yang Harus Dibawa:</p>
+            <ol style="font-size:11px; margin:3px 0 10px; padding-left:18px; line-height:1.55;">
                 <li>Surat Undangan ini (dicetak).</li>
                 <li><strong>Sertifikat / Piagam / Bukti Prestasi ASLI</strong> yang pernah didaftarkan.</li>
                 <li>Bagi peserta hafidz: hadir siap untuk diuji hafalannya langsung di hadapan penguji.</li>
@@ -905,20 +916,20 @@
             </ol>
 
             <!-- PENUTUP -->
-            <p style="font-size:13px; line-height:1.8; margin:0 0 30px;">Atas perhatian dan kehadiran Ananda, kami ucapkan terima kasih.<br>
+            <p style="font-size:11px; line-height:1.6; margin:0 0 14px;">Atas perhatian dan kehadiran Ananda, kami ucapkan terima kasih.<br>
             Semoga Allah SWT meridhoi langkah Ananda.</p>
 
             <!-- TTD -->
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                <div style="font-size:11px; font-style:italic; color:#555;">
-                    <i>Dicetak otomatis oleh sistem pada: <span id="und-print-date"></span></i>
+                <div style="font-size:10px; font-style:italic; color:#555;">
+                    <i>Dicetak pada: <span id="und-print-date"></span></i>
                 </div>
-                <div style="text-align:center; min-width:220px;">
-                    <p style="margin:0; font-size:13px;">Tasikmalaya, 10 April 2026</p>
-                    <p style="margin:0; font-size:13px;">Ketua Panitia PMB,</p>
-                    <div style="height:65px;"></div>
-                    <p style="margin:0; font-weight:bold; text-decoration:underline; font-size:13px;">Dede Fathul Umam, S.Pd.I.</p>
-                    <p style="margin:0; font-size:13px;">NIP. 197809132009011011</p>
+                <div style="text-align:center; min-width:190px;">
+                    <p style="margin:0; font-size:11px;">Tasikmalaya, 10 April 2026</p>
+                    <p style="margin:0; font-size:11px;">Ketua Panitia PMB,</p>
+                    <div style="height:50px;"></div>
+                    <p style="margin:0; font-weight:bold; text-decoration:underline; font-size:11px;">Dede Fathul Umam, S.Pd.I.</p>
+                    <p style="margin:0; font-size:11px;">NIP. 197809132009011011</p>
                 </div>
             </div>
 
