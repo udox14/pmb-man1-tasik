@@ -845,14 +845,14 @@ window.editData = function() {
             <td style="padding:6px 8px; border:1px solid #e2e8f0;">
               <input type="number" class="eo-input eo-rapor-nilai" data-key="${k}"
                      value="${rObjEdit[k]?.rata ?? ''}"
-                     placeholder="mis. 85.5" min="0" max="100" step="0.1"
+                     placeholder="contoh: 85.5" min="0" max="100" step="0.1"
                      oninput="hitungRataRaporEdit()"
                      style="padding:7px 10px; font-size:0.82rem;">
             </td>
             <td style="padding:6px 8px; border:1px solid #e2e8f0;">
               <input type="number" class="eo-input eo-rapor-rank" data-key="${k}"
                      value="${rObjEdit[k]?.rank ?? ''}"
-                     placeholder="mis. 3" min="1"
+                     placeholder="contoh: 3" min="1"
                      style="padding:7px 10px; font-size:0.82rem;">
             </td>
           </tr>`).join('')}

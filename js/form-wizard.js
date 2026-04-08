@@ -424,13 +424,13 @@ function initPrestasiUI() {
                         <td style="padding:8px 10px; border:1px solid #e2e8f0; font-weight:600; color:#334155;">${lbl}</td>
                         <td style="padding:6px 8px; border:1px solid #e2e8f0;">
                             <input type="number" class="input-modern-form rapor-nilai" data-key="${key}"
-                                   placeholder="mis. 85.5" min="0" max="100" step="0.1"
+                                   placeholder="contoh: 85.5" min="0" max="100" step="0.1"
                                    oninput="hitungRataRapor()"
                                    style="margin:0; padding:6px 10px; font-size:0.82rem;">
                         </td>
                         <td style="padding:6px 8px; border:1px solid #e2e8f0;">
                             <input type="number" class="input-modern-form rapor-rank" data-key="${key}"
-                                   placeholder="mis. 3" min="1"
+                                   placeholder="contoh: 3" min="1"
                                    style="margin:0; padding:6px 10px; font-size:0.82rem;">
                         </td>
                     </tr>`).join('')}

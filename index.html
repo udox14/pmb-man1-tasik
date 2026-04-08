@@ -987,9 +987,9 @@
             .hero-desc { max-width: 100%; }
 
             /* Mobile title: tengah */
-            .hl-pmb    { font-size: clamp(2.2rem, 9vw, 3.4rem); letter-spacing: -1px; text-align: center; }
-            .hl-school { font-size: clamp(1.6rem, 7vw, 3.4rem); letter-spacing: -1px; white-space: normal; text-align: center; }
-            .hl-ta     { text-align: center; }
+            .hl-pmb    { font-size: clamp(1.8rem, 8vw, 3.4rem); letter-spacing: -1px; text-align: center; }
+            .hl-school { font-size: clamp(1.4rem, 6vw, 3.4rem); letter-spacing: -1px; white-space: normal; text-align: center; }
+            .hl-ta     { text-align: center; font-size: 0.95rem; }
 
             .alur-link-mobile { display: flex; }
             .hero-mobile-strip { display: flex; }
@@ -1043,6 +1043,14 @@
         }
 
         @media (max-width: 600px) {
+            /* Header & Brand Fix */
+            header { height: 60px; }
+            :root { --header-height: 60px; }
+            body { padding-top: 60px; }
+            .brand-title { font-size: 0.95rem; }
+            .brand-subtitle { display: none; }
+            .kemenag-logo { width: 32px; }
+
             /* Help widget mobile */
             .help-widget { bottom: 16px; right: 16px; }
 
@@ -1309,9 +1317,11 @@
                         <div class="syarat-inline">
                             <div class="syarat-inline-title">Kriteria Penerimaan</div>
                             <ul>
-                                <li>Prestasi Akademik, Non-Akademik, atau Keagamaan minimal
-                                    <strong>Tingkat Provinsi</strong> — dibuktikan scan sertifikat asli</li>
-                                <li>Hafalan Al-Quran (Tahfidz) <strong>minimal 10 Juz</strong></li>
+                                <li><b>Nilai Rapor</b> (rata-rata 5 semester: Kelas 7 Sem 1 s.d. Kelas 9 Sem 1)</li>
+                                <li><b>Prestasi Akademik</b> minimal Tingkat Provinsi (contoh: KSM, MYRES, OSN/Olimpiade Sains, dll.)</li>
+                                <li><b>Prestasi Non-Akademik</b> minimal Tingkat Provinsi (contoh: O2SN, FLS2N, kejuaraan olahraga, seni, kepramukaan, dll.)</li>
+                                <li><b>Prestasi Keagamaan</b> minimal Tingkat Provinsi (contoh: MTQ, MQK, Kaligrafi, dll.)</li>
+                                <li><b>Hafalan Al-Quran (Tahfidz)</b> — Standar 10 Juz (pendaftar <b>diizinkan</b> melampirkan hafalan di bawah 10 juz sebagai bahan pertimbangan)</li>
                             </ul>
                         </div>
 
