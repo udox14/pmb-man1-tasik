@@ -1781,43 +1781,43 @@ window.aturJalur = async function() {
                         <input type="checkbox" id="check-prestasi" ${presChecked ? 'checked' : ''} style="transform:scale(1.5);">
                     </div>
                     
-                    <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px; font-size:0.8rem;">
-                        <h4 style="margin:0 0 10px; color:#1e293b;">Teks Jadwal Prestasi</h4>
+                    <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:20px; font-size:0.85rem;">
+                        <h4 style="margin:0 0 15px; color:#1e293b; font-size:1rem;">Teks Jadwal Prestasi</h4>
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Periode Pendaftaran</label>
-                        <input type="text" id="t-daf-pres" class="swal2-input" style="margin:0 0 12px; width:100%; font-size:0.85rem;" placeholder="contoh: 6 - 14 April 2026" value="${config['TEKS_DAFTAR_PRES'] || '6 – 14 April 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Periode Pendaftaran</label>
+                        <input type="text" id="t-daf-pres" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 6 - 14 April 2026" value="${config['TEKS_DAFTAR_PRES'] || '6 – 14 April 2026'}">
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Tanggal Tes Pembuktian</label>
-                        <input type="text" id="t-tes-pres" class="swal2-input" style="margin:0 0 12px; width:100%; font-size:0.85rem;" placeholder="contoh: 16 April 2026" value="${config['TEKS_TES_PRES'] || '16 April 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Tes Pembuktian</label>
+                        <input type="text" id="t-tes-pres" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 16 April 2026" value="${config['TEKS_TES_PRES'] || '16 April 2026'}">
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Tanggal Pengumuman</label>
-                        <input type="text" id="t-peng-pres" class="swal2-input" style="margin:0 0 12px; width:100%; font-size:0.85rem;" placeholder="contoh: 18 April 2026" value="${config['TEKS_PENGUMUMAN_PRES'] || '18 April 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Pengumuman</label>
+                        <input type="text" id="t-peng-pres" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 18 April 2026" value="${config['TEKS_PENGUMUMAN_PRES'] || '18 April 2026'}">
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Periode Lapor Diri / Daftar Ulang</label>
-                        <input type="text" id="t-lap-pres" class="swal2-input" style="margin:0 0 16px; width:100%; font-size:0.85rem;" placeholder="contoh: 20 – 25 April 2026" value="${config['TEKS_LAPOR_PRES'] || '20 – 25 April 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Periode Lapor Diri / Daftar Ulang</label>
+                        <input type="text" id="t-lap-pres" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 20 – 25 April 2026" value="${config['TEKS_LAPOR_PRES'] || '20 – 25 April 2026'}">
 
-                        <h4 style="margin:15px 0 10px; color:#1e293b;">Teks Jadwal Reguler & Lainnya</h4>
+                        <h4 style="margin:25px 0 15px; color:#1e293b; font-size:1rem; border-top:1px dashed #ddd; padding-top:20px;">Teks Jadwal Reguler & Lainnya</h4>
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Periode Pendaftaran Reguler</label>
-                        <input type="text" id="t-daf-reg" class="swal2-input" style="margin:0 0 12px; width:100%; font-size:0.85rem;" placeholder="contoh: 20 April – 20 Mei 2026" value="${config['TEKS_DAFTAR_REG'] || '20 April – 20 Mei 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Periode Pendaftaran Reguler</label>
+                        <input type="text" id="t-daf-reg" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 20 April – 20 Mei 2026" value="${config['TEKS_DAFTAR_REG'] || '20 April – 20 Mei 2026'}">
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Tanggal Pengumuman Reguler</label>
-                        <input type="text" id="t-peng-reg" class="swal2-input" style="margin:0 0 12px; width:100%; font-size:0.85rem;" placeholder="contoh: 25 Mei 2026" value="${config['TEKS_PENGUMUMAN_REG'] || '25 Mei 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Pengumuman Reguler</label>
+                        <input type="text" id="t-peng-reg" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 25 Mei 2026" value="${config['TEKS_PENGUMUMAN_REG'] || '25 Mei 2026'}">
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Periode Lapor Diri Reguler</label>
-                        <input type="text" id="t-lap-reg" class="swal2-input" style="margin:0 0 12px; width:100%; font-size:0.85rem;" placeholder="contoh: 6 – 12 Juni 2026" value="${config['TEKS_LAPOR_REG'] || '6 – 12 Juni 2026'}">
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Periode Lapor Diri Reguler</label>
+                        <input type="text" id="t-lap-reg" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 6 – 12 Juni 2026" value="${config['TEKS_LAPOR_REG'] || '6 – 12 Juni 2026'}">
                         
-                        <label style="display:block; margin-bottom:3px; font-weight:600; color:#475569;">Tanggal Rapat Orang Tua</label>
-                        <input type="text" id="t-rapat" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.85rem;" placeholder="contoh: 6 Juni 2026" value="${config['TEKS_RAPAT'] || '6 Juni 2026'}">
-                    </div> <!-- <-- Penutup disini agar rapi -->
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Rapat Orang Tua</label>
+                        <input type="text" id="t-rapat" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 6 Juni 2026" value="${config['TEKS_RAPAT'] || '6 Juni 2026'}">
+                    </div> 
 
-                    <div style="margin-top:15px; border-top:1px dashed #ddd; padding-top:15px;">
-                        <h4 style="margin:0 0 10px; color:#1e293b;">Akurasi Waktu Hitung Mundur</h4>
-                        <label style="display:block; font-weight:600; color:#1e293b; font-size:0.8rem; margin-bottom:5px;">Tanggal Pengumuman Prestasi</label>
-                        <input type="datetime-local" id="tgl-pres" class="swal2-input" style="margin:0; width:100%; font-size:0.9rem;" value="${config['TANGGAL_PENGUMUMAN_PRESTASI'] || '2026-04-18T00:00'}">
+                    <div style="margin-top:25px; border-top:1px dashed #ddd; padding-top:20px; text-align:left;">
+                        <h4 style="margin:0 0 15px; color:#1e293b; font-size:1rem;">Akurasi Waktu Hitung Mundur</h4>
+                        <label style="display:block; font-weight:600; color:#475569; font-size:0.8rem; margin:15px 0 5px;">Tanggal Pengumuman Prestasi</label>
+                        <input type="datetime-local" id="tgl-pres" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" value="${config['TANGGAL_PENGUMUMAN_PRESTASI'] || '2026-04-18T00:00'}">
                         
-                        <label style="display:block; font-weight:600; color:#1e293b; font-size:0.8rem; margin-top:10px; margin-bottom:5px;">Tanggal Pengumuman Reguler</label>
-                        <input type="datetime-local" id="tgl-reg" class="swal2-input" style="margin:0; width:100%; font-size:0.9rem;" value="${config['TANGGAL_PENGUMUMAN_REGULER'] || '2026-05-25T00:00'}">
+                        <label style="display:block; font-weight:600; color:#475569; font-size:0.8rem; margin:15px 0 5px;">Tanggal Pengumuman Reguler</label>
+                        <input type="datetime-local" id="tgl-reg" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" value="${config['TANGGAL_PENGUMUMAN_REGULER'] || '2026-05-25T00:00'}">
                     </div>
                 </div>
             `,
