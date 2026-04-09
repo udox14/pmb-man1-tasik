@@ -1801,6 +1801,9 @@ window.aturJalur = async function() {
                         <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Periode Pendaftaran Reguler</label>
                         <input type="text" id="t-daf-reg" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 20 April – 20 Mei 2026" value="${config['TEKS_DAFTAR_REG'] || '20 April – 20 Mei 2026'}">
                         
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Tes Seleksi CBT</label>
+                        <input type="text" id="t-cbt" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 21 – 23 Mei 2026" value="${config['TEKS_TES_CBT'] || '21 – 23 Mei 2026'}">
+                        
                         <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Pengumuman Reguler</label>
                         <input type="text" id="t-peng-reg" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 25 Mei 2026" value="${config['TEKS_PENGUMUMAN_REG'] || '25 Mei 2026'}">
                         
@@ -1834,6 +1837,7 @@ window.aturJalur = async function() {
                     document.getElementById('t-peng-pres').value,
                     document.getElementById('t-lap-pres').value,
                     document.getElementById('t-daf-reg').value,
+                    document.getElementById('t-cbt').value,
                     document.getElementById('t-peng-reg').value,
                     document.getElementById('t-lap-reg').value,
                     document.getElementById('t-rapat').value
@@ -1852,9 +1856,10 @@ window.aturJalur = async function() {
                 { key: 'TEKS_PENGUMUMAN_PRES', value: formValues[6] },
                 { key: 'TEKS_LAPOR_PRES', value: formValues[7] },
                 { key: 'TEKS_DAFTAR_REG', value: formValues[8] },
-                { key: 'TEKS_PENGUMUMAN_REG', value: formValues[9] },
-                { key: 'TEKS_LAPOR_REG', value: formValues[10] },
-                { key: 'TEKS_RAPAT', value: formValues[11] }
+                { key: 'TEKS_TES_CBT', value: formValues[9] },
+                { key: 'TEKS_PENGUMUMAN_REG', value: formValues[10] },
+                { key: 'TEKS_LAPOR_REG', value: formValues[11] },
+                { key: 'TEKS_RAPAT', value: formValues[12] }
             ]});
             Swal.fire('Sukses', 'Pengaturan berhasil disimpan', 'success');
         }
