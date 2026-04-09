@@ -1122,7 +1122,8 @@ window.viewDetail = async function(id) {
                                 ${buildFlagItem('scan_akta_url',               'Akta Kelahiran',        'ph-file-pdf',           berkasArr)}
                                 ${buildFlagItem('scan_kelakuan_baik_url',      'Surat Kelakuan Baik',   'ph-certificate',        berkasArr)}
                                 ${buildFlagItem('scan_ktp_ortu_url',           'KTP Orang Tua',         'ph-identification-card',berkasArr)}
-                                ${buildFlagItem('scan_rapor_url',              'Rapor',                 'ph-book-open-text',     berkasArr)}
+                                ${buildFlagItem('scan_rapor_url',              'Document Rapor (PDF)',  'ph-book-open-text',     berkasArr)}
+                                ${buildFlagItem('nilai_rapor',                 'Input Nilai Rapor (Angka)','ph-list-numbers',       berkasArr)}
                                 ${p.scan_sertifikat_prestasi_url ? buildFlagItem('scan_sertifikat_prestasi_url','Sertifikat Prestasi','ph-trophy',berkasArr) : ''}
                             </div>
                             ${p.no_telepon_ortu ? `
