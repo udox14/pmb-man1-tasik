@@ -409,6 +409,10 @@ function initPrestasiUI() {
                 <span><i class="ph ph-book-open-text" style="margin-right:6px;"></i>Nilai Rapor</span>
                 <small style="font-weight:400; color:#64748b;">Kelas 7–9 (5 Semester)</small>
             </div>
+            <p style="font-size:0.75rem; background:#fee2e2; color:#b91c1c; padding:10px 14px; border-radius:6px; border:1px solid #fecaca; margin:0 0 16px; font-weight:600; line-height:1.5; display:flex; gap:8px;">
+                <i class="ph ph-warning-circle" style="font-size:1.1rem; margin-top:1px;"></i>
+                <span><b>PERHATIAN:</b> Nilai yang diinput <u>WAJIB disamakan dengan angka asli yang tertera di Buku Rapor</u>. Manipulasi atau ketidaksesuaian nilai pada saat verifikasi fisik akan menyebabkan kelulusan Anda <b>DIBATALKAN</b>.</span>
+            </p>
             <p style="font-size:0.78rem; color:#64748b; margin:0 0 12px; line-height:1.5;">Isi rata-rata nilai rapor tiap semester (bukan per pelajaran). Ranking bersifat opsional.</p>
             <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
                 <thead>
@@ -439,6 +443,14 @@ function initPrestasiUI() {
             <div id="rapor-rata-display" style="margin-top:12px; padding:10px 14px; border-radius:8px; background:#f0fdf4; border:1px solid #bbf7d0; display:none;">
                 <span style="font-size:0.78rem; color:#166534; font-weight:700;">Rata-rata keseluruhan:</span>
                 <span id="rapor-rata-val" style="font-size:1.1rem; font-weight:800; color:#15803d; margin-left:8px;"></span>
+            </div>
+
+            <!-- CHECKBOX INTEGRITAS -->
+            <div style="margin-top: 15px; padding: 12px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 8px; display: flex; gap: 10px; align-items: start;">
+                <input type="checkbox" id="check-integritas-rapor" style="margin-top: 3px; transform: scale(1.2); cursor: pointer;">
+                <label for="check-integritas-rapor" style="font-size: 0.78rem; color: #991b1b; font-weight: 700; cursor: pointer; line-height: 1.4;">
+                    SAYA MENYATAKAN: Bahwa seluruh nilai rapor yang saya input adalah BENAR sesuai dengan buku rapor asli. Saya bersedia DIDISKUALIFIKASI jika ditemukan ketidaksesuaian data.
+                </label>
             </div>
         </div>
 
@@ -575,6 +587,18 @@ window.submitForm = async function() {
         if (!certFile || certFile.files.length === 0) {
             Swal.fire({icon: 'warning', title: 'Berkas Kurang', text: 'Wajib upload sertifikat prestasi.'});
             if(certFile) { certFile.parentElement.style.borderColor = '#ef4444'; certFile.parentElement.style.backgroundColor = '#fff5f5'; }
+            return;
+        }
+
+        const checkIntegritas = document.getElementById('check-integritas-rapor');
+        if (checkIntegritas && !checkIntegritas.checked) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pernyataan Integritas',
+                text: 'Anda harus menyetujui pernyataan integritas nilai rapor terlebih dahulu.'
+            });
+            checkIntegritas.parentElement.style.borderColor = '#ef4444';
+            checkIntegritas.parentElement.style.backgroundColor = '#fee2e2';
             return;
         }
         const rows = document.querySelectorAll('.pres-row');

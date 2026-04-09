@@ -444,6 +444,18 @@ function renderStatus(data) {
 }
 
 // ===========================================================
+// CETAK ULANG BUKTI PENDAFTARAN
+// ===========================================================
+window.cetakResume = function() {
+  if (!_cachedData) {
+    Swal.fire('Error', 'Data belum termuat sepenuhnya, silakan tunggu atau refresh halaman.', 'error');
+    return;
+  }
+  localStorage.setItem('resume_data', JSON.stringify(_cachedData));
+  window.open('../resume.html', '_blank');
+}
+
+// ===========================================================
 // EDIT DATA — Form penuh + Upload Ulang
 // ===========================================================
 window.editData = function() {
@@ -831,6 +843,10 @@ window.editData = function() {
     raporTab.className = 'eo-section';
     raporTab.id = 'eo-rapor';
     raporTab.innerHTML = `
+      <p style="font-size:0.75rem; background:#fee2e2; color:#b91c1c; padding:10px 14px; border-radius:6px; border:1px solid #fecaca; margin:0 0 14px; font-weight:600; line-height:1.5; display:flex; gap:8px;">
+        <i class="ph ph-warning-circle" style="font-size:1.1rem; margin-top:1px;"></i>
+        <span><b>PERHATIAN:</b> Nilai yang diinput <u>WAJIB sesuai dengan Buku Rapor</u>. Manipulasi nilai akan membatalkan kelulusan Anda secara sepihak.</span>
+      </p>
       <p style="font-size:.78rem; color:#64748b; margin:0 0 14px; line-height:1.5;">
         Isi rata-rata nilai rapor dari kelas 7 semester 1 hingga kelas 9 semester 1.
         Ranking tiap semester bersifat opsional.
@@ -865,6 +881,15 @@ window.editData = function() {
         <span style="font-size:.78rem; color:#166534; font-weight:700;">Rata-rata keseluruhan:</span>
         <span id="eo-rapor-avg-val" style="font-size:1.1rem; font-weight:800; color:#15803d; margin-left:8px;"></span>
       </div>
+      
+      <!-- CHECKBOX INTEGRITAS EDIT -->
+      <div style="margin-top: 15px; padding: 12px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 8px; display: flex; gap: 10px; align-items: start; text-align: left;">
+          <input type="checkbox" id="check-integritas-rapor-edit" style="margin-top: 3px; transform: scale(1.1); cursor: pointer;">
+          <label for="check-integritas-rapor-edit" style="font-size: 0.75rem; color: #991b1b; font-weight: 700; cursor: pointer; line-height: 1.4;">
+              SAYA MENJAMIN: Nilai yang saya input ini adalah BENAR sesuai rapor asli. Saya siap didiskualifikasi jika memalsukan data.
+          </label>
+      </div>
+
       <button onclick="saveNilaiRapor()"
               style="margin-top:14px; width:100%; padding:11px; background:#0d1b2a; color:white;
                      border:none; border-radius:8px; font-size:.83rem; font-weight:700; cursor:pointer;
@@ -937,6 +962,18 @@ window.hitungRataRaporEdit = function() {
 };
 
 window.saveNilaiRapor = async function() {
+  const checkIntegritas = document.getElementById('check-integritas-rapor-edit');
+  if (checkIntegritas && !checkIntegritas.checked) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Pernyataan Integritas',
+        text: 'Wajib mencentang pernyataan integritas sebelum menyimpan nilai rapor.'
+    });
+    checkIntegritas.parentElement.style.borderColor = '#ef4444';
+    checkIntegritas.parentElement.style.backgroundColor = '#fee2e2';
+    return;
+  }
+
   const raporData = {};
   document.querySelectorAll('.eo-rapor-nilai').forEach(inp => {
     const key = inp.dataset.key;
