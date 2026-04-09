@@ -1361,7 +1361,7 @@
                     <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik — PDF, Maks 2MB</li>
                     <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua (gabung) — PDF, Maks 2MB</li>
                     <li><i class="ph ph-book-open-text"></i> Scan Rapor 5 Semester — PDF, Maks 2MB</li>
-                    <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (khusus Jalur Prestasi) — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (khusus Jalur Prestasi) — PDF, Maks 5MB</li>
                 </ul>
             </div>
             <button class="btn btn-primary" onclick="closeInstruction()"
@@ -1472,9 +1472,9 @@
                 }
                 const sizeKB = file.size / 1024;
                 if (sizeKB > limitKB) {
-                    Swal.fire('File Terlalu Besar', `Ukuran (${(sizeKB/1024).toFixed(2)} MB) melebihi batas 2 MB.`, 'error');
+                    Swal.fire('File Terlalu Besar', `Ukuran (${(sizeKB/1024).toFixed(2)} MB) melebihi batas 5 MB.`, 'error');
                     input.value = '';
-                    if (label) { label.innerText = 'Terlalu besar! Maks 2MB'; label.style.color = '#dc2626'; }
+                    if (label) { label.innerText = 'Terlalu besar! Maks 5MB'; label.style.color = '#dc2626'; }
                     return;
                 }
                 if (label) { label.innerText = 'File terpilih: ' + file.name; label.style.color = '#00796b'; }

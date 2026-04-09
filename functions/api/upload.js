@@ -7,8 +7,8 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-// Maksimum 2MB
-const MAX_SIZE_BYTES = 2 * 1024 * 1024;
+// Maksimum 5MB
+const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -25,7 +25,7 @@ export async function onRequestPost(context) {
 
     if (file.size > MAX_SIZE_BYTES) {
       return Response.json(
-        { error: `File terlalu besar. Maksimum 2MB. Ukuran file: ${(file.size / 1024 / 1024).toFixed(2)}MB` },
+        { error: `File terlalu besar. Maksimum 5MB. Ukuran file: ${(file.size / 1024 / 1024).toFixed(2)}MB` },
         { status: 400, headers: CORS }
       );
     }

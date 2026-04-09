@@ -454,13 +454,13 @@ function initPrestasiUI() {
             </div>
         </div>
 
-        <!-- UPLOAD SERTIFIKAT: 2MB -->
+        <!-- UPLOAD SERTIFIKAT: 5MB -->
         <div class="upload-grid-modern" style="margin-top: 30px;">
             <div class="upload-card-item" style="grid-column: 1 / -1;">
-                <input type="file" id="file_sertifikat" accept=".pdf" onchange="validateSimpleUpload(this, 2048)">
+                <input type="file" id="file_sertifikat" accept=".pdf" onchange="validateSimpleUpload(this, 5120)">
                 <div class="upload-icon-box"><i class="ph ph-trophy"></i></div>
                 <span class="upload-label-text">Upload Sertifikat Prestasi (Gabung 1 PDF) *</span>
-                <span class="upload-status-text" id="lbl-file_sertifikat">Max 2MB (PDF Only)</span>
+                <span class="upload-status-text" id="lbl-file_sertifikat">Max 5MB (PDF Only)</span>
             </div>
         </div>
     `;
@@ -583,13 +583,6 @@ window.submitForm = async function() {
     const jalur = localStorage.getItem('pmb_jalur');
 
     if (jalur === 'PRESTASI') {
-        const certFile = document.getElementById('file_sertifikat');
-        if (!certFile || certFile.files.length === 0) {
-            Swal.fire({icon: 'warning', title: 'Berkas Kurang', text: 'Wajib upload sertifikat prestasi.'});
-            if(certFile) { certFile.parentElement.style.borderColor = '#ef4444'; certFile.parentElement.style.backgroundColor = '#fff5f5'; }
-            return;
-        }
-
         const checkIntegritas = document.getElementById('check-integritas-rapor');
         if (checkIntegritas && !checkIntegritas.checked) {
             Swal.fire({
@@ -601,17 +594,21 @@ window.submitForm = async function() {
             checkIntegritas.parentElement.style.backgroundColor = '#fee2e2';
             return;
         }
+
         const rows = document.querySelectorAll('.pres-row');
         const tahfidzJuz = document.querySelector('.tahfidz-juz');
         const tahfidzVal = tahfidzJuz ? tahfidzJuz.value.trim() : '';
 
-        // Cek apakah ada minimal 1 baris prestasi yang namanya terisi
         const hasFilledPrestasi = Array.from(rows).some(row => row.querySelector('.pres-nama')?.value.trim() !== '');
         const isTahfidzFilled   = tahfidzVal !== '';
 
-        if (!hasFilledPrestasi && !isTahfidzFilled) {
-            Swal.fire({icon: 'warning', title: 'Data Prestasi Kosong', text: 'Wajib mengisi minimal 1 prestasi (Akademik/Non-Akademik/Keagamaan) atau isian Tahfidz.'});
-            return;
+        if (hasFilledPrestasi || isTahfidzFilled) {
+            const certFile = document.getElementById('file_sertifikat');
+            if (!certFile || certFile.files.length === 0) {
+                Swal.fire({icon: 'warning', title: 'Berkas Kurang', text: 'Wajib upload sertifikat prestasi sebagai bukti prestasi akademik/non-akademik/tahfidz.'});
+                if(certFile) { certFile.parentElement.style.borderColor = '#ef4444'; certFile.parentElement.style.backgroundColor = '#fff5f5'; }
+                return;
+            }
         }
     }
 
@@ -639,7 +636,8 @@ window.submitForm = async function() {
         const nama = document.getElementById('nama_lengkap').value.replace(/[^a-zA-Z0-9]/g, '_');
         const folderName = `${nisn}_${nama}`;
 
-        // Batas upload semua berkas: 2MB — upload ke R2 via /api/upload
+        let fileUrls = { foto_url: null, scan_kk_url: null, scan_akta_url: null, scan_skb_url: null, scan_ktp_ortu_url: null, scan_rapor_url: null, scan_sertifikat_prestasi_url: null };
+
         async function uploadFile(fileInputId, docName, maxKB, autoCompress = false) {
             const fileInput = document.getElementById(fileInputId);
             if (fileInput && fileInput.files.length > 0) {
@@ -657,7 +655,7 @@ window.submitForm = async function() {
             return null;
         }
 
-        // Semua berkas batas 2048 KB (2MB)
+        // Batas upload berkas umum: 2MB, Khusus Sertifikat: 5MB
         const [fotoUrl, kkUrl, aktaUrl, skbUrl, ktpOrtuUrl, raporUrl, sertifUrl] = await Promise.all([
             uploadFile('file_foto', 'FOTO', 2048, true),
             uploadFile('file_kk', 'KK', 2048),
@@ -665,7 +663,7 @@ window.submitForm = async function() {
             uploadFile('file_skb', 'SKB', 2048),
             uploadFile('file_ktp_ortu', 'KTP_ORTU', 2048),
             uploadFile('file_rapor', 'RAPOR', 2048),
-            (jalur === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 2048) : Promise.resolve(null)
+            (jalur === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 5120) : Promise.resolve(null)
         ]);
 
         const getSelectText = (id) => { const el = document.getElementById(id); return el.options[el.selectedIndex]?.text || ''; };
