@@ -42,6 +42,18 @@ async function loadDashboardData() {
     renderStatus(pendaftarData);
     setupSmartCountdown(pendaftarData);
 
+    try {
+        const setDB = await apiGet('pengaturan');
+        if (Array.isArray(setDB)) {
+            const cfg = {};
+            setDB.forEach(item => cfg[item.key] = item.value);
+            document.querySelectorAll('.dyn-txt').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (cfg[key]) el.innerHTML = cfg[key];
+            });
+        }
+    } catch(e) { console.error('Gagal meload teks dinamis', e); }
+
   } catch (err) {
     console.error('Error Dashboard:', err);
     Swal.fire({

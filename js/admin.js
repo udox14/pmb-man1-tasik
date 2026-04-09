@@ -1787,13 +1787,26 @@ window.aturJalur = async function() {
                         <input type="checkbox" id="check-prestasi" ${presChecked ? 'checked' : ''} style="transform:scale(1.5);">
                     </div>
                     
-                    <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
-                        <label style="display:block; font-weight:600; color:#1e293b; margin-bottom:5px;">📅 Pengumuman Prestasi</label>
-                        <input type="datetime-local" id="tgl-pres" class="swal2-input" style="margin:0; width:100%; font-size:0.9rem;" value="${config['TANGGAL_PENGUMUMAN_PRESTASI'] || '2026-04-18T00:00'}">
+                    <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px; font-size:0.8rem;">
+                        <h4 style="margin:0 0 10px; color:#1e293b;">Teks Jadwal Prestasi</h4>
+                        <input type="text" id="t-daf-pres" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Pendaftaran (cth: 6 - 14 April 2026)" value="${config['TEKS_DAFTAR_PRES'] || '6 – 14 April 2026'}">
+                        <input type="text" id="t-tes-pres" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Tes (cth: 16 April 2026)" value="${config['TEKS_TES_PRES'] || '16 April 2026'}">
+                        <input type="text" id="t-peng-pres" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Pengumuman (cth: 18 April 2026)" value="${config['TEKS_PENGUMUMAN_PRES'] || '18 April 2026'}">
+                        <input type="text" id="t-lap-pres" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Lapor Diri (cth: 20 – 25 April 2026)" value="${config['TEKS_LAPOR_PRES'] || '20 – 25 April 2026'}">
+
+                        <h4 style="margin:15px 0 10px; color:#1e293b;">Teks Jadwal Reguler & Lainnya</h4>
+                        <input type="text" id="t-daf-reg" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Pendaftaran Reguler" value="${config['TEKS_DAFTAR_REG'] || '20 April – 20 Mei 2026'}">
+                        <input type="text" id="t-peng-reg" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Pengumuman Reguler" value="${config['TEKS_PENGUMUMAN_REG'] || '25 Mei 2026'}">
+                        <input type="text" id="t-lap-reg" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Lapor Diri Reguler" value="${config['TEKS_LAPOR_REG'] || '6 – 12 Juni 2026'}">
+                        <input type="text" id="t-rapat" class="swal2-input" style="margin:0 0 10px; width:100%; font-size:0.8rem;" placeholder="Tanggal Rapat Ortu" value="${config['TEKS_RAPAT'] || '6 Juni 2026'}">
                     </div>
 
-                    <div style="margin-top:10px;">
-                        <label style="display:block; font-weight:600; color:#1e293b; margin-bottom:5px;">📅 Pengumuman Reguler</label>
+                    <div style="margin-top:15px; border-top:1px dashed #ddd; padding-top:15px;">
+                        <h4 style="margin:0 0 10px; color:#1e293b;">Akurasi Waktu Hitung Mundur</h4>
+                        <label style="display:block; font-weight:600; color:#1e293b; font-size:0.8rem; margin-bottom:5px;">Tanggal Pengumuman Prestasi</label>
+                        <input type="datetime-local" id="tgl-pres" class="swal2-input" style="margin:0; width:100%; font-size:0.9rem;" value="${config['TANGGAL_PENGUMUMAN_PRESTASI'] || '2026-04-18T00:00'}">
+                        
+                        <label style="display:block; font-weight:600; color:#1e293b; font-size:0.8rem; margin-top:10px; margin-bottom:5px;">Tanggal Pengumuman Reguler</label>
                         <input type="datetime-local" id="tgl-reg" class="swal2-input" style="margin:0; width:100%; font-size:0.9rem;" value="${config['TANGGAL_PENGUMUMAN_REGULER'] || '2026-05-25T00:00'}">
                     </div>
                 </div>
@@ -1805,7 +1818,15 @@ window.aturJalur = async function() {
                     document.getElementById('check-reguler').checked,
                     document.getElementById('check-prestasi').checked,
                     document.getElementById('tgl-pres').value,
-                    document.getElementById('tgl-reg').value
+                    document.getElementById('tgl-reg').value,
+                    document.getElementById('t-daf-pres').value,
+                    document.getElementById('t-tes-pres').value,
+                    document.getElementById('t-peng-pres').value,
+                    document.getElementById('t-lap-pres').value,
+                    document.getElementById('t-daf-reg').value,
+                    document.getElementById('t-peng-reg').value,
+                    document.getElementById('t-lap-reg').value,
+                    document.getElementById('t-rapat').value
                 ];
             }
         });
@@ -1815,7 +1836,15 @@ window.aturJalur = async function() {
                 { key: 'JALUR_REGULER', value: String(formValues[0]) },
                 { key: 'JALUR_PRESTASI', value: String(formValues[1]) },
                 { key: 'TANGGAL_PENGUMUMAN_PRESTASI', value: formValues[2] },
-                { key: 'TANGGAL_PENGUMUMAN_REGULER', value: formValues[3] }
+                { key: 'TANGGAL_PENGUMUMAN_REGULER', value: formValues[3] },
+                { key: 'TEKS_DAFTAR_PRES', value: formValues[4] },
+                { key: 'TEKS_TES_PRES', value: formValues[5] },
+                { key: 'TEKS_PENGUMUMAN_PRES', value: formValues[6] },
+                { key: 'TEKS_LAPOR_PRES', value: formValues[7] },
+                { key: 'TEKS_DAFTAR_REG', value: formValues[8] },
+                { key: 'TEKS_PENGUMUMAN_REG', value: formValues[9] },
+                { key: 'TEKS_LAPOR_REG', value: formValues[10] },
+                { key: 'TEKS_RAPAT', value: formValues[11] }
             ]});
             Swal.fire('Sukses', 'Pengaturan berhasil disimpan', 'success');
         }

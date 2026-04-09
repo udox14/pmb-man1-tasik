@@ -23,6 +23,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         helpList.style.overflowY = 'visible';
     }
 
+    try {
+        const data = await apiGet('pengaturan');
+        if (Array.isArray(data)) {
+            const cfg = {};
+            data.forEach(item => cfg[item.key] = item.value);
+            
+            document.querySelectorAll('.dyn-txt').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (cfg[key]) {
+                    el.innerHTML = cfg[key]; // pakai innerHTML agar mendukung elemen bold dsb
+                }
+            });
+        }
+    } catch(e) { console.error('Gagal memuat teks dinamis'); }
+
     const styleFix = document.createElement('style');
     styleFix.innerHTML = `
         .contact-info { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; }
