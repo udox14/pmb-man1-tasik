@@ -51,6 +51,13 @@ async function loadDashboardData() {
                 const key = el.getAttribute('data-key');
                 if (cfg[key]) el.innerHTML = cfg[key];
             });
+            if (cfg['LINK_GRUP_WA']) {
+                const linkWA = cfg['LINK_GRUP_WA'];
+                const aWa = document.getElementById('wa-dash-link');
+                const iWa = document.getElementById('wa-dash-qrcode');
+                if (aWa) aWa.href = linkWA;
+                if (iWa) iWa.setAttribute('onerror', `this.src='https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(linkWA)}'`);
+            }
         }
     } catch(e) { console.error('Gagal meload teks dinamis', e); }
 

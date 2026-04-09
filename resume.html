@@ -497,6 +497,28 @@
             </div>
         </div>
 
+        <!-- Grup WA -->
+        <div class="resume-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+            <div class="card-head" style="background: #dcfce7; border-color: #bbf7d0; display:flex; gap:10px; align-items:center;">
+                <i class="ph ph-whatsapp-logo" style="color: #166534; font-size:1.2rem;"></i>
+                <span class="card-head-label" style="color: #166534; font-weight:800; font-size:0.75rem;">Grup WhatsApp Calon Murid</span>
+            </div>
+            <div class="card-body" style="text-align: center; padding: 25px 20px;">
+                <p style="margin: 0 0 18px; font-size: 0.9rem; color: #14532d; line-height: 1.6;">
+                    Wajib bergabung dengan Grup WhatsApp resmi untuk mendapatkan berbagai informasi terbaru, pengumuman seleksi, dan bantuan dari panitia PMB.
+                </p>
+                <div style="margin-bottom: 20px; padding: 10px; background: white; display: inline-block; border-radius: 12px; border: 1px dashed #4ade80;">
+                    <img id="wa-barcode-img" src="images/barcode-wa.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo'" alt="Barcode WA" style="width: 140px; height: 140px; display: block; margin: 0 auto;">
+                    <div style="font-size: 0.7rem; color: #166534; margin-top: 8px; font-weight: 800; letter-spacing: 1px;">SCAN BARCODE INI</div>
+                </div>
+                <div>
+                   <a id="wa-link-btn" href="https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo" target="_blank" class="btn btn-primary" style="background: #16a34a; width: 100%; display: inline-flex; justify-content: center; gap: 8px; padding: 12px; font-size:0.9rem;">
+                       Klik Link Ini Untuk Bergabung <i class="ph ph-arrow-square-out"></i>
+                   </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Tombol aksi -->
         <div class="action-row no-print">
             <button onclick="window.print()" class="btn btn-outline-dark">
@@ -604,6 +626,22 @@
             </div>
         </div>
 
+        <!-- Group WhatsApp -->
+        <div style="border: 1px solid black; padding: 15px; margin: 20px 0; display: flex; align-items: center; gap: 20px;">
+            <div style="flex-shrink: 0; border: 1px dashed #666; padding: 5px;">
+                <img id="wa-barcode-img-print" src="images/barcode-wa.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo'" alt="Barcode WA" style="width: 90px; height: 90px; display: block;">
+            </div>
+            <div>
+                <b style="font-size: 16px;">WAJIB: Bergabung ke Grup WhatsApp Resmi</b>
+                <p style="margin: 6px 0 0; font-size: 13px; line-height: 1.5;">
+                    Silakan scan barcode di samping atau ketik link berikut di browser untuk bergabung ke grup WhatsApp calon murid baru guna mendapatkan informasi terbaru:
+                </p>
+                <p id="wa-link-text-print" style="margin: 8px 0 0; font-size: 14px; font-weight: bold; font-family: monospace;">
+                    ▶ https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo
+                </p>
+            </div>
+        </div>
+
         <!-- TTD -->
         <div style="margin-top:50px; display:flex; justify-content:flex-end;">
             <div style="text-align:center; width:260px;">
@@ -707,6 +745,29 @@
             } else {
                 if (rowRuangPrint) rowRuangPrint.style.display = 'none';
             }
+
+            // Ambil link grup WA dari pengaturan
+            fetch('../api/pengaturan')
+                .then(r => r.json())
+                .then(setDB => {
+                    if (Array.isArray(setDB)) {
+                        const cfg = {};
+                        setDB.forEach(item => cfg[item.key] = item.value);
+                        if (cfg['LINK_GRUP_WA']) {
+                            const link = cfg['LINK_GRUP_WA'];
+                            const btn = document.getElementById('wa-link-btn');
+                            const text = document.getElementById('wa-link-text-print');
+                            const imgWeb = document.getElementById('wa-barcode-img');
+                            const imgPrint = document.getElementById('wa-barcode-img-print');
+
+                            if(btn) btn.href = link;
+                            if(text) text.innerHTML = `▶ ${link}`;
+                            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(link)}`;
+                            if(imgWeb) imgWeb.setAttribute('onerror', `this.src='${qrUrl}'`);
+                            if(imgPrint) imgPrint.setAttribute('onerror', `this.src='${qrUrl}'`);
+                        }
+                    }
+                }).catch(e => console.error('Fetch WA Config error', e));
         });
     </script>
 </body>

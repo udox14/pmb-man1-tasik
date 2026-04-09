@@ -1812,6 +1812,10 @@ window.aturJalur = async function() {
                         
                         <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Rapat Orang Tua</label>
                         <input type="text" id="t-rapat" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 6 Juni 2026" value="${config['TEKS_RAPAT'] || '6 Juni 2026'}">
+                        
+                        <h4 style="margin:25px 0 15px; color:#1e293b; font-size:1rem; border-top:1px dashed #ddd; padding-top:20px;">Link WhatsApp</h4>
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Link Grup WhatsApp Calon Murid</label>
+                        <input type="text" id="t-link-wa" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="https://chat.whatsapp.com/..." value="${config['LINK_GRUP_WA'] || 'https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo'}">
                     </div> 
 
                     <div style="margin-top:25px; border-top:1px dashed #ddd; padding-top:20px; text-align:left;">
@@ -1840,7 +1844,8 @@ window.aturJalur = async function() {
                     document.getElementById('t-cbt').value,
                     document.getElementById('t-peng-reg').value,
                     document.getElementById('t-lap-reg').value,
-                    document.getElementById('t-rapat').value
+                    document.getElementById('t-rapat').value,
+                    document.getElementById('t-link-wa').value
                 ];
             }
         });
@@ -1859,7 +1864,8 @@ window.aturJalur = async function() {
                 { key: 'TEKS_TES_CBT', value: formValues[9] },
                 { key: 'TEKS_PENGUMUMAN_REG', value: formValues[10] },
                 { key: 'TEKS_LAPOR_REG', value: formValues[11] },
-                { key: 'TEKS_RAPAT', value: formValues[12] }
+                { key: 'TEKS_RAPAT', value: formValues[12] },
+                { key: 'LINK_GRUP_WA', value: formValues[13] }
             ]});
             Swal.fire('Sukses', 'Pengaturan berhasil disimpan', 'success');
         }
