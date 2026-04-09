@@ -411,7 +411,7 @@ function initPrestasiUI() {
             </div>
             <p style="font-size:0.75rem; background:#fee2e2; color:#b91c1c; padding:10px 14px; border-radius:6px; border:1px solid #fecaca; margin:0 0 16px; font-weight:600; line-height:1.5; display:flex; gap:8px;">
                 <i class="ph ph-warning-circle" style="font-size:1.1rem; margin-top:1px;"></i>
-                <span><b>PERHATIAN:</b> Nilai yang diinput <u>WAJIB disamakan dengan angka asli yang tertera di Buku Rapor</u>. Manipulasi atau ketidaksesuaian nilai pada saat verifikasi fisik akan menyebabkan kelulusan Anda <b>DIBATALKAN</b>.</span>
+                <span><b>PERHATIAN:</b> Nilai yang diinput <u>WAJIB disamakan dengan angka asli yang tertera di Buku Rapor</u>. Ketidaksesuaian data pengisian nilai pada saat verifikasi fisik akan menyebabkan kelulusan Anda <b>DIBATALKAN</b>.</span>
             </p>
             <p style="font-size:0.78rem; color:#64748b; margin:0 0 12px; line-height:1.5;">Isi rata-rata nilai rapor tiap semester (bukan per pelajaran). Ranking bersifat opsional.</p>
             <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
@@ -449,7 +449,7 @@ function initPrestasiUI() {
             <div style="margin-top: 15px; padding: 12px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 8px; display: flex; gap: 10px; align-items: start;">
                 <input type="checkbox" id="check-integritas-rapor" style="margin-top: 3px; transform: scale(1.2); cursor: pointer;">
                 <label for="check-integritas-rapor" style="font-size: 0.78rem; color: #991b1b; font-weight: 700; cursor: pointer; line-height: 1.4;">
-                    SAYA MENYATAKAN: Bahwa seluruh nilai rapor yang saya input adalah BENAR sesuai dengan buku rapor asli. Saya bersedia DIDISKUALIFIKASI jika ditemukan ketidaksesuaian data.
+                    SAYA MENYATAKAN: Bahwa seluruh nilai rapor yang saya input adalah BENAR sesuai dengan buku rapor asli. Saya bersedia menerima konsekuensi diskualifikasi apabila di kemudian hari ditemukan ketidaksesuaian data.
                 </label>
             </div>
         </div>

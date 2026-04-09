@@ -1317,13 +1317,14 @@ window.viewDetail = async function(id) {
                 return;
             }
             const labelMap = {
-                'foto_url':                     'Pas Foto',
-                'scan_kk_url':                  'Kartu Keluarga',
-                'scan_akta_url':                'Akta Kelahiran',
-                'scan_kelakuan_baik_url':       'Surat Kelakuan Baik',
-                'scan_ktp_ortu_url':            'KTP Orang Tua',
-                'scan_rapor_url':               'Rapor',
-                'scan_sertifikat_prestasi_url': 'Sertifikat Prestasi',
+                'foto_url':                     'Pas Foto (Buram/Tidak Sesuai)',
+                'scan_kk_url':                  'Scan Kartu Keluarga',
+                'scan_akta_url':                'Scan Akta Kelahiran',
+                'scan_kelakuan_baik_url':       'Scan Surat Kelakuan Baik',
+                'scan_ktp_ortu_url':            'Scan KTP Orang Tua',
+                'scan_rapor_url':               'Dokumen Scan Rapor',
+                'scan_sertifikat_prestasi_url': 'Scan Sertifikat Prestasi',
+                'nilai_rapor':                  'Rata-Rata Nilai Rapor (Input Angka Tidak Sesuai dengan Asli)'
             };
             const berkasNames = editState.berkas_ditolak
                 .map(k => '- ' + (labelMap[k] || k))
@@ -1332,10 +1333,10 @@ window.viewDetail = async function(id) {
             const msg =
                 encodeURIComponent('Assalamualaikum Warahmatullahi Wabarakatuh.') + '%0A%0A' +
                 encodeURIComponent(`Kepada Yth. Orang Tua / Wali dari ${p.nama_lengkap},`) + '%0A%0A' +
-                encodeURIComponent('Mohon maaf mengganggu waktunya. Kami dari Panitia Penerimaan Murid Baru (PMB) MAN 1 Tasikmalaya ingin menyampaikan bahwa berkas pendaftaran putra/putri Bapak/Ibu masih perlu dilengkapi.') + '%0A%0A' +
-                encodeURIComponent('Berkas yang perlu diupload ulang:') + '%0A' +
-                berkasNames + '%0A%0A' +
-                encodeURIComponent('Mohon kiranya Bapak/Ibu dapat membantu putra/putri untuk login kembali ke portal PMB dan mengupload ulang berkas tersebut sesegera mungkin agar proses pendaftaran dapat segera kami tindaklanjuti.') + '%0A%0A' +
+                encodeURIComponent('Mohon maaf mengganggu waktunya. Kami dari Panitia Penerimaan Murid Baru (PMB) MAN 1 Tasikmalaya menginformasikan bahwa data/berkas pendaftaran putra/putri Bapak/Ibu masih ada yang bermasalah atau belum sesuai kriteria.') + '%0A%0A' +
+                encodeURIComponent('Bagian yang bermasalah dan wajib diperbaiki/diupload ulang:') + '%0A' +
+                encodeURIComponent(berkasNames.replace(/%0A/g, '\n')) + '%0A%0A' + // encode URI handles new lines differently, so encode the mapped string directly
+                encodeURIComponent('Mohon kiranya Bapak/Ibu dapat mengarahkan putra/putri untuk segera login kembali ke portal PMB dan memperbaiki bagian tersebut sesegera mungkin, agar proses pendaftaran dapat dilanjutkan.') + '%0A%0A' +
                 encodeURIComponent('Apabila ada pertanyaan, jangan ragu untuk menghubungi kami kembali. Terima kasih atas perhatian dan kerjasamanya.') + '%0A%0A' +
                 encodeURIComponent('Wassalamualaikum Warahmatullahi Wabarakatuh.') + '%0A' +
                 encodeURIComponent('Panitia PMB MAN 1 Tasikmalaya');

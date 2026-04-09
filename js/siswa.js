@@ -845,7 +845,7 @@ window.editData = function() {
     raporTab.innerHTML = `
       <p style="font-size:0.75rem; background:#fee2e2; color:#b91c1c; padding:10px 14px; border-radius:6px; border:1px solid #fecaca; margin:0 0 14px; font-weight:600; line-height:1.5; display:flex; gap:8px;">
         <i class="ph ph-warning-circle" style="font-size:1.1rem; margin-top:1px;"></i>
-        <span><b>PERHATIAN:</b> Nilai yang diinput <u>WAJIB sesuai dengan Buku Rapor</u>. Manipulasi nilai akan membatalkan kelulusan Anda secara sepihak.</span>
+        <span><b>PERHATIAN:</b> Nilai yang diinput <u>WAJIB sesuai dengan Buku Rapor</u>. Ketidaksesuaian nilai pada saat verifikasi akan membatalkan kelulusan Anda.</span>
       </p>
       <p style="font-size:.78rem; color:#64748b; margin:0 0 14px; line-height:1.5;">
         Isi rata-rata nilai rapor dari kelas 7 semester 1 hingga kelas 9 semester 1.
@@ -886,7 +886,7 @@ window.editData = function() {
       <div style="margin-top: 15px; padding: 12px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 8px; display: flex; gap: 10px; align-items: start; text-align: left;">
           <input type="checkbox" id="check-integritas-rapor-edit" style="margin-top: 3px; transform: scale(1.1); cursor: pointer;">
           <label for="check-integritas-rapor-edit" style="font-size: 0.75rem; color: #991b1b; font-weight: 700; cursor: pointer; line-height: 1.4;">
-              SAYA MENJAMIN: Nilai yang saya input ini adalah BENAR sesuai rapor asli. Saya siap didiskualifikasi jika memalsukan data.
+              SAYA MENJAMIN: Nilai yang saya input ini adalah BENAR sesuai rapor asli. Saya siap menerima konsekuensi diskualifikasi jika ditemukan ketidaksesuaian data.
           </label>
       </div>
 
