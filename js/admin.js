@@ -322,6 +322,18 @@ function updateBulkUI() {
         bar.classList.add('show'); 
         countSpan.innerText = selectedIds.size; 
         
+        // Buat tombol cetak form verifikasi prestasi
+        if (!document.getElementById('btn-bulk-cetak-prestasi')) {
+            const btnCetak = document.createElement('button');
+            btnCetak.id = 'btn-bulk-cetak-prestasi';
+            btnCetak.className = 'btn btn-primary';
+            btnCetak.style.background = '#0284c7'; // Biru terang
+            btnCetak.style.borderColor = '#0284c7';
+            btnCetak.innerHTML = '<i class="ph ph-printer"></i> Cetak Form Verifikasi';
+            btnCetak.onclick = () => window.bulkAction('CETAK_PRESTASI');
+            bar.appendChild(btnCetak);
+        }
+
         // Buat tombol jadwal massal jika belum ada
         if (!document.getElementById('btn-bulk-jadwal')) {
             const btnJadwal = document.createElement('button');
@@ -376,6 +388,160 @@ window.bulkAction = async function(action) {
         processZipDownload(selectedPendaftar, `Berkas_TERPILIH_PMB_${tgl}.zip`);
         return; 
     }
+
+    // TANGANI CETAK FORM VERIFIKASI PRESTASI
+    if (action === 'CETAK_PRESTASI') {
+        const prestasiIds = ids.filter(id => {
+            const p = allPendaftar.find(x => x.id === id);
+            return p && p.jalur === 'PRESTASI';
+        });
+
+        if (prestasiIds.length === 0) {
+            Swal.fire('Info', 'Mohon pilih setidaknya satu pendaftar Jalur Prestasi.', 'info');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Mempersiapkan Form...',
+            text: 'Mengunduh detail prestasi dari server.',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        const selectedPendaftar = allPendaftar.filter(p => prestasiIds.includes(p.id));
+        let printAreaHTML = '';
+        const tglCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+
+        for (let p of selectedPendaftar) {
+            let cats = [];
+            // Deteksi rapor
+            if (p.scan_rapor_url || p.nilai_rapor) {
+                cats.push("NILAI RAPOR");
+            }
+
+            // Fetch Prestasi Lomba/Tahfidz
+            try {
+                const presData = await apiGet('prestasi?pendaftar_id=' + p.id);
+                if (Array.isArray(presData)) {
+                    if (presData.some(x => x.kategori === 'Akademik')) cats.push('AKADEMIK');
+                    if (presData.some(x => x.kategori === 'Non-Akademik' || x.kategori === 'Keagamaan')) cats.push('NON-AKADEMIK');
+                    if (presData.some(x => x.kategori === 'Tahfidz')) cats.push('TAHFIDZ');
+                }
+            } catch (e) {
+                console.warn('Gagal memuat detail prestasi untuk', p.id);
+            }
+
+            // Hapus duplikat
+            cats = [...new Set(cats)];
+            let catString = cats.length > 0 ? cats.join(' &amp; ') : 'TIDAK ADA DATA PRESTASI (KOSONG)';
+
+            const photoSrc = p.foto_url ? p.foto_url : 'https://via.placeholder.com/150x200?text=FOTO';
+            const alamatPendek = [p.desa_kelurahan, p.kecamatan, p.kabupaten_kota, p.provinsi].filter(x => x && x !== '-').join(', ');
+            
+            // Generate string Nilai Rapor Compact
+            let nilaiRaporHtml = '';
+            if (p.nilai_rapor) {
+                try {
+                    let n = typeof p.nilai_rapor === 'string' ? JSON.parse(p.nilai_rapor) : p.nilai_rapor;
+                    let rArr = [];
+                    let total = 0, count = 0;
+                    for (let key in n) {
+                        let label = key.replace('_','.'); // "7_1" -> "7.1"
+                        let text = `Smt ${label}: <b>${n[key].rata}</b>`;
+                        if (n[key].rank) text += ` (Rkg ${n[key].rank})`;
+                        rArr.push(text);
+                        total += parseFloat(n[key].rata); count++;
+                    }
+                    if (count > 0) {
+                        let avg = (total / count).toFixed(2);
+                        nilaiRaporHtml = `<tr><td style="vertical-align:top; font-weight:bold;">DETAIL RAPOR</td><td style="vertical-align:top; line-height:1.5;">: ${rArr.join(' | ')} <br> \u2192 Rata-rata Total: <b style="color:#15803d; font-size:16px;">${avg}</b></td></tr>`;
+                    }
+                } catch(e) { }
+            }
+
+            printAreaHTML += `
+            <div class="page-break" style="font-family:'Times New Roman',serif; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0; position:relative;">
+                <div style="border:2px solid #000; padding:25px;">
+                    <div style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:20px;">
+                        <img src="../images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" style="width:100px; height:auto;">
+                        <div style="text-align:center; line-height:1.15; color:#000;">
+                            <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
+                            <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
+                            <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                            <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                            <p style="margin:0; font-size:12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; margin-bottom:25px;">
+                        <h3 style="margin:0; font-size:20px; font-weight:bold; font-family:Arial,sans-serif; text-decoration:underline;">FORM VERIFIKASI BERKAS</h3>
+                        <p style="margin:5px 0 0; font-size:16px; font-weight:bold; background:#eee; padding:5px; border:1px solid #000; display:inline-block;">JALUR PRESTASI</p>
+                        <h2 style="margin:10px 0 0; font-size:24px; font-weight:bold; color:#000;">KATEGORI: ${catString}</h2>
+                    </div>
+
+                    <div style="display:flex; gap:30px; align-items:flex-start; margin-bottom:20px;">
+                        <div style="width:4cm; flex-shrink:0; text-align:center;">
+                            <img src="${photoSrc}" style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
+                        </div>
+                        <div style="flex:1;">
+                            <table style="width:100%; font-size:15px; border-collapse:separate; border-spacing:0 10px; line-height:1.4;">
+                                <tr><td style="width:160px; font-weight:bold;">NOMOR DAFTAR</td><td>: <span style="font-weight:bold; font-size:18px;">${p.no_pendaftaran || '-'}</span></td></tr>
+                                <tr><td>NAMA LENGKAP</td><td>: <b style="text-transform:uppercase;">${p.nama_lengkap}</b></td></tr>
+                                <tr><td>NISN</td><td>: ${p.nisn || '-'}</td></tr>
+                                <tr><td>ASAL SEKOLAH</td><td>: ${p.asal_sekolah || '-'}</td></tr>
+                                <tr><td style="vertical-align:top; font-weight:bold;">ALAMAT LENGKAP</td><td style="vertical-align:top;">: ${alamatPendek}</td></tr>
+                                ${nilaiRaporHtml}
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:30px; border:2px solid #000; padding:15px;">
+                        <div style="font-weight:bold; text-decoration:underline; margin-bottom:15px; font-size:16px;">Hasil Verifikasi Fisik Dokumen (Oleh Panitia):</div>
+                        <table style="width:100%; font-size:15px; margin-bottom:10px;">
+                            <tr>
+                                <td style="width:40px;"><div style="width:30px; height:30px; border:2px solid #000;"></div></td>
+                                <td style="font-weight:bold; font-size:16px;">SESUAI (LULUS VERIFIKASI)</td>
+                            </tr>
+                            <tr><td colspan="2" style="height:15px;"></td></tr>
+                            <tr>
+                                <td style="width:40px;"><div style="width:30px; height:30px; border:2px solid #000;"></div></td>
+                                <td style="font-weight:bold; font-size:16px;">TIDAK SESUAI (TIDAK LULUS) / DIBATALKAN</td>
+                            </tr>
+                        </table>
+                        <p style="margin:10px 0 0; font-size:12px; font-style:italic;">* Peringatan: Beri tanda Centang ( V ) atau Silang ( X ) pada kotak di atas setelah dokumen asli dicocokkan dengan data tabel.</p>
+                    </div>
+
+                    <div style="margin-top:40px; display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div style="font-size:11px; font-style:italic; max-width:250px;">
+                            <i>Dicetak dari Panel Admin pada: ${tglCetak}</i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-start; min-width:260px;">
+                            <p style="margin:0; font-size:15px;">Tasikmalaya, ............................. 2026</p>
+                            <p style="margin:5px 0 0; font-size:15px; font-weight:bold;">Verifikator / Penguji,</p>
+                            <div style="height:80px;"></div>
+                            <p style="margin:0; font-weight:bold; font-size:15px;">( ..................................................... )</p>
+                            <p style="margin:0; font-size:14px;">Nama Terang &amp; Tanda Tangan</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        const area = document.getElementById('cetak-verifikasi-area');
+        if (area) area.innerHTML = printAreaHTML;
+        Swal.close();
+
+        // Panggil print
+        setTimeout(() => {
+            window.print();
+            // Bersihkan area memory-setelah 3 detik (jika print ditutup)
+            setTimeout(() => { if (area) area.innerHTML = ''; }, 3000);
+        }, 500);
+
+        return;
+    }
+
 
     let updateData = {};
     let confirmText = '';

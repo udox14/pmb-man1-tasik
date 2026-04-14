@@ -869,6 +869,22 @@
         @media (max-width: 480px) {
             .stats-grid-modern { grid-template-columns: 1fr; }
         }
+
+        /* ── Print styles ─────────────────────────────────────────── */
+        @media print {
+            body * { visibility: hidden; }
+            .admin-wrapper { display: none !important; }
+
+            #cetak-verifikasi-area, #cetak-verifikasi-area * { visibility: visible; }
+            #cetak-verifikasi-area {
+                position: absolute; left: 0; top: 0;
+                width: 100%; margin: 0; padding: 0;
+                display: block !important;
+                border: none; background: white;
+            }
+            .page-break { page-break-after: always; }
+            @page { size: A4; margin: 1cm; }
+        }
     </style>
 </head>
 <body class="admin-body">
@@ -1221,6 +1237,11 @@
         </div><!-- /admin-content-pad -->
     </main>
 </div>
+
+<!-- =======================================================
+     AREA CETAK VERIFIKASI (HIDDEN BY DEFAULT)
+======================================================== -->
+<div id="cetak-verifikasi-area" style="display:none;"></div>
 
 <script src="../js/config.js"></script>
 <script src="../js/auth.js"></script>
