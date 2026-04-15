@@ -438,23 +438,31 @@ window.bulkAction = async function(action) {
             const photoSrc = p.foto_url ? p.foto_url : 'https://via.placeholder.com/150x200?text=FOTO';
             const alamatPendek = [p.desa_kelurahan, p.kecamatan, p.kabupaten_kota, p.provinsi].filter(x => x && x !== '-').join(', ');
             
-            // Generate string Nilai Rapor Compact
+            // Generate Tabel Nilai Rapor
             let nilaiRaporHtml = '';
             if (p.nilai_rapor) {
                 try {
                     let n = typeof p.nilai_rapor === 'string' ? JSON.parse(p.nilai_rapor) : p.nilai_rapor;
-                    let rArr = [];
+                    let thead = '', tbody = '';
                     let total = 0, count = 0;
                     for (let key in n) {
                         let label = key.replace('_','.'); // "7_1" -> "7.1"
-                        let text = `Smt ${label}: <b>${n[key].rata}</b>`;
-                        if (n[key].rank) text += ` (Rkg ${n[key].rank})`;
-                        rArr.push(text);
+                        thead += `<th style="border:1px solid #000; padding:4px 2px; text-align:center; font-weight:bold;">Smt ${label}</th>`;
+                        tbody += `<td style="border:1px solid #000; padding:4px 2px; text-align:center;">${n[key].rata} ${n[key].rank ? `<br><small style="font-size:10px;">(Rkg ${n[key].rank})</small>` : ''}</td>`;
                         total += parseFloat(n[key].rata); count++;
                     }
                     if (count > 0) {
                         let avg = (total / count).toFixed(2);
-                        nilaiRaporHtml = `<tr><td style="vertical-align:top; font-weight:bold;">DETAIL RAPOR</td><td style="vertical-align:top; line-height:1.5;">: ${rArr.join(' | ')} <br> \u2192 Rata-rata Total: <b style="color:#15803d; font-size:16px;">${avg}</b></td></tr>`;
+                        thead += `<th style="border:1px solid #000; padding:4px 2px; text-align:center; background:#f0fdf4; font-weight:bold;">Rata-rata</th>`;
+                        tbody += `<td style="border:1px solid #000; padding:4px 2px; text-align:center; background:#f0fdf4; font-weight:bold; color:#15803d; font-size:15px;">${avg}</td>`;
+                        
+                        let tableHTML = `
+                        <table style="width:100%; border-collapse:collapse; font-size:13px; line-height:1.2; margin-top:2px;">
+                            <thead style="background:#f8fafc;"><tr>${thead}</tr></thead>
+                            <tbody><tr>${tbody}</tr></tbody>
+                        </table>`;
+                        
+                        nilaiRaporHtml = `<tr><td style="vertical-align:top; font-weight:bold; padding-top:6px;">NILAI RAPOR</td><td style="vertical-align:top; padding-top:6px; padding-left:0;">: ${tableHTML}</td></tr>`;
                     }
                 } catch(e) { }
             }
