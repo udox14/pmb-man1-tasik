@@ -494,7 +494,7 @@ window.bulkAction = async function(action) {
                             <img src="${photoSrc}" style="width:3.5cm; height:5cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
                         </div>
                         <div style="flex:1;">
-                            <table style="width:100%; font-size:14px; border-collapse:separate; border-spacing:0 6px; line-height:1.3;">
+                            <table style="width:100%; font-size:14px; border-collapse:separate; border-spacing:0 12px; line-height:1.4;">
                                 <tr><td style="width:140px; font-weight:bold;">NOMOR DAFTAR</td><td>: <span style="font-weight:bold; font-size:16px;">${p.no_pendaftaran || '-'}</span></td></tr>
                                 <tr><td>NAMA LENGKAP</td><td>: <b style="text-transform:uppercase; font-size:15px;">${p.nama_lengkap}</b></td></tr>
                                 <tr><td>NISN</td><td>: ${p.nisn || '-'}</td></tr>
@@ -505,14 +505,14 @@ window.bulkAction = async function(action) {
                         </div>
                     </div>
 
-                    <div style="margin-top:15px; border:2px solid #000; padding:10px 15px;">
-                        <div style="font-weight:bold; text-decoration:underline; margin-bottom:10px; font-size:14px;">Hasil Verifikasi Fisik Dokumen (Oleh Panitia):</div>
-                        <table style="width:100%; font-size:14px; margin-bottom:5px;">
+                    <div style="margin-top:20px; border:2px solid #000; padding:15px 20px;">
+                        <div style="font-weight:bold; text-decoration:underline; margin-bottom:12px; font-size:14px;">Hasil Verifikasi Fisik Dokumen (Oleh Panitia):</div>
+                        <table style="width:100%; font-size:14px; margin-bottom:8px;">
                             <tr>
                                 <td style="width:35px;"><div style="width:25px; height:25px; border:2px solid #000;"></div></td>
                                 <td style="font-weight:bold; font-size:14px;">SESUAI (LULUS VERIFIKASI)</td>
                             </tr>
-                            <tr><td colspan="2" style="height:10px;"></td></tr>
+                            <tr><td colspan="2" style="height:12px;"></td></tr>
                             <tr>
                                 <td style="width:35px;"><div style="width:25px; height:25px; border:2px solid #000;"></div></td>
                                 <td style="font-weight:bold; font-size:14px;">TIDAK SESUAI (TIDAK LULUS) / DIBATALKAN</td>
@@ -521,17 +521,8 @@ window.bulkAction = async function(action) {
                         <p style="margin:8px 0 0; font-size:11px; font-style:italic;">* Peringatan: Beri tanda Centang ( V ) atau Silang ( X ) pada kotak di atas setelah dokumen asli dicocokkan dengan data tabel.</p>
                     </div>
 
-                    <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:flex-end;">
-                        <div style="font-size:11px; font-style:italic; max-width:250px;">
-                            <i>Dicetak dari Panel Admin pada: ${tglCetak}</i>
-                        </div>
-                        <div style="display:flex; flex-direction:column; align-items:flex-start; min-width:250px;">
-                            <p style="margin:0; font-size:14px;">Tasikmalaya, ............................. 2026</p>
-                            <p style="margin:4px 0 0; font-size:14px; font-weight:bold;">Verifikator / Penguji,</p>
-                            <div style="height:60px;"></div>
-                            <p style="margin:0; font-weight:bold; font-size:14px;">( ..................................................... )</p>
-                            <p style="margin:0; font-size:13px;">Nama Terang &amp; Tanda Tangan</p>
-                        </div>
+                    <div style="margin-top:20px; text-align:right;">
+                        <i style="font-size:11px; font-style:italic;">Dicetak dari Panel Admin pada: ${tglCetak}</i>
                     </div>
                 </div>
             </div>
