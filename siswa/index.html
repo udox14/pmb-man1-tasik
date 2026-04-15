@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +13,21 @@
     <style>
         /* ── Tokens ─────────────────────────────────────────────── */
         :root {
-            --ink:       #0d1b2a;
-            --ink-mid:   #334155;
-            --ink-soft:  #64748b;
+            --ink: #0d1b2a;
+            --ink-mid: #334155;
+            --ink-soft: #64748b;
             --ink-faint: #94a3b8;
-            --rule:      #e2e8f0;
+            --rule: #e2e8f0;
             --rule-dark: #cbd5e1;
-            --surface:   #ffffff;
-            --bg:        #f1f5f9;
-            --teal:      #00796b;
+            --surface: #ffffff;
+            --bg: #f1f5f9;
+            --teal: #00796b;
             --teal-dark: #004d40;
-            --teal-dim:  #e0f2f1;
-            --gold:      #d97706;
-            --ok:        #16a34a;
-            --err:       #dc2626;
-            --radius:    10px;
+            --teal-dim: #e0f2f1;
+            --gold: #d97706;
+            --ok: #16a34a;
+            --err: #dc2626;
+            --radius: 10px;
             --header-height: 64px;
         }
 
@@ -41,15 +42,28 @@
         /* ── Header ─────────────────────────────────────────────── */
         header {
             height: var(--header-height);
-            background: rgba(255,255,255,.97);
+            background: rgba(255, 255, 255, .97);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--rule);
             box-shadow: none;
         }
-        .brand-title    { font-size: 1rem; font-weight: 800; color: var(--ink); }
-        .brand-subtitle { font-size: .72rem; color: var(--ink-soft); }
-        .kemenag-logo   { width: 36px; }
-        .page-context   {
+
+        .brand-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .brand-subtitle {
+            font-size: .72rem;
+            color: var(--ink-soft);
+        }
+
+        .kemenag-logo {
+            width: 36px;
+        }
+
+        .page-context {
             font-size: .78rem;
             font-weight: 600;
             color: var(--ink-soft);
@@ -57,18 +71,24 @@
             margin-right: 4px;
             border-right: 1px solid var(--rule-dark);
         }
+
         .nav-actions .btn {
             border-radius: var(--radius);
             padding: 8px 16px;
             font-size: .82rem;
             font-weight: 700;
         }
+
         .btn-danger {
             background: #fee2e2;
             color: var(--err);
             border: 1px solid #fecaca;
         }
-        .btn-danger:hover { background: #fecaca; transform: none; }
+
+        .btn-danger:hover {
+            background: #fecaca;
+            transform: none;
+        }
 
         /* ── Layout ─────────────────────────────────────────────── */
         .dash-wrap {
@@ -99,6 +119,7 @@
             background: var(--bg);
             border-bottom: 1px solid var(--rule);
         }
+
         .profile-img-box img {
             width: 100%;
             height: 100%;
@@ -109,6 +130,7 @@
             padding: 16px 18px;
             border-bottom: 1px solid var(--rule);
         }
+
         .p-name {
             font-weight: 800;
             font-size: 1rem;
@@ -116,11 +138,13 @@
             margin-bottom: 3px;
             line-height: 1.3;
         }
+
         .p-nisn {
             font-size: .75rem;
             color: var(--ink-soft);
             margin-bottom: 10px;
         }
+
         #badge-jalur {
             display: inline-block;
             font-size: .68rem;
@@ -135,7 +159,10 @@
         }
 
         /* Sidebar nav */
-        .sidebar-nav { padding: 10px; }
+        .sidebar-nav {
+            padding: 10px;
+        }
+
         .sidebar-section-label {
             font-size: .62rem;
             font-weight: 800;
@@ -145,7 +172,14 @@
             padding: 10px 8px 6px;
             display: block;
         }
-        .menu-list { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
         .menu-btn {
             display: flex;
             align-items: center;
@@ -164,12 +198,28 @@
             text-align: left;
             font-family: inherit;
         }
-        .menu-btn i { font-size: 1rem; flex-shrink: 0; }
-        .menu-btn:hover { background: var(--bg); color: var(--teal); }
-        .menu-btn:hover i { color: var(--teal); }
+
+        .menu-btn i {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .menu-btn:hover {
+            background: var(--bg);
+            color: var(--teal);
+        }
+
+        .menu-btn:hover i {
+            color: var(--teal);
+        }
 
         /* File list */
-        .file-list-small { display: flex; flex-direction: column; gap: 3px; }
+        .file-list-small {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
         .file-btn-small {
             display: flex;
             align-items: center;
@@ -184,11 +234,21 @@
             text-decoration: none;
             transition: background .15s, color .15s;
         }
-        .file-btn-small:hover { background: var(--bg); color: var(--teal); }
-        .file-btn-small i { font-size: .9rem; flex-shrink: 0; }
+
+        .file-btn-small:hover {
+            background: var(--bg);
+            color: var(--teal);
+        }
+
+        .file-btn-small i {
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
 
         /* ── Main ─────────────────────────────────────────────────── */
-        .main-col { min-width: 0; }
+        .main-col {
+            min-width: 0;
+        }
 
         /* Countdown banner */
         .timer-banner {
@@ -201,27 +261,32 @@
             align-items: center;
             margin-bottom: 16px;
         }
+
         .timer-banner h2 {
             font-size: .95rem;
             font-weight: 800;
             margin: 0 0 3px;
         }
+
         .timer-banner p {
             font-size: .75rem;
-            color: rgba(255,255,255,.45);
+            color: rgba(255, 255, 255, .45);
             margin: 0;
         }
+
         .timer-grid {
             display: flex;
             gap: 8px;
             text-align: center;
         }
+
         .t-box {
-            background: rgba(255,255,255,.1);
+            background: rgba(255, 255, 255, .1);
             padding: 8px 10px;
             border-radius: 8px;
             min-width: 52px;
         }
+
         .t-val {
             font-size: 1.4rem;
             font-weight: 800;
@@ -229,9 +294,10 @@
             line-height: 1;
             font-variant-numeric: tabular-nums;
         }
+
         .t-lbl {
             font-size: .6rem;
-            color: rgba(255,255,255,.45);
+            color: rgba(255, 255, 255, .45);
             text-transform: uppercase;
             letter-spacing: .5px;
         }
@@ -243,8 +309,17 @@
             margin-bottom: 16px;
             display: none;
         }
-        .notif-success { background: #f0fdf4; border: 1px solid #bbf7d0; }
-        .notif-danger  { background: #fef2f2; border: 1px solid #fecaca; }
+
+        .notif-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .notif-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
         .notif-title {
             font-size: .92rem;
             font-weight: 800;
@@ -253,11 +328,13 @@
             align-items: center;
             gap: 8px;
         }
+
         .notif-body {
             font-size: .84rem;
             margin-bottom: 14px;
             line-height: 1.65;
         }
+
         .undangan-card {
             background: white;
             padding: 12px 16px;
@@ -277,6 +354,7 @@
             gap: 12px;
             margin-bottom: 16px;
         }
+
         .status-card-lg {
             background: var(--surface);
             padding: 18px 20px;
@@ -287,6 +365,7 @@
             flex-direction: column;
             gap: 8px;
         }
+
         .status-card-lg label {
             font-size: .62rem;
             text-transform: uppercase;
@@ -294,6 +373,7 @@
             color: var(--ink-faint);
             font-weight: 700;
         }
+
         .status-value-lg {
             font-size: .88rem;
             font-weight: 800;
@@ -302,10 +382,38 @@
             gap: 8px;
             color: var(--ink);
         }
-        .st-yellow { border-left-color: #eab308; } .st-yellow .status-value-lg { color: #a16207; }
-        .st-green  { border-left-color: var(--ok); } .st-green .status-value-lg  { color: #15803d; }
-        .st-red    { border-left-color: var(--err); } .st-red .status-value-lg    { color: #b91c1c; }
-        .st-blue   { border-left-color: #2563eb; } .st-blue .status-value-lg   { color: #1e40af; }
+
+        .st-yellow {
+            border-left-color: #eab308;
+        }
+
+        .st-yellow .status-value-lg {
+            color: #a16207;
+        }
+
+        .st-green {
+            border-left-color: var(--ok);
+        }
+
+        .st-green .status-value-lg {
+            color: #15803d;
+        }
+
+        .st-red {
+            border-left-color: var(--err);
+        }
+
+        .st-red .status-value-lg {
+            color: #b91c1c;
+        }
+
+        .st-blue {
+            border-left-color: #2563eb;
+        }
+
+        .st-blue .status-value-lg {
+            color: #1e40af;
+        }
 
         /* Biodata card */
         .biodata-wrapper {
@@ -314,6 +422,7 @@
             border-radius: 14px;
             overflow: hidden;
         }
+
         .biodata-header {
             padding: 14px 20px;
             border-bottom: 1px solid var(--rule);
@@ -321,6 +430,7 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .biodata-header h3 {
             font-size: .82rem;
             font-weight: 800;
@@ -338,7 +448,10 @@
             border-bottom: 1px solid var(--rule);
             background: var(--bg);
         }
-        .tab-nav::-webkit-scrollbar { display: none; }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
 
         .tab-btn {
             padding: 12px 16px;
@@ -354,11 +467,25 @@
             font-family: inherit;
             margin-bottom: -1px;
         }
-        .tab-btn:hover { color: var(--ink); }
-        .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 800; }
 
-        .tab-content { display: none; padding: 22px 20px; }
-        .tab-content.active { display: block; }
+        .tab-btn:hover {
+            color: var(--ink);
+        }
+
+        .tab-btn.active {
+            color: var(--teal);
+            border-bottom-color: var(--teal);
+            font-weight: 800;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 22px 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
 
         /* Data grid */
         .data-grid {
@@ -366,6 +493,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 16px 24px;
         }
+
         .d-item label {
             font-size: .62rem;
             color: var(--ink-faint);
@@ -375,6 +503,7 @@
             display: block;
             margin-bottom: 4px;
         }
+
         .d-item div {
             font-size: .88rem;
             font-weight: 600;
@@ -406,6 +535,7 @@
             border-radius: var(--radius);
             padding: 12px 14px;
         }
+
         .pesantren-val-box label {
             font-size: .62rem;
             color: var(--ink-faint);
@@ -415,6 +545,7 @@
             display: block;
             margin-bottom: 5px;
         }
+
         .pesantren-val-box div {
             font-size: .92rem;
             font-weight: 700;
@@ -427,6 +558,7 @@
             border-collapse: collapse;
             font-size: .8rem;
         }
+
         .prestasi-table th {
             text-align: left;
             font-size: .65rem;
@@ -438,12 +570,17 @@
             background: var(--bg);
             border-bottom: 1px solid var(--rule);
         }
+
         .prestasi-table td {
             padding: 12px;
             border-bottom: 1px solid var(--rule);
             color: var(--ink-mid);
         }
-        .prestasi-table tr:last-child td { border-bottom: none; }
+
+        .prestasi-table tr:last-child td {
+            border-bottom: none;
+        }
+
         .pres-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -457,40 +594,72 @@
 
         /* ── Print styles ─────────────────────────────────────────── */
         @media print {
-            body * { visibility: hidden; }
-            .dash-wrap { display: none !important; }
+            body * {
+                visibility: hidden;
+            }
+
+            .dash-wrap {
+                display: none !important;
+            }
 
             /* Mode: Cetak Kartu CBT */
             body.print-kartu #kartu-peserta,
-            body.print-kartu #kartu-peserta * { visibility: visible; }
+            body.print-kartu #kartu-peserta * {
+                visibility: visible;
+            }
+
             body.print-kartu #kartu-peserta {
-                position: absolute; left: 0; top: 0;
-                width: 100%; margin: 0; padding: 0;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
                 display: block !important;
-                border: none; background: white;
+                border: none;
+                background: white;
             }
 
             /* Mode: Cetak Undangan Prestasi */
             body.print-undangan #undangan-cetak,
-            body.print-undangan #undangan-cetak * { visibility: visible; }
+            body.print-undangan #undangan-cetak * {
+                visibility: visible;
+            }
+
             body.print-undangan #undangan-cetak {
-                position: absolute; left: 0; top: 0;
-                width: 100%; margin: 0; padding: 0;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
                 display: block !important;
-                border: none; background: white;
+                border: none;
+                background: white;
             }
 
             /* Fallback: jika tidak ada class, cetak kartu (perilaku lama) */
             body:not(.print-undangan):not(.print-kartu) #kartu-peserta,
-            body:not(.print-undangan):not(.print-kartu) #kartu-peserta * { visibility: visible; }
-            body:not(.print-undangan):not(.print-kartu) #kartu-peserta {
-                position: absolute; left: 0; top: 0;
-                width: 100%; margin: 0; padding: 0;
-                display: block !important;
-                border: none; background: white;
+            body:not(.print-undangan):not(.print-kartu) #kartu-peserta * {
+                visibility: visible;
             }
 
-            @page { size: A4; margin: 1.5cm; }
+            body:not(.print-undangan):not(.print-kartu) #kartu-peserta {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                display: block !important;
+                border: none;
+                background: white;
+            }
+
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
         }
 
         /* ── Mobile ──────────────────────────────────────────────── */
@@ -500,42 +669,79 @@
                 padding: 16px 16px 48px;
                 gap: 14px;
             }
+
             .sidebar-card {
                 position: static;
                 display: grid;
                 grid-template-columns: 120px 1fr;
                 border-radius: 12px;
             }
+
             .profile-img-box {
                 border-right: 1px solid var(--rule);
                 border-bottom: none;
                 aspect-ratio: auto;
                 height: 160px;
             }
-            .profile-info { border-bottom: none; border-right: none; }
-            .sidebar-nav { display: none; /* shown via mobile menu */ }
+
+            .profile-info {
+                border-bottom: none;
+                border-right: none;
+            }
+
+            .sidebar-nav {
+                display: none;
+                /* shown via mobile menu */
+            }
 
             /* Full-width sidebar on very small */
-            .timer-banner { flex-direction: column; gap: 14px; padding: 18px; }
-            .timer-grid { flex-wrap: wrap; justify-content: center; }
-            .status-main-grid { grid-template-columns: 1fr; }
-            .data-grid { grid-template-columns: 1fr; }
-            .sub-label, .pesantren-val-box { grid-column: span 1; }
+            .timer-banner {
+                flex-direction: column;
+                gap: 14px;
+                padding: 18px;
+            }
 
-            .brand-subtitle { display: none; }
-            .page-context   { display: none; }
+            .timer-grid {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .status-main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sub-label,
+            .pesantren-val-box {
+                grid-column: span 1;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+            .page-context {
+                display: none;
+            }
         }
 
         @media (max-width: 480px) {
             .sidebar-card {
                 grid-template-columns: 1fr;
             }
+
             .profile-img-box {
                 height: 220px;
                 border-right: none;
                 border-bottom: 1px solid var(--rule);
             }
-            .sidebar-nav { display: block; }
+
+            .sidebar-nav {
+                display: block;
+            }
         }
 
         /* ── Mobile action row (bawah sidebar di mobile) ─────────── */
@@ -546,9 +752,13 @@
             gap: 8px;
             flex-wrap: wrap;
         }
+
         @media (max-width: 860px) {
-            .mobile-actions { display: flex; }
+            .mobile-actions {
+                display: flex;
+            }
         }
+
         .mob-btn {
             display: flex;
             align-items: center;
@@ -564,10 +774,17 @@
             font-family: inherit;
             transition: background .15s;
         }
-        .mob-btn:hover { background: var(--bg); }
-        .mob-btn i { font-size: .9rem; }
+
+        .mob-btn:hover {
+            background: var(--bg);
+        }
+
+        .mob-btn i {
+            font-size: .9rem;
+        }
     </style>
 </head>
+
 <body>
 
     <!-- HEADER -->
@@ -576,8 +793,8 @@
             <nav>
                 <div class="brand-wrapper">
                     <img src="../images/logo.png"
-                         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
-                         alt="Logo" class="kemenag-logo">
+                        onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'"
+                        alt="Logo" class="kemenag-logo">
                     <div class="brand-text">
                         <div class="brand-title">MAN 1 TASIKMALAYA</div>
                         <div class="brand-subtitle">Sukamanah · Sukarame · Kab. Tasikmalaya</div>
@@ -606,7 +823,7 @@
                 <!-- Foto -->
                 <div class="profile-img-box">
                     <img src="" id="profile-pic" alt="Foto Siswa"
-                         onerror="this.src='https://via.placeholder.com/300x400?text=FOTO'">
+                        onerror="this.src='https://via.placeholder.com/300x400?text=FOTO'">
                 </div>
 
                 <!-- Info -->
@@ -626,12 +843,11 @@
                         <button onclick="cetakResume()" class="menu-btn">
                             <i class="ph ph-receipt"></i> Cetak Bukti Pendaftaran
                         </button>
-                        <a href="https://drive.google.com/drive/folders/YOUR_FOLDER_ID"
-                           target="_blank" class="menu-btn">
+                        <a href="https://drive.google.com/drive/folders/YOUR_FOLDER_ID" target="_blank"
+                            class="menu-btn">
                             <i class="ph ph-download-simple"></i> Unduh Berkas Pendukung
                         </a>
-                        <button id="btn-sidebar-cetak" onclick="cetakKartu()" class="menu-btn"
-                                style="display:none;">
+                        <button id="btn-sidebar-cetak" onclick="cetakKartu()" class="menu-btn" style="display:none;">
                             <i class="ph ph-printer"></i> Cetak Kartu Tes
                         </button>
                     </div>
@@ -648,8 +864,7 @@
                     <button onclick="cetakResume()" class="mob-btn">
                         <i class="ph ph-receipt"></i> Cetak Bukti
                     </button>
-                    <button id="btn-sidebar-cetak-mob" onclick="cetakKartu()" class="mob-btn"
-                            style="display:none;">
+                    <button id="btn-sidebar-cetak-mob" onclick="cetakKartu()" class="mob-btn" style="display:none;">
                         <i class="ph ph-printer"></i> Cetak Kartu
                     </button>
                 </div>
@@ -680,14 +895,15 @@
                     Harap hadir tepat waktu dan bawa <strong>Sertifikat Asli / Bukti Hafalan</strong>.
                 </p>
                 <div class="undangan-card">
-                    <div><strong>Tanggal:</strong> <span class="dyn-txt" data-key="TEKS_TES_PRES">16 April 2026</span></div>
+                    <div><strong>Tanggal:</strong> <span class="dyn-txt" data-key="TEKS_TES_PRES">16 April 2026</span>
+                    </div>
                     <div><strong>Waktu:</strong> 07.30 WIB</div>
                     <div><strong>Tempat:</strong> Kampus MAN 1 Tasikmalaya</div>
                     <div><strong>Pakaian:</strong> Seragam Sekolah Asal</div>
                 </div>
                 <div>
                     <button onclick="cetakUndangan()" class="btn btn-primary"
-                            style="background:#15803d;border:none;border-radius:8px;padding:10px 18px;font-size:.82rem;">
+                        style="background:#15803d;border:none;border-radius:8px;padding:10px 18px;font-size:.82rem;">
                         <i class="ph ph-printer"></i> Cetak Undangan ini
                     </button>
                 </div>
@@ -704,29 +920,40 @@
                     dengan <strong>wajib mengikuti Tes CBT</strong>.
                 </p>
                 <button onclick="pindahKeRegulerTrigger()" class="btn btn-primary"
-                        style="background:#dc2626;border:none;width:100%;justify-content:center;border-radius:8px;">
+                    style="background:#dc2626;border:none;width:100%;justify-content:center;border-radius:8px;">
                     Ikut Jalur Reguler <i class="ph ph-arrow-right"></i>
                 </button>
             </div>
 
             <!-- Grup WA -->
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; display:flex; flex-wrap:wrap; border-radius:12px; margin-bottom:20px; overflow:hidden;">
-                <div style="background: #dcfce7; padding: 15px 20px; width: 100%; border-bottom: 1px solid #bbf7d0; display:flex; gap:10px; align-items:center;">
+            <div
+                style="background: #f0fdf4; border: 1px solid #bbf7d0; display:flex; flex-wrap:wrap; border-radius:12px; margin-bottom:20px; overflow:hidden;">
+                <div
+                    style="background: #dcfce7; padding: 15px 20px; width: 100%; border-bottom: 1px solid #bbf7d0; display:flex; gap:10px; align-items:center;">
                     <i class="ph ph-whatsapp-logo" style="color: #166534; font-size:1.3rem;"></i>
-                    <span style="color: #166534; font-weight:800; font-size:0.9rem;">Grup WhatsApp Calon Murid Baru</span>
+                    <span style="color: #166534; font-weight:800; font-size:0.9rem;">Grup WhatsApp Calon Murid
+                        Baru</span>
                 </div>
                 <div style="padding: 20px; width: 100%; display:flex; flex-wrap:wrap; align-items:center; gap: 20px;">
                     <div style="flex:1; min-width:200px;">
                         <p style="margin: 0 0 15px; font-size: 0.9rem; color: #14532d; line-height: 1.6;">
-                            Wajib bergabung dengan Grup WhatsApp resmi untuk mendapatkan berbagai informasi terbaru, pengumuman seleksi, dan bantuan dari panitia PMB.
+                            Wajib bergabung dengan Grup WhatsApp resmi untuk mendapatkan berbagai informasi terbaru,
+                            pengumuman seleksi, dan bantuan dari panitia PMB.
                         </p>
-                        <a id="wa-dash-link" href="https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo" target="_blank" class="btn btn-primary" style="background: #16a34a; display: inline-flex; justify-content: center; gap: 8px; padding: 10px 16px; font-size:0.85rem;">
+                        <a id="wa-dash-link" href="https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo" target="_blank"
+                            class="btn btn-primary"
+                            style="background: #16a34a; display: inline-flex; justify-content: center; gap: 8px; padding: 10px 16px; font-size:0.85rem;">
                             Klik Untuk Bergabung <i class="ph ph-arrow-square-out"></i>
                         </a>
                     </div>
-                    <div style="padding: 10px; background: white; border-radius: 12px; border: 1px dashed #4ade80; text-align:center;">
-                        <img id="wa-dash-qrcode" src="../images/barcode-wa.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo'" alt="Barcode WA" style="width: 100px; height: 100px; display: block; margin: 0 auto;">
-                        <div style="font-size: 0.65rem; color: #166534; margin-top: 5px; font-weight: 800; letter-spacing: 1px;">SCAN BARCODE INI</div>
+                    <div
+                        style="padding: 10px; background: white; border-radius: 12px; border: 1px dashed #4ade80; text-align:center;">
+                        <img id="wa-dash-qrcode" src="../images/barcode-wa.png"
+                            onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://chat.whatsapp.com/JZlDusVAym7Gq9nB3nI5xo'"
+                            alt="Barcode WA" style="width: 100px; height: 100px; display: block; margin: 0 auto;">
+                        <div
+                            style="font-size: 0.65rem; color: #166534; margin-top: 5px; font-weight: 800; letter-spacing: 1px;">
+                            SCAN BARCODE INI</div>
                     </div>
                 </div>
             </div>
@@ -758,22 +985,40 @@
                     <button class="tab-btn" onclick="switchTab('tab-alamat')">Alamat</button>
                     <button class="tab-btn" onclick="switchTab('tab-keluarga')">Keluarga</button>
                     <button class="tab-btn" onclick="switchTab('tab-sekolah')">Sekolah</button>
-                    <button class="tab-btn" onclick="switchTab('tab-prestasi')"
-                            id="btn-tab-prestasi" style="display:none;">Prestasi</button>
+                    <button class="tab-btn" onclick="switchTab('tab-prestasi')" id="btn-tab-prestasi"
+                        style="display:none;">Prestasi</button>
                 </div>
 
                 <!-- Tab: Data Diri -->
                 <div id="tab-diri" class="tab-content active">
                     <div class="data-grid">
-                        <div class="d-item"><label>Nomor Pendaftaran</label><div id="no-daftar">—</div></div>
-                        <div class="d-item"><label>NIK</label><div id="d-nik">—</div></div>
-                        <div class="d-item"><label>Tempat, Tanggal Lahir</label><div id="d-ttl">—</div></div>
-                        <div class="d-item"><label>Jenis Kelamin</label><div id="d-jk">—</div></div>
-                        <div class="d-item"><label>Agama</label><div>Islam</div></div>
-                        <div class="d-item"><label>Anak Ke-</label><div id="d-anak">—</div></div>
-                        <div class="d-item"><label>Jumlah Saudara</label><div id="d-saudara">—</div></div>
-                        <div class="d-item"><label>Status Anak</label><div id="d-status-anak">—</div></div>
-                        <div class="d-item"><label>Ukuran Baju</label><div id="d-baju">—</div></div>
+                        <div class="d-item"><label>Nomor Pendaftaran</label>
+                            <div id="no-daftar">—</div>
+                        </div>
+                        <div class="d-item"><label>NIK</label>
+                            <div id="d-nik">—</div>
+                        </div>
+                        <div class="d-item"><label>Tempat, Tanggal Lahir</label>
+                            <div id="d-ttl">—</div>
+                        </div>
+                        <div class="d-item"><label>Jenis Kelamin</label>
+                            <div id="d-jk">—</div>
+                        </div>
+                        <div class="d-item"><label>Agama</label>
+                            <div>Islam</div>
+                        </div>
+                        <div class="d-item"><label>Anak Ke-</label>
+                            <div id="d-anak">—</div>
+                        </div>
+                        <div class="d-item"><label>Jumlah Saudara</label>
+                            <div id="d-saudara">—</div>
+                        </div>
+                        <div class="d-item"><label>Status Anak</label>
+                            <div id="d-status-anak">—</div>
+                        </div>
+                        <div class="d-item"><label>Ukuran Baju</label>
+                            <div id="d-baju">—</div>
+                        </div>
                     </div>
                 </div>
 
@@ -781,14 +1026,27 @@
                 <div id="tab-alamat" class="tab-content">
                     <div class="data-grid">
                         <div class="d-item" style="grid-column:span 2;">
-                            <label>Alamat Lengkap</label><div id="d-alamat">—</div>
+                            <label>Alamat Lengkap</label>
+                            <div id="d-alamat">—</div>
                         </div>
-                        <div class="d-item"><label>RT / RW</label><div id="d-rtrw">—</div></div>
-                        <div class="d-item"><label>Desa / Kelurahan</label><div id="d-desa">—</div></div>
-                        <div class="d-item"><label>Kecamatan</label><div id="d-kec">—</div></div>
-                        <div class="d-item"><label>Kabupaten / Kota</label><div id="d-kab">—</div></div>
-                        <div class="d-item"><label>Provinsi</label><div id="d-prov">—</div></div>
-                        <div class="d-item"><label>Kode Pos</label><div id="d-pos">—</div></div>
+                        <div class="d-item"><label>RT / RW</label>
+                            <div id="d-rtrw">—</div>
+                        </div>
+                        <div class="d-item"><label>Desa / Kelurahan</label>
+                            <div id="d-desa">—</div>
+                        </div>
+                        <div class="d-item"><label>Kecamatan</label>
+                            <div id="d-kec">—</div>
+                        </div>
+                        <div class="d-item"><label>Kabupaten / Kota</label>
+                            <div id="d-kab">—</div>
+                        </div>
+                        <div class="d-item"><label>Provinsi</label>
+                            <div id="d-prov">—</div>
+                        </div>
+                        <div class="d-item"><label>Kode Pos</label>
+                            <div id="d-pos">—</div>
+                        </div>
                     </div>
                 </div>
 
@@ -796,20 +1054,41 @@
                 <div id="tab-keluarga" class="tab-content">
                     <div class="data-grid">
                         <div class="d-item" style="grid-column:span 2;">
-                            <label>Nomor Kartu Keluarga (KK)</label><div id="d-kk">—</div>
+                            <label>Nomor Kartu Keluarga (KK)</label>
+                            <div id="d-kk">—</div>
                         </div>
                         <div class="sub-label">Data Ayah</div>
-                        <div class="d-item"><label>Nama Ayah</label><div id="d-ayah">—</div></div>
-                        <div class="d-item"><label>NIK Ayah</label><div id="d-ayah-nik">—</div></div>
-                        <div class="d-item"><label>Pendidikan</label><div id="d-ayah-pend">—</div></div>
-                        <div class="d-item"><label>Pekerjaan</label><div id="d-ayah-job">—</div></div>
-                        <div class="d-item"><label>Penghasilan</label><div id="d-ayah-hasil">—</div></div>
+                        <div class="d-item"><label>Nama Ayah</label>
+                            <div id="d-ayah">—</div>
+                        </div>
+                        <div class="d-item"><label>NIK Ayah</label>
+                            <div id="d-ayah-nik">—</div>
+                        </div>
+                        <div class="d-item"><label>Pendidikan</label>
+                            <div id="d-ayah-pend">—</div>
+                        </div>
+                        <div class="d-item"><label>Pekerjaan</label>
+                            <div id="d-ayah-job">—</div>
+                        </div>
+                        <div class="d-item"><label>Penghasilan</label>
+                            <div id="d-ayah-hasil">—</div>
+                        </div>
                         <div class="sub-label">Data Ibu</div>
-                        <div class="d-item"><label>Nama Ibu</label><div id="d-ibu">—</div></div>
-                        <div class="d-item"><label>NIK Ibu</label><div id="d-ibu-nik">—</div></div>
-                        <div class="d-item"><label>Pendidikan</label><div id="d-ibu-pend">—</div></div>
-                        <div class="d-item"><label>Pekerjaan</label><div id="d-ibu-job">—</div></div>
-                        <div class="d-item"><label>Penghasilan</label><div id="d-ibu-hasil">—</div></div>
+                        <div class="d-item"><label>Nama Ibu</label>
+                            <div id="d-ibu">—</div>
+                        </div>
+                        <div class="d-item"><label>NIK Ibu</label>
+                            <div id="d-ibu-nik">—</div>
+                        </div>
+                        <div class="d-item"><label>Pendidikan</label>
+                            <div id="d-ibu-pend">—</div>
+                        </div>
+                        <div class="d-item"><label>Pekerjaan</label>
+                            <div id="d-ibu-job">—</div>
+                        </div>
+                        <div class="d-item"><label>Penghasilan</label>
+                            <div id="d-ibu-hasil">—</div>
+                        </div>
                         <div class="d-item" style="grid-column:span 2;">
                             <label>Nomor HP Orang Tua (WhatsApp)</label>
                             <div id="d-hp">—</div>
@@ -820,10 +1099,18 @@
                 <!-- Tab: Sekolah -->
                 <div id="tab-sekolah" class="tab-content">
                     <div class="data-grid">
-                        <div class="d-item"><label>Asal Sekolah</label><div id="d-sekolah">—</div></div>
-                        <div class="d-item"><label>NPSN</label><div id="d-npsn">—</div></div>
-                        <div class="d-item"><label>Status</label><div id="d-status-sek">—</div></div>
-                        <div class="d-item"><label>Alamat Sekolah</label><div id="d-alamat-sek">—</div></div>
+                        <div class="d-item"><label>Asal Sekolah</label>
+                            <div id="d-sekolah">—</div>
+                        </div>
+                        <div class="d-item"><label>NPSN</label>
+                            <div id="d-npsn">—</div>
+                        </div>
+                        <div class="d-item"><label>Status</label>
+                            <div id="d-status-sek">—</div>
+                        </div>
+                        <div class="d-item"><label>Alamat Sekolah</label>
+                            <div id="d-alamat-sek">—</div>
+                        </div>
                         <div class="pesantren-val-box">
                             <label>Pilihan Tempat Tinggal / Pesantren</label>
                             <div id="d-pesantren">—</div>
@@ -844,39 +1131,71 @@
 
     <!-- UNDANGAN TES PEMBUKTIAN PRESTASI (PRINT) -->
     <!-- UNDANGAN TES PEMBUKTIAN PRESTASI (PRINT) - LAYOUT SAMA DENGAN KARTU CBT -->
-    <div id="undangan-cetak" style="display:none; font-family:'Times New Roman',serif; background:white; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0;">
+    <div id="undangan-cetak"
+        style="display:none; font-family:'Times New Roman',serif; background:white; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0;">
         <div style="border:2px solid #000; padding:25px; position:relative;">
-            <div style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:25px; display:flex; align-items:center; justify-content:center; gap:20px;">
+            <div
+                style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:25px; display:flex; align-items:center; justify-content:center; gap:20px;">
                 <img src="../images/logo.png" style="width:100px; height:auto;" onerror="this.style.display='none'">
                 <div style="text-align:center; line-height:1.15; color:#000;">
-                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
-                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
-                    <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
-                    <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA
+                        REPUBLIK INDONESIA</h5>
+                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN
+                        AGAMA KAB. TASIKMALAYA</h5>
+                    <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH
+                        ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                    <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame
+                        Kab.Tasikmalaya</p>
                     <p style="margin:0; font-size:12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
-                    <p style="margin:0; font-size:12px; font-weight:bold;"><i>website : www.manegeri1tasikmalaya.sch.id &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
+                    <p style="margin:0; font-size:12px; font-weight:bold;"><i>website : www.manegeri1tasikmalaya.sch.id
+                            &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
                 </div>
             </div>
-            <div style="text-align:center; margin-bottom:30px; background:#eee; border:1px solid #000; padding:8px 0; border-radius:4px;">
-                <h3 style="margin:0; font-size:18px; font-weight:bold; font-family:Arial,sans-serif;">KARTU TES PEMBUKTIAN PRESTASI</h3>
+            <div
+                style="text-align:center; margin-bottom:30px; background:#eee; border:1px solid #000; padding:8px 0; border-radius:4px;">
+                <h3 style="margin:0; font-size:18px; font-weight:bold; font-family:Arial,sans-serif;">KARTU TES
+                    PEMBUKTIAN PRESTASI</h3>
                 <p style="margin:2px 0 0 0; font-size:14px;">PENERIMAAN MURID BARU (PMB) TAHUN AJARAN 2026/2027</p>
             </div>
             <div style="display:flex; gap:30px; align-items:flex-start; margin-bottom:20px;">
                 <div style="width:4cm; flex-shrink:0; text-align:center;">
-                    <img id="und-foto" src="" style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
+                    <img id="und-foto" src=""
+                        style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
                 </div>
                 <div style="flex:1;">
                     <table style="width:100%; font-size:15px; border-collapse:separate; border-spacing:0 8px;">
-                        <tr><td style="width:150px; font-weight:bold;">NOMOR PESERTA</td><td>: <span id="und-no" style="font-weight:bold; font-size:18px;"></span></td></tr>
-                        <tr><td>NAMA LENGKAP</td><td>: <span id="und-nama" style="text-transform:uppercase;"></span></td></tr>
-                        <tr><td>NISN</td><td>: <span id="und-nisn"></span></td></tr>
-                        <tr><td>JENIS KELAMIN</td><td>: <span id="und-jk"></span></td></tr>
-                        <tr><td>ASAL SEKOLAH</td><td>: <span id="und-sekolah"></span></td></tr>
+                        <tr>
+                            <td style="width:150px; font-weight:bold;">NOMOR PESERTA</td>
+                            <td>: <span id="und-no" style="font-weight:bold; font-size:18px;"></span></td>
+                        </tr>
+                        <tr>
+                            <td>NAMA LENGKAP</td>
+                            <td>: <span id="und-nama" style="text-transform:uppercase;"></span></td>
+                        </tr>
+                        <tr>
+                            <td>NISN</td>
+                            <td>: <span id="und-nisn"></span></td>
+                        </tr>
+                        <tr>
+                            <td>JENIS KELAMIN</td>
+                            <td>: <span id="und-jk"></span></td>
+                        </tr>
+                        <tr>
+                            <td>ASAL SEKOLAH</td>
+                            <td>: <span id="und-sekolah"></span></td>
+                        </tr>
                     </table>
                     <div style="margin-top:20px; border:2px solid #000; padding:10px 15px;">
                         <table style="width:100%; font-size:15px; font-weight:bold;">
-                            <tr><td style="width:150px;">RUANG TES</td><td>: Kampus MAN 1 Tasikmalaya</td></tr>
-                            <tr><td>WAKTU TES</td><td>: <span class="dyn-txt" data-key="TEKS_JADWAL_CETAK_WAKTU">Rabu, 16 April 2026</span> - 07.30 WIB</td></tr>
+                            <tr>
+                                <td style="width:150px;">RUANG TES</td>
+                                <td>: Kampus MAN 1 Tasikmalaya</td>
+                            </tr>
+                            <tr>
+                                <td>WAKTU TES</td>
+                                <td>: <span class="dyn-txt" data-key="TEKS_JADWAL_CETAK_WAKTU">Kamis, 16 April
+                                        2026</span> - 07.30 WIB</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -897,11 +1216,13 @@
                     <i>Dicetak otomatis oleh sistem pada: <span id="und-print-date"></span></i>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-start; min-width:250px;">
-                    <p style="margin:0; font-size:14px;">Tasikmalaya, <span class="dyn-txt" data-key="TEKS_JADWAL_CETAK_TSK">10 April 2026</span></p>
+                    <p style="margin:0; font-size:14px;">Tasikmalaya, <span class="dyn-txt"
+                            data-key="TEKS_JADWAL_CETAK_TSK">10 April 2026</span></p>
                     <p style="margin:0; font-size:14px;">Mengetahui,</p>
                     <p style="margin:0; font-size:14px;">Ketua PMB T.A. 2026/2027</p>
                     <div style="height:70px;"></div>
-                    <p style="margin:0; font-weight:bold; text-decoration:underline; font-size:14px;">Dede Fathul Umam, S.Pd.I.</p>
+                    <p style="margin:0; font-weight:bold; text-decoration:underline; font-size:14px;">Dede Fathul Umam,
+                        S.Pd.I.</p>
                     <p style="margin:0; font-size:14px;">NIP. 197809132009011011</p>
                 </div>
             </div>
@@ -909,39 +1230,70 @@
     </div>
 
     <!-- KARTU PESERTA (PRINT) — semua ID dipertahankan -->
-    <div id="kartu-peserta" style="display:none; font-family:'Times New Roman',serif; background:white; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0;">
+    <div id="kartu-peserta"
+        style="display:none; font-family:'Times New Roman',serif; background:white; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0;">
         <div style="border:2px solid #000; padding:25px; position:relative;">
-            <div style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:25px; display:flex; align-items:center; justify-content:center; gap:20px;">
+            <div
+                style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:25px; display:flex; align-items:center; justify-content:center; gap:20px;">
                 <img src="../images/logo.png" style="width:100px; height:auto;">
                 <div style="text-align:center; line-height:1.15; color:#000;">
-                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
-                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
-                    <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
-                    <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA
+                        REPUBLIK INDONESIA</h5>
+                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN
+                        AGAMA KAB. TASIKMALAYA</h5>
+                    <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH
+                        ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                    <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame
+                        Kab.Tasikmalaya</p>
                     <p style="margin:0; font-size:12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
-                    <p style="margin:0; font-size:12px; font-weight:bold;"><i>website : www.manegeri1tasikmalaya.sch.id &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
+                    <p style="margin:0; font-size:12px; font-weight:bold;"><i>website : www.manegeri1tasikmalaya.sch.id
+                            &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
                 </div>
             </div>
-            <div style="text-align:center; margin-bottom:30px; background:#eee; border:1px solid #000; padding:8px 0; border-radius:4px;">
-                <h3 style="margin:0; font-size:18px; font-weight:bold; font-family:Arial,sans-serif;">KARTU PESERTA UJIAN SELEKSI (CBT)</h3>
+            <div
+                style="text-align:center; margin-bottom:30px; background:#eee; border:1px solid #000; padding:8px 0; border-radius:4px;">
+                <h3 style="margin:0; font-size:18px; font-weight:bold; font-family:Arial,sans-serif;">KARTU PESERTA
+                    UJIAN SELEKSI (CBT)</h3>
                 <p style="margin:2px 0 0 0; font-size:14px;">PENERIMAAN MURID BARU (PMB) TAHUN AJARAN 2026/2027</p>
             </div>
             <div style="display:flex; gap:30px; align-items:flex-start; margin-bottom:20px;">
                 <div style="width:4cm; flex-shrink:0; text-align:center;">
-                    <img id="print-foto" src="" style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
+                    <img id="print-foto" src=""
+                        style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
                 </div>
                 <div style="flex:1;">
                     <table style="width:100%; font-size:15px; border-collapse:separate; border-spacing:0 8px;">
-                        <tr><td style="width:150px; font-weight:bold;">NOMOR PESERTA</td><td>: <span id="print-no" style="font-weight:bold; font-size:18px;"></span></td></tr>
-                        <tr><td>NAMA LENGKAP</td><td>: <span id="print-nama" style="text-transform:uppercase;"></span></td></tr>
-                        <tr><td>NISN</td><td>: <span id="print-nisn"></span></td></tr>
-                        <tr><td>JENIS KELAMIN</td><td>: <span id="print-jk"></span></td></tr>
-                        <tr><td>ASAL SEKOLAH</td><td>: <span id="print-sekolah"></span></td></tr>
+                        <tr>
+                            <td style="width:150px; font-weight:bold;">NOMOR PESERTA</td>
+                            <td>: <span id="print-no" style="font-weight:bold; font-size:18px;"></span></td>
+                        </tr>
+                        <tr>
+                            <td>NAMA LENGKAP</td>
+                            <td>: <span id="print-nama" style="text-transform:uppercase;"></span></td>
+                        </tr>
+                        <tr>
+                            <td>NISN</td>
+                            <td>: <span id="print-nisn"></span></td>
+                        </tr>
+                        <tr>
+                            <td>JENIS KELAMIN</td>
+                            <td>: <span id="print-jk"></span></td>
+                        </tr>
+                        <tr>
+                            <td>ASAL SEKOLAH</td>
+                            <td>: <span id="print-sekolah"></span></td>
+                        </tr>
                     </table>
                     <div style="margin-top:20px; border:2px solid #000; padding:10px 15px;">
                         <table style="width:100%; font-size:15px; font-weight:bold;">
-                            <tr><td style="width:150px;">RUANG UJIAN</td><td>: <span id="print-ruang"></span></td></tr>
-                            <tr><td>WAKTU TES</td><td>: <span id="print-waktu"></span></td></tr>
+                            <tr>
+                                <td style="width:150px;">RUANG UJIAN</td>
+                                <td>: <span id="print-ruang"></span></td>
+                            </tr>
+                            <tr>
+                                <td>WAKTU TES</td>
+                                <td>: <span id="print-waktu"></span></td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -961,11 +1313,13 @@
                     <i>Dicetak otomatis oleh sistem pada: <span id="print-date"></span></i>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-start; min-width:250px;">
-                    <p style="margin:0; font-size:14px;">Tasikmalaya, <span class="dyn-txt" data-key="TEKS_JADWAL_CETAK_TSK2">20 April 2026</span></p>
+                    <p style="margin:0; font-size:14px;">Tasikmalaya, <span class="dyn-txt"
+                            data-key="TEKS_JADWAL_CETAK_TSK2">20 April 2026</span></p>
                     <p style="margin:0; font-size:14px;">Mengetahui,</p>
                     <p style="margin:0; font-size:14px;">Ketua PMBM T.A. 2026/2027</p>
                     <div style="height:70px;"></div>
-                    <p style="margin:0; font-weight:bold; text-decoration:underline; font-size:14px;">Dede Fathul Umam, S.Pd.I.</p>
+                    <p style="margin:0; font-weight:bold; text-decoration:underline; font-size:14px;">Dede Fathul Umam,
+                        S.Pd.I.</p>
                     <p style="margin:0; font-size:14px;">NIP. 197809132009011011</p>
                 </div>
             </div>
@@ -976,4 +1330,5 @@
     <script src="../js/auth.js"></script>
     <script src="../js/siswa.js"></script>
 </body>
+
 </html>
