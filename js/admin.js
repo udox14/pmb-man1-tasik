@@ -1661,8 +1661,17 @@ window.setEditState = function(type, value, btn) {
 }
 
 window.saveDetailChanges = async function() {
-    const toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
-    toast.fire({ icon: 'info', title: 'Menyimpan...' });
+    const saveBtn = document.getElementById('btn-save-changes');
+    let originalText = '';
+    let originalBg = '';
+    
+    if (saveBtn) {
+        originalText = saveBtn.innerHTML;
+        originalBg = saveBtn.style.background;
+        saveBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Loading...';
+        saveBtn.style.pointerEvents = 'none';
+        saveBtn.style.opacity = '0.7';
+    }
     
     let payload = { 
         status_verifikasi: editState.status_verifikasi, 
@@ -1684,6 +1693,11 @@ window.saveDetailChanges = async function() {
 
     const result = await apiPost('admin?action=update-satu', { id: editState.id, payload });
     
+    if (saveBtn) {
+        saveBtn.style.pointerEvents = 'auto';
+        saveBtn.style.opacity = '1';
+    }
+
     if (!result.error) {
         const index = allPendaftar.findIndex(x => x.id === editState.id);
         if (index !== -1) { 
@@ -1705,17 +1719,18 @@ window.saveDetailChanges = async function() {
             renderPlottingTable(); 
         }
         
-        const saveBtn = document.getElementById('btn-save-changes');
-        if(saveBtn) { 
-            saveBtn.innerHTML = '<i class="ph ph-check"></i> OK'; 
-            saveBtn.style.background = '#0f172a'; 
+        if (saveBtn) { 
+            saveBtn.innerHTML = '<i class="ph ph-check"></i> Tersimpan'; 
+            saveBtn.style.background = '#10b981'; // success green
+            saveBtn.style.color = '#fff';
             setTimeout(() => { 
-                saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> SIMPAN'; 
+                saveBtn.innerHTML = originalText; 
+                saveBtn.style.background = originalBg;
             }, 2000); 
         }
-        toast.fire({ icon: 'success', title: 'Tersimpan' });
     } else { 
-        toast.fire({ icon: 'error', title: 'Gagal: ' + result.error }); 
+        Swal.fire('Gagal Menyimpan', result.error, 'error');
+        if (saveBtn) saveBtn.innerHTML = originalText;
     }
 }
 
