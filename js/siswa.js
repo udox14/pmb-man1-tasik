@@ -282,10 +282,8 @@ function renderFullData(data) {
   setTxt('print-jk',       data.jenis_kelamin);
   setTxt('print-sekolah',  data.asal_sekolah);
   setTxt('print-ruang',    data.ruang_tes || '-');
-  const waktuTes = (data.tanggal_tes && data.sesi_tes)
-    ? `${data.tanggal_tes}, ${data.sesi_tes}`
-    : '-';
-  setTxt('print-waktu', waktuTes);
+  setTxt('print-hari',     data.tanggal_tes || '-');
+  setTxt('print-sesi',     data.sesi_tes || '-');
 }
 
 // ===========================================================

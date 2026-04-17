@@ -847,8 +847,8 @@
                             class="menu-btn">
                             <i class="ph ph-download-simple"></i> Unduh Berkas Pendukung
                         </a>
-                        <button id="btn-sidebar-cetak" onclick="cetakKartu()" class="menu-btn" style="display:none;">
-                            <i class="ph ph-printer"></i> Cetak Kartu Tes
+                        <button id="btn-sidebar-cetak" onclick="cetakKartu()" class="menu-btn" style="display:none; background:var(--teal); color:white; border:none; box-shadow:0 4px 12px rgba(0,121,107,0.3); font-weight:800; justify-content:center; padding:12px; margin-top:10px;">
+                            <i class="ph ph-printer" style="color:white; font-size:1.2rem;"></i> Cetak Kartu Ujian
                         </button>
                     </div>
 
@@ -864,8 +864,8 @@
                     <button onclick="cetakResume()" class="mob-btn">
                         <i class="ph ph-receipt"></i> Cetak Bukti
                     </button>
-                    <button id="btn-sidebar-cetak-mob" onclick="cetakKartu()" class="mob-btn" style="display:none;">
-                        <i class="ph ph-printer"></i> Cetak Kartu
+                    <button id="btn-sidebar-cetak-mob" onclick="cetakKartu()" class="mob-btn" style="display:none; background:var(--teal); color:white; font-weight:800;">
+                        <i class="ph ph-printer"></i> Cetak Kartu Ujian
                     </button>
                 </div>
             </div>
@@ -883,6 +883,22 @@
                     <p>Hasil Seleksi PMB 2026/2027</p>
                 </div>
                 <div class="timer-grid" id="timer"></div>
+            </div>
+
+            <!-- Status cards -->
+            <div class="status-main-grid">
+                <div class="status-card-lg" id="card-verif">
+                    <label>Status Verifikasi Berkas</label>
+                    <div class="status-value-lg" id="val-verif">
+                        <i class="ph ph-hourglass"></i> Menunggu
+                    </div>
+                </div>
+                <div class="status-card-lg" id="card-lulus">
+                    <label>Status Kelulusan Akhir</label>
+                    <div class="status-value-lg" id="val-lulus">
+                        <i class="ph ph-info"></i> Belum Ada
+                    </div>
+                </div>
             </div>
 
             <!-- Notif Prestasi: Undangan -->
@@ -954,22 +970,6 @@
                         <div
                             style="font-size: 0.65rem; color: #166534; margin-top: 5px; font-weight: 800; letter-spacing: 1px;">
                             SCAN BARCODE INI</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Status cards -->
-            <div class="status-main-grid">
-                <div class="status-card-lg" id="card-verif">
-                    <label>Status Verifikasi Berkas</label>
-                    <div class="status-value-lg" id="val-verif">
-                        <i class="ph ph-hourglass"></i> Menunggu
-                    </div>
-                </div>
-                <div class="status-card-lg" id="card-lulus">
-                    <label>Status Kelulusan Akhir</label>
-                    <div class="status-value-lg" id="val-lulus">
-                        <i class="ph ph-info"></i> Belum Ada
                     </div>
                 </div>
             </div>
@@ -1190,13 +1190,16 @@
             <div style="margin-top:25px; border:2px solid #000; padding:12px 15px;">
                 <table style="width:100%; font-size:16px; font-weight:bold;">
                     <tr>
-                        <td style="width:160px; white-space:nowrap;">RUANG TES</td>
+                        <td style="width:160px; white-space:nowrap;">TEMPAT / RUANG</td>
                         <td style="white-space:nowrap;">: Kampus MAN 1 Tasikmalaya</td>
                     </tr>
                     <tr>
-                        <td style="white-space:nowrap;">WAKTU TES</td>
-                        <td style="white-space:nowrap;">: <span class="dyn-txt" data-key="TEKS_JADWAL_CETAK_WAKTU">Kamis, 16 April
-                                2026</span> - 07.30 WIB</td>
+                        <td style="white-space:nowrap;">HARI / TANGGAL</td>
+                        <td style="white-space:nowrap;">: <span class="dyn-txt" data-key="TEKS_JADWAL_CETAK_WAKTU">Kamis, 16 April 2026</span></td>
+                    </tr>
+                    <tr>
+                        <td style="white-space:nowrap;">SESI UJIAN</td>
+                        <td style="white-space:nowrap;">: 07.30 WIB - Selesai</td>
                     </tr>
                 </table>
             </div>
@@ -1294,8 +1297,12 @@
                             <td style="white-space:nowrap;">: <span id="print-ruang"></span></td>
                         </tr>
                         <tr>
-                            <td style="white-space:nowrap;">WAKTU TES</td>
-                            <td style="white-space:nowrap;">: <span id="print-waktu"></span></td>
+                            <td style="white-space:nowrap;">HARI / TANGGAL</td>
+                            <td style="white-space:nowrap;">: <span id="print-hari"></span></td>
+                        </tr>
+                        <tr>
+                            <td style="white-space:nowrap;">SESI UJIAN</td>
+                            <td style="white-space:nowrap;">: <span id="print-sesi"></span></td>
                         </tr>
                     </table>
                 </div>
