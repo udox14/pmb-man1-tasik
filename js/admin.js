@@ -1103,7 +1103,6 @@ window.autoPlotting = async function() {
         }
     }
 }
-}
 
 // ==========================================
 // 9. DETAIL SISWA (SWEETALERT POPUP)
