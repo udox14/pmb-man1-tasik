@@ -758,11 +758,17 @@ function renderPlottingTable() {
     const fSesi = document.getElementById('filterPlotSesi')?.value || "";
     const fRuang = document.getElementById('filterPlotRuang')?.value || "";
 
-    // FILTER MURNI REGULER: Semua pendaftar Reguler wajib CBT
-    let targetStudents = allPendaftar.filter(p => 
-        p.jalur === 'REGULER' && 
-        p.status_verifikasi === true
-    );
+    // Siswa yang wajib CBT:
+    // 1. Jalur REGULER yang sudah terverifikasi
+    // 2. Jalur PRESTASI yang berkasnya ditolak (status_verifikasi === false)
+    // 3. Jalur PRESTASI yang gagal tes pembuktian (status_kelulusan === 'TIDAK DITERIMA') meski berkas diterima
+    let targetStudents = allPendaftar.filter(p => {
+        if (!p.status_verifikasi && p.status_verifikasi !== false) return false; // null = belum verif, skip
+        if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
+        return false;
+    });
     
     if (fTgl) {
         if (fTgl === 'UNASSIGNED') {
@@ -878,12 +884,17 @@ window.autoPlotting = async function() {
 
     if (!confirm.isConfirmed) return;
 
-    let unassigned = allPendaftar.filter(p => 
-        p.jalur === 'REGULER' && 
-        p.status_verifikasi === true && 
-        !p.ruang_tes &&
-        (!p.scan_sertifikat_prestasi_url || p.scan_sertifikat_prestasi_url === "")
-    );
+    // Siswa yang belum dijadwalkan dan wajib CBT:
+    // - Jalur REGULER terverifikasi tanpa jadwal
+    // - Jalur PRESTASI berkas ditolak tanpa jadwal
+    // - Jalur PRESTASI gagal tes pembuktian (TIDAK DITERIMA) tanpa jadwal
+    let unassigned = allPendaftar.filter(p => {
+        if (p.ruang_tes) return false; // sudah punya jadwal ruang, skip
+        if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
+        return false;
+    });
 
     if (unassigned.length === 0) {
         Swal.fire('Info', 'Semua siswa Reguler murni yang memenuhi syarat sudah memiliki jadwal.', 'info');
@@ -901,12 +912,14 @@ window.autoPlotting = async function() {
         });
     });
 
-    let assigned = allPendaftar.filter(p => 
-        p.jalur === 'REGULER' && 
-        p.status_verifikasi === true && 
-        p.ruang_tes &&
-        (!p.scan_sertifikat_prestasi_url || p.scan_sertifikat_prestasi_url === "")
-    );
+    // Siswa yang sudah dijadwalkan dan wajib CBT (untuk hitung kapasitas):
+    let assigned = allPendaftar.filter(p => {
+        if (!p.ruang_tes) return false; // belum ada ruang
+        if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
+        return false;
+    });
 
     assigned.forEach(p => {
         if (slots[p.tanggal_tes] && slots[p.tanggal_tes][p.sesi_tes] && slots[p.tanggal_tes][p.sesi_tes][p.ruang_tes] !== undefined) {
@@ -1069,7 +1082,11 @@ window.viewDetail = async function(id) {
         const isLulusFalse = p.status_kelulusan === 'TIDAK DITERIMA' ? 'active' : '';
         const isLulusPending = (!p.status_kelulusan || p.status_kelulusan === 'PENDING') ? 'active' : '';
 
-        const isBebasTes = (p.jalur === 'REGULER' && p.scan_sertifikat_prestasi_url);
+        // Bebas CBT hanya jika: jalur PRESTASI DAN status_verifikasi diterima DAN belum dinyatakan TIDAK DITERIMA
+        // Siswa PRESTASI yang berkasnya ditolak (false) ATAU yang gagal tes pembuktian (TIDAK DITERIMA) WAJIB ikut CBT
+        const isBebasTes = (p.jalur === 'PRESTASI' &&
+            p.status_verifikasi === true &&
+            p.status_kelulusan !== 'TIDAK DITERIMA');
 
         Swal.fire({
             title: '', 
@@ -1344,7 +1361,7 @@ window.viewDetail = async function(id) {
                         <div class="d-body">
 
                             <!-- JADWAL TES CBT -->
-                            ${(p.jalur === 'REGULER' && !isBebasTes) ? `
+                            ${!isBebasTes ? `
                             <div class="detail-title" style="margin-top:0;">Jadwal Tes CBT</div>
                             <div class="d-cbt-box detail-grid">
                                 <div class="detail-item">
@@ -1363,7 +1380,7 @@ window.viewDetail = async function(id) {
                             ` : ''}
 
                             <!-- DATA PRIBADI -->
-                            <div class="detail-title" ${(p.jalur !== 'REGULER' || isBebasTes) ? 'style="margin-top:0;"' : ''}>Data Pribadi</div>
+                            <div class="detail-title" ${isBebasTes ? 'style="margin-top:0;"' : ''}>Data Pribadi</div>
                             <div class="detail-grid">
                                 <div class="detail-item"><label>NIK</label><b>${val(p.nik)}</b></div>
                                 <div class="detail-item"><label>Tempat, Tanggal Lahir</label><b>${val(p.tempat_lahir)}, ${val(p.tanggal_lahir)}</b></div>

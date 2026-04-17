@@ -401,44 +401,55 @@ function renderStatus(data) {
     if (btnPrintMob) btnPrintMob.style.display = show ? 'flex' : 'none';
   };
 
-  if (data.jalur === 'REGULER') {
-    if (data.status_verifikasi === true) {
+  // Siswa wajib CBT jika:
+  // 1. Jalur REGULER yang sudah terverifikasi, ATAU
+  // 2. Jalur PRESTASI yang berkasnya DITOLAK (status_verifikasi === false), ATAU
+  // 3. Jalur PRESTASI yang berkas diterima TAPI gagal tes pembuktian (status_kelulusan === 'TIDAK DITERIMA')
+  const mustFollowCBT =
+    (data.jalur === 'REGULER' && data.status_verifikasi === true) ||
+    (data.jalur === 'PRESTASI' && data.status_verifikasi === false) ||
+    (data.jalur === 'PRESTASI' && data.status_verifikasi === true && data.status_kelulusan === 'TIDAK DITERIMA');
+
+  if (mustFollowCBT) {
+    if (data.status_verifikasi === true || data.status_verifikasi === false) {
       if (data.ruang_tes && data.tanggal_tes && data.sesi_tes) {
+        // Jadwal sudah ada — tampilkan tombol cetak
         showPrint(true);
+      } else {
+        // Verifikasi sudah ada tapi jadwal belum
         showPrint(false);
         const infoBox = document.createElement('div');
-        infoBox.style.cssText = 'padding:16px 18px; border-radius:12px; margin-bottom:14px;';
-        infoBox.id             = 'info-tunggu-jadwal';
-        infoBox.style.background = '#fffbeb';
-        infoBox.style.border     = '1px solid #fcd34d';
-        infoBox.innerHTML = `
-          <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#b45309;">
-            <i class="ph ph-calendar-blank"></i> Jadwal Akademik (CBT) Belum Tersedia
-          </h4>
-          <p style="margin:0; font-size:.82rem; color:#b45309; line-height:1.5;">
-            Berkas Anda sudah <strong>VALID</strong>, namun jadwal ujian Akademik/CBT belum diatur panitia.
-            Tombol Cetak Kartu Ujian akan muncul setelah jadwal Anda tersedia.
-          </p>`;
-        if (timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
-      }
-    } else {
-      showPrint(false);
-      if (data.status_verifikasi === null) {
-        const infoBox = document.createElement('div');
-        infoBox.id = 'info-tunggu-verif';
+        infoBox.id = 'info-tunggu-jadwal';
         infoBox.style.cssText =
           'background:#fffbeb; border:1px solid #fcd34d; padding:16px 18px; border-radius:12px; margin-bottom:14px;';
         infoBox.innerHTML = `
           <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#b45309;">
-            <i class="ph ph-warning-circle"></i> Menunggu Verifikasi
+            <i class="ph ph-calendar-blank"></i> Jadwal Tes CBT Belum Tersedia
           </h4>
-          <p style="margin:0; font-size:.82rem; color:#b45309;">
-            Tombol <strong>Cetak Kartu Ujian</strong> belum tersedia. Tunggu hingga berkas diverifikasi panitia.
+          <p style="margin:0; font-size:.82rem; color:#b45309; line-height:1.5;">
+            Status verifikasi Anda sudah diproses, namun jadwal ujian CBT belum diatur panitia.
+            Tombol <strong>Cetak Kartu Ujian</strong> akan muncul setelah jadwal Anda tersedia.
           </p>`;
         if (timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
       }
+    } else {
+      // Belum diverifikasi sama sekali (null)
+      showPrint(false);
+      const infoBox = document.createElement('div');
+      infoBox.id = 'info-tunggu-verif';
+      infoBox.style.cssText =
+        'background:#fffbeb; border:1px solid #fcd34d; padding:16px 18px; border-radius:12px; margin-bottom:14px;';
+      infoBox.innerHTML = `
+        <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#b45309;">
+          <i class="ph ph-warning-circle"></i> Menunggu Verifikasi
+        </h4>
+        <p style="margin:0; font-size:.82rem; color:#b45309;">
+          Tombol <strong>Cetak Kartu Ujian</strong> belum tersedia. Tunggu hingga berkas diverifikasi panitia.
+        </p>`;
+      if (timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
     }
   } else {
+    // Bebas CBT (PRESTASI masih dalam proses / sudah DITERIMA via jalur prestasi)
     showPrint(false);
   }
 }
