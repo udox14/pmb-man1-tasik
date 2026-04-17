@@ -24,8 +24,15 @@ let scheduleConfig = [
     {
         tanggal: "Kamis, 21 Mei 2026",
         sesi: [
-            { nama: "Sesi 1 (07.30 - 09.30 WIB)", rooms: 4, capacity: 20 },
-            { nama: "Sesi 2 (10.00 - 12.00 WIB)", rooms: 4, capacity: 20 }
+            { 
+                nama: "Sesi 1 (07.30 - 09.30 WIB)", 
+                ruangan: [
+                    { nama: "Ruang 1", capacity: 20 },
+                    { nama: "Ruang 2", capacity: 20 },
+                    { nama: "Ruang 3", capacity: 20 },
+                    { nama: "Ruang 4", capacity: 20 }
+                ] 
+            }
         ]
     }
 ];
@@ -86,19 +93,30 @@ async function loadPendaftar() {
 
         const cfgAll = await apiGet('pengaturan', { keys: 'JADWAL_CONFIG' });
         const cfgData = Array.isArray(cfgAll) ? cfgAll.find(r => r.key === 'JADWAL_CONFIG') : null;
+        let loadedCfg = null;
         if (cfgData && cfgData.value) {
-            try { 
-                scheduleConfig = JSON.parse(cfgData.value); 
-                if (!Array.isArray(scheduleConfig)) scheduleConfig = []; // Auto-reset pola lama
-            } catch(e) {
-                console.warn('Gagal mem-parsing jadwal config');
-            }
+            try { loadedCfg = JSON.parse(cfgData.value); } catch(e) { }
         } else {
             const localCfg = localStorage.getItem('JADWAL_CONFIG');
             if(localCfg) {
-                const p = JSON.parse(localCfg);
-                if (Array.isArray(p)) scheduleConfig = p;
+                try { loadedCfg = JSON.parse(localCfg); } catch(e) { }
             }
+        }
+        
+        if (Array.isArray(loadedCfg)) {
+            // Migrasi dari pola lama ke pola array `ruangan`
+            loadedCfg.forEach(h => {
+                (h.sesi || []).forEach(s => {
+                    if (!s.ruangan && s.rooms) {
+                        s.ruangan = [];
+                        let capArr = String(s.capacity).split(',').map(x => parseInt(x.trim()) || 20);
+                        for(let r=1; r<=s.rooms; r++){
+                            s.ruangan.push({ nama: `Ruang ${r}`, capacity: capArr[r-1] || capArr[0] || 20 });
+                        }
+                    }
+                });
+            });
+            scheduleConfig = loadedCfg;
         }
 
     } catch (err) {
@@ -728,17 +746,35 @@ function renderScheduleSettings() {
         if (hari.sesi && hari.sesi.length > 0) {
             hari.sesi.forEach((sesi, sIndex) => {
                 html += `
-                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:var(--surface); padding:8px 12px; border-radius:6px; border:1px solid var(--rule);">
-                        <input type="text" class="input-modern-form cfg-input-sesi-nama" data-hindex="${hIndex}" data-sindex="${sIndex}" placeholder="Nama Sesi (Cth: Sesi 1 - 07.30)" value="${sesi.nama || ''}" style="flex:1; min-width:140px;">
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <span style="font-size:0.7rem; color:var(--ink-soft);">Ruang(s):</span>
-                            <input type="number" class="input-modern-form cfg-input-sesi-rooms" data-hindex="${hIndex}" data-sindex="${sIndex}" value="${sesi.rooms || 1}" min="1" style="width:60px; padding:6px;">
+                    <div style="background:var(--surface); padding:10px 14px; border-radius:8px; border:1px solid var(--rule); margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <input type="text" class="input-modern-form cfg-input-sesi-nama" data-hindex="${hIndex}" data-sindex="${sIndex}" placeholder="Nama Sesi (Cth: Sesi 1 - 07.30)" value="${sesi.nama || ''}" style="width:250px; font-weight:600;">
+                            <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="removeConfigSession(${hIndex}, ${sIndex})"><i class="ph ph-trash"></i> Hapus Sesi</button>
                         </div>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <span style="font-size:0.7rem; color:var(--ink-soft);">Kap/Ruang:</span>
-                            <input type="number" class="input-modern-form cfg-input-sesi-capacity" data-hindex="${hIndex}" data-sindex="${sIndex}" value="${sesi.capacity || 20}" min="1" style="width:60px; padding:6px;">
+                        
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-left:14px; border-left:2px solid var(--rule); padding-left:10px;">
+        `;
+        
+                if (sesi.ruangan && sesi.ruangan.length > 0) {
+                    sesi.ruangan.forEach((r, rIndex) => {
+                        html += `
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="text" class="input-modern-form cfg-input-ruang-nama" data-hindex="${hIndex}" data-sindex="${sIndex}" data-rindex="${rIndex}" placeholder="Nama Ruang (Cth: Ruang 1)" value="${r.nama || ''}" style="width:120px; padding:6px; font-size:0.75rem;">
+                                <div style="display:flex; align-items:center; gap:4px;">
+                                    <span style="font-size:0.7rem; color:var(--ink-soft);">Kapasitas:</span>
+                                    <input type="number" class="input-modern-form cfg-input-ruang-capacity" data-hindex="${hIndex}" data-sindex="${sIndex}" data-rindex="${rIndex}" value="${r.capacity || 20}" min="1" style="width:60px; padding:6px; font-size:0.75rem;">
+                                </div>
+                                <button class="page-btn" style="color:var(--red); width:24px; height:24px;" onclick="removeConfigRoom(${hIndex}, ${sIndex}, ${rIndex})"><i class="ph ph-x"></i></button>
+                            </div>
+                        `;
+                    });
+                }
+                
+                html += `
+                            <button class="btn btn-secondary btn-sm" style="align-self:flex-start; margin-top:4px; font-size:0.7rem; padding:4px 10px;" onclick="addConfigRoom(${hIndex}, ${sIndex})">
+                                <i class="ph ph-plus"></i> Tambah Ruangan
+                            </button>
                         </div>
-                        <button class="page-btn" style="color:var(--red);" onclick="removeConfigSession(${hIndex}, ${sIndex})"><i class="ph ph-x"></i></button>
                     </div>
                 `;
             });
@@ -761,7 +797,7 @@ function renderScheduleSettings() {
 window.addConfigDate = function() {
     window.syncConfigFromUI();
     if(!Array.isArray(scheduleConfig)) scheduleConfig = [];
-    scheduleConfig.push({ tanggal: "", sesi: [{ nama: "Sesi 1", rooms: 4, capacity: 20 }] });
+    scheduleConfig.push({ tanggal: "", sesi: [{ nama: "Sesi 1", ruangan: [{nama:"Ruang 1", capacity:20}] }] });
     renderScheduleSettings();
 }
 
@@ -782,13 +818,26 @@ window.removeConfigDate = function(hIndex) {
 
 window.addConfigSession = function(hIndex) {
     window.syncConfigFromUI();
-    scheduleConfig[hIndex].sesi.push({ nama: "", rooms: 1, capacity: 20 });
+    scheduleConfig[hIndex].sesi.push({ nama: "", ruangan: [{nama:"Ruang 1", capacity:20}] });
     renderScheduleSettings();
 }
 
 window.removeConfigSession = function(hIndex, sIndex) {
     window.syncConfigFromUI();
     scheduleConfig[hIndex].sesi.splice(sIndex, 1);
+    renderScheduleSettings();
+}
+
+window.addConfigRoom = function(hIndex, sIndex) {
+    window.syncConfigFromUI();
+    let nextNum = scheduleConfig[hIndex].sesi[sIndex].ruangan.length + 1;
+    scheduleConfig[hIndex].sesi[sIndex].ruangan.push({ nama: "Ruang " + nextNum, capacity: 20 });
+    renderScheduleSettings();
+}
+
+window.removeConfigRoom = function(hIndex, sIndex, rIndex) {
+    window.syncConfigFromUI();
+    scheduleConfig[hIndex].sesi[sIndex].ruangan.splice(rIndex, 1);
     renderScheduleSettings();
 }
 
@@ -799,11 +848,11 @@ window.syncConfigFromUI = function() {
     document.querySelectorAll('.cfg-input-sesi-nama').forEach(el => {
         scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].nama = el.value.trim();
     });
-    document.querySelectorAll('.cfg-input-sesi-rooms').forEach(el => {
-        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].rooms = parseInt(el.value) || 0;
+    document.querySelectorAll('.cfg-input-ruang-nama').forEach(el => {
+        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].ruangan[el.dataset.rindex].nama = el.value.trim();
     });
-    document.querySelectorAll('.cfg-input-sesi-capacity').forEach(el => {
-        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].capacity = parseInt(el.value) || 0;
+    document.querySelectorAll('.cfg-input-ruang-capacity').forEach(el => {
+        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].ruangan[el.dataset.rindex].capacity = parseInt(el.value) || 0;
     });
 }
 
@@ -816,12 +865,16 @@ window.saveScheduleConfig = async function() {
         if(!h.tanggal) isValid = false;
         if(h.sesi.length === 0) isValid = false;
         h.sesi.forEach(s => {
-            if(!s.nama || s.rooms <= 0 || s.capacity <= 0) isValid = false;
+            if(!s.nama) isValid = false;
+            if(!s.ruangan || s.ruangan.length === 0) isValid = false;
+            (s.ruangan || []).forEach(r => {
+                if(!r.nama || r.capacity <= 0) isValid = false;
+            });
         });
     });
 
     if (!isValid) {
-        Swal.fire('Warning', 'Isian tidak lengkap. Pastikan nama hari, nama sesi, ruangan, dan kapasitas terisi (min. 1).', 'warning'); 
+        Swal.fire('Warning', 'Isian tidak lengkap. Pastikan nama hari, nama sesi, nama ruangan, dan kapasitas terisi (min. 1).', 'warning'); 
         return;
     }
 
@@ -852,22 +905,25 @@ window.updatePlottingFilters = function() {
 
     let uniqueDates = scheduleConfig.map(h => h.tanggal);
     let uniqueSessions = new Set();
-    let maxRooms = 0;
+    let uniqueRooms = new Set();
     scheduleConfig.forEach(h => {
         (h.sesi || []).forEach(s => {
             uniqueSessions.add(s.nama);
-            if(s.rooms > maxRooms) maxRooms = s.rooms;
+            (s.ruangan || []).forEach(r => {
+                uniqueRooms.add(r.nama);
+            });
         });
     });
     uniqueSessions = Array.from(uniqueSessions);
+    let allRoomsList = Array.from(uniqueRooms);
 
     selTgl.innerHTML = '<option value="">Semua Tanggal</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
     selSesi.innerHTML = '<option value="">Semua Sesi</option>' + uniqueSessions.map(s => `<option value="${s}">${s}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
     
     let optRuang = '<option value="">Semua Ruangan</option>';
-    for(let r=1; r<=maxRooms; r++) {
-        optRuang += `<option value="Ruang ${r}">Ruang ${r}</option>`;
-    }
+    allRoomsList.forEach(r => {
+        optRuang += `<option value="${r}">${r}</option>`;
+    });
     optRuang += '<option value="UNASSIGNED">-- Belum Diatur --</option>';
     selRuang.innerHTML = optRuang;
 
@@ -915,22 +971,25 @@ function renderPlottingTable() {
 
     let uniqueDates = scheduleConfig.map(h => h.tanggal);
     let uniqueSessions = new Set();
-    let maxRooms = 0;
+    let uniqueRooms = new Set();
     scheduleConfig.forEach(h => {
         (h.sesi || []).forEach(s => {
             uniqueSessions.add(s.nama);
-            if(s.rooms > maxRooms) maxRooms = s.rooms;
+            (s.ruangan || []).forEach(r => {
+                uniqueRooms.add(r.nama);
+            });
         });
     });
     uniqueSessions = Array.from(uniqueSessions);
+    let allRoomsList = Array.from(uniqueRooms);
 
     const optDates = '<option value="">- Belum Diatur -</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
     const optSessions = '<option value="">- Belum Diatur -</option>' + uniqueSessions.map(s => `<option value="${s}">${s}</option>`).join('');
     
     let optRooms = '<option value="">- Belum Diatur -</option>';
-    for(let r=1; r<=maxRooms; r++){
-        optRooms += `<option value="Ruang ${r}">Ruang ${r}</option>`;
-    }
+    allRoomsList.forEach(r => {
+        optRooms += `<option value="${r}">${r}</option>`;
+    });
 
     targetStudents.forEach(p => {
         const tr = document.createElement('tr');
@@ -1025,9 +1084,9 @@ window.autoPlotting = async function() {
         slots[h.tanggal] = {};
         (h.sesi || []).forEach(s => {
             slots[h.tanggal][s.nama] = {};
-            for (let r = 1; r <= s.rooms; r++) { 
-                slots[h.tanggal][s.nama][`Ruang ${r}`] = { current: 0, max: s.capacity }; 
-            }
+            (s.ruangan || []).forEach(r => {
+                 slots[h.tanggal][s.nama][r.nama] = { current: 0, max: r.capacity };
+            });
         });
     });
 
@@ -1053,8 +1112,8 @@ window.autoPlotting = async function() {
             if (assignedSlot) break;
             for (let s of (h.sesi || [])) {
                 if (assignedSlot) break;
-                for (let r = 1; r <= s.rooms; r++) {
-                    let roomName = `Ruang ${r}`;
+                for (let r of (s.ruangan || [])) {
+                    let roomName = r.nama;
                     let slotState = slots[h.tanggal][s.nama][roomName];
                     if (slotState && slotState.current < slotState.max) {
                         slotState.current++;
