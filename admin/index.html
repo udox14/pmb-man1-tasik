@@ -1099,28 +1099,13 @@
                         <p style="font-size:.78rem;color:var(--ink-soft);margin:0 0 16px;line-height:1.6;">
                             Tentukan kapasitas dan ketersediaan waktu sebelum melakukan plotting ke peserta tes Reguler.
                         </p>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Tanggal Tes (Satu per baris)</label>
-                                <textarea id="cfg-dates" class="input-modern-form" rows="4"
-                                          placeholder="Kamis, 21 Mei 2026&#10;Jumat, 22 Mei 2026"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Daftar Sesi (Satu per baris)</label>
-                                <textarea id="cfg-sessions" class="input-modern-form" rows="4"
-                                          placeholder="Sesi 1 (07.30 - 09.30)&#10;Sesi 2 (10.00 - 12.00)"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Jumlah Ruangan</label>
-                                <input type="number" id="cfg-rooms" class="input-modern-form" placeholder="Contoh: 4">
-                                <small style="font-size:.7rem;color:var(--ink-faint);display:block;margin-top:4px;">
-                                    Sistem membuat Ruang 1 s.d. Ruang X
-                                </small>
-                            </div>
-                            <div class="form-group">
-                                <label>Kapasitas Peserta / Ruangan</label>
-                                <input type="number" id="cfg-capacity" class="input-modern-form" placeholder="Contoh: 20">
-                            </div>
+                        <div id="config-builder-container" style="display:flex; flex-direction:column; gap:16px;">
+                            <!-- Dinamis JS -->
+                        </div>
+                        <div style="margin-top:16px; border-top:1px dashed var(--rule-dark); padding-top:16px; display:flex; gap:8px;">
+                            <button class="btn btn-secondary btn-sm" onclick="addConfigDate()">
+                                <i class="ph ph-calendar-plus"></i> Tambah Hari Tes
+                            </button>
                         </div>
                         <button class="btn btn-primary btn-sm" onclick="saveScheduleConfig()" style="margin-top:4px;">
                             <i class="ph ph-floppy-disk"></i> Simpan Pengaturan

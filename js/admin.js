@@ -20,12 +20,15 @@ let editState = {};
 let currentSort = { column: 'created_at', direction: 'desc' };
 
 // State Jadwal Baru
-let scheduleConfig = {
-    dates: ["Kamis, 21 Mei 2026", "Jumat, 22 Mei 2026", "Sabtu, 23 Mei 2026"],
-    sessions: ["Sesi 1 (07.30 - 09.30 WIB)", "Sesi 2 (10.00 - 12.00 WIB)", "Sesi 3 (13.00 - 15.00 WIB)"],
-    rooms: 4,
-    capacity: 20
-};
+let scheduleConfig = [
+    {
+        tanggal: "Kamis, 21 Mei 2026",
+        sesi: [
+            { nama: "Sesi 1 (07.30 - 09.30 WIB)", rooms: 4, capacity: 20 },
+            { nama: "Sesi 2 (10.00 - 12.00 WIB)", rooms: 4, capacity: 20 }
+        ]
+    }
+];
 let plottingChanges = {};
 
 // ==========================================
@@ -86,13 +89,15 @@ async function loadPendaftar() {
         if (cfgData && cfgData.value) {
             try { 
                 scheduleConfig = JSON.parse(cfgData.value); 
+                if (!Array.isArray(scheduleConfig)) scheduleConfig = []; // Auto-reset pola lama
             } catch(e) {
                 console.warn('Gagal mem-parsing jadwal config');
             }
         } else {
             const localCfg = localStorage.getItem('JADWAL_CONFIG');
             if(localCfg) {
-                scheduleConfig = JSON.parse(localCfg);
+                const p = JSON.parse(localCfg);
+                if (Array.isArray(p)) scheduleConfig = p;
             }
         }
 
@@ -691,27 +696,135 @@ window.bulkAction = async function(action) {
 // 8. LOGIKA PANEL MANAJEMEN JADWAL 
 // ==========================================
 function renderScheduleSettings() {
-    document.getElementById('cfg-dates').value = scheduleConfig.dates.join('\n');
-    document.getElementById('cfg-sessions').value = scheduleConfig.sessions.join('\n');
-    document.getElementById('cfg-rooms').value = scheduleConfig.rooms;
-    document.getElementById('cfg-capacity').value = scheduleConfig.capacity;
-}
-
-window.saveScheduleConfig = async function() {
-    const datesStr = document.getElementById('cfg-dates').value.trim();
-    const sessionsStr = document.getElementById('cfg-sessions').value.trim();
+    const container = document.getElementById('config-builder-container');
+    if (!container) return;
+    container.innerHTML = '';
     
-    const dates = datesStr.split('\n').map(d => d.trim()).filter(d => d);
-    const sessions = sessionsStr.split('\n').map(s => s.trim()).filter(s => s);
-    const rooms = parseInt(document.getElementById('cfg-rooms').value);
-    const capacity = parseInt(document.getElementById('cfg-capacity').value);
+    if (!Array.isArray(scheduleConfig)) {
+        scheduleConfig = [];
+    }
 
-    if (dates.length === 0 || sessions.length === 0 || !rooms || !capacity) {
-        Swal.fire('Warning', 'Pastikan semua kolom pengaturan terisi dengan benar.', 'warning'); 
+    if (scheduleConfig.length === 0) {
+        container.innerHTML = '<div style="color:var(--ink-soft); font-size:0.8rem; text-align:center; padding:20px;">Belum ada pengaturan hari tes. Klik tombol "Tambah Hari Tes".</div>';
         return;
     }
 
-    scheduleConfig = { dates, sessions, rooms, capacity };
+    scheduleConfig.forEach((hari, hIndex) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px; background: var(--bg); position: relative;';
+        
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                <input type="text" class="input-modern-form cfg-input-tgl" data-hindex="${hIndex}" placeholder="Cth: Senin, 20 Mei 2026" value="${hari.tanggal || ''}" style="font-weight:bold; flex:1; min-width:200px;">
+                <div style="display:flex; gap:6px;">
+                    <button class="btn btn-secondary btn-sm" onclick="duplicateConfigDate(${hIndex})" title="Duplikat Hari Ini"><i class="ph ph-copy"></i> Copy</button>
+                    <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="removeConfigDate(${hIndex})"><i class="ph ph-trash"></i></button>
+                </div>
+            </div>
+            
+            <div style="margin-left: 10px; border-left: 2px dashed var(--rule-dark); padding-left: 12px; display:flex; flex-direction:column; gap:8px;">
+        `;
+        
+        if (hari.sesi && hari.sesi.length > 0) {
+            hari.sesi.forEach((sesi, sIndex) => {
+                html += `
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:var(--surface); padding:8px 12px; border-radius:6px; border:1px solid var(--rule);">
+                        <input type="text" class="input-modern-form cfg-input-sesi-nama" data-hindex="${hIndex}" data-sindex="${sIndex}" placeholder="Nama Sesi (Cth: Sesi 1 - 07.30)" value="${sesi.nama || ''}" style="flex:1; min-width:140px;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="font-size:0.7rem; color:var(--ink-soft);">Ruang(s):</span>
+                            <input type="number" class="input-modern-form cfg-input-sesi-rooms" data-hindex="${hIndex}" data-sindex="${sIndex}" value="${sesi.rooms || 1}" min="1" style="width:60px; padding:6px;">
+                        </div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="font-size:0.7rem; color:var(--ink-soft);">Kap/Ruang:</span>
+                            <input type="number" class="input-modern-form cfg-input-sesi-capacity" data-hindex="${hIndex}" data-sindex="${sIndex}" value="${sesi.capacity || 20}" min="1" style="width:60px; padding:6px;">
+                        </div>
+                        <button class="page-btn" style="color:var(--red);" onclick="removeConfigSession(${hIndex}, ${sIndex})"><i class="ph ph-x"></i></button>
+                    </div>
+                `;
+            });
+        } else {
+            html += `<span style="font-size:0.7rem; color:var(--ink-soft);">Belum ada sesi di hari ini.</span>`;
+        }
+        
+        html += `
+                <button class="btn btn-secondary btn-sm" style="align-self:flex-start; margin-top:4px;" onclick="addConfigSession(${hIndex})">
+                    <i class="ph ph-plus"></i> Tambah Sesi
+                </button>
+            </div>
+        `;
+        
+        item.innerHTML = html;
+        container.appendChild(item);
+    });
+}
+
+window.addConfigDate = function() {
+    window.syncConfigFromUI();
+    if(!Array.isArray(scheduleConfig)) scheduleConfig = [];
+    scheduleConfig.push({ tanggal: "", sesi: [{ nama: "Sesi 1", rooms: 4, capacity: 20 }] });
+    renderScheduleSettings();
+}
+
+window.duplicateConfigDate = function(hIndex) {
+    window.syncConfigFromUI();
+    let toCopy = JSON.parse(JSON.stringify(scheduleConfig[hIndex]));
+    toCopy.tanggal = toCopy.tanggal ? toCopy.tanggal + " (Copy)" : "Hari Baru";
+    scheduleConfig.splice(hIndex + 1, 0, toCopy);
+    renderScheduleSettings();
+}
+
+window.removeConfigDate = function(hIndex) {
+    if(confirm('Hapus hari tes ini beserta seluruh sesinya?')) {
+        scheduleConfig.splice(hIndex, 1);
+        renderScheduleSettings();
+    }
+}
+
+window.addConfigSession = function(hIndex) {
+    window.syncConfigFromUI();
+    scheduleConfig[hIndex].sesi.push({ nama: "", rooms: 1, capacity: 20 });
+    renderScheduleSettings();
+}
+
+window.removeConfigSession = function(hIndex, sIndex) {
+    window.syncConfigFromUI();
+    scheduleConfig[hIndex].sesi.splice(sIndex, 1);
+    renderScheduleSettings();
+}
+
+window.syncConfigFromUI = function() {
+    document.querySelectorAll('.cfg-input-tgl').forEach(el => {
+        scheduleConfig[el.dataset.hindex].tanggal = el.value.trim();
+    });
+    document.querySelectorAll('.cfg-input-sesi-nama').forEach(el => {
+        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].nama = el.value.trim();
+    });
+    document.querySelectorAll('.cfg-input-sesi-rooms').forEach(el => {
+        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].rooms = parseInt(el.value) || 0;
+    });
+    document.querySelectorAll('.cfg-input-sesi-capacity').forEach(el => {
+        scheduleConfig[el.dataset.hindex].sesi[el.dataset.sindex].capacity = parseInt(el.value) || 0;
+    });
+}
+
+window.saveScheduleConfig = async function() {
+    syncConfigFromUI();
+    
+    let isValid = true;
+    if(scheduleConfig.length === 0) isValid = false;
+    scheduleConfig.forEach(h => {
+        if(!h.tanggal) isValid = false;
+        if(h.sesi.length === 0) isValid = false;
+        h.sesi.forEach(s => {
+            if(!s.nama || s.rooms <= 0 || s.capacity <= 0) isValid = false;
+        });
+    });
+
+    if (!isValid) {
+        Swal.fire('Warning', 'Isian tidak lengkap. Pastikan nama hari, nama sesi, ruangan, dan kapasitas terisi (min. 1).', 'warning'); 
+        return;
+    }
+
     localStorage.setItem('JADWAL_CONFIG', JSON.stringify(scheduleConfig));
     
     try { 
@@ -721,6 +834,7 @@ window.saveScheduleConfig = async function() {
     }
 
     Swal.fire('Berhasil', 'Pengaturan master jadwal disimpan.', 'success');
+    renderScheduleSettings(); 
     updatePlottingFilters(); 
     renderPlottingTable(); 
 }
@@ -736,11 +850,22 @@ window.updatePlottingFilters = function() {
     const curSesi = selSesi.value;
     const curRuang = selRuang.value;
 
-    selTgl.innerHTML = '<option value="">Semua Tanggal</option>' + scheduleConfig.dates.map(d => `<option value="${d}">${d}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
-    selSesi.innerHTML = '<option value="">Semua Sesi</option>' + scheduleConfig.sessions.map(s => `<option value="${s}">${s}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
+    let uniqueDates = scheduleConfig.map(h => h.tanggal);
+    let uniqueSessions = new Set();
+    let maxRooms = 0;
+    scheduleConfig.forEach(h => {
+        (h.sesi || []).forEach(s => {
+            uniqueSessions.add(s.nama);
+            if(s.rooms > maxRooms) maxRooms = s.rooms;
+        });
+    });
+    uniqueSessions = Array.from(uniqueSessions);
+
+    selTgl.innerHTML = '<option value="">Semua Tanggal</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
+    selSesi.innerHTML = '<option value="">Semua Sesi</option>' + uniqueSessions.map(s => `<option value="${s}">${s}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
     
     let optRuang = '<option value="">Semua Ruangan</option>';
-    for(let r=1; r<=scheduleConfig.rooms; r++) {
+    for(let r=1; r<=maxRooms; r++) {
         optRuang += `<option value="Ruang ${r}">Ruang ${r}</option>`;
     }
     optRuang += '<option value="UNASSIGNED">-- Belum Diatur --</option>';
@@ -758,12 +883,8 @@ function renderPlottingTable() {
     const fSesi = document.getElementById('filterPlotSesi')?.value || "";
     const fRuang = document.getElementById('filterPlotRuang')?.value || "";
 
-    // Siswa yang wajib CBT:
-    // 1. Jalur REGULER yang sudah terverifikasi
-    // 2. Jalur PRESTASI yang berkasnya ditolak (status_verifikasi === false)
-    // 3. Jalur PRESTASI yang gagal tes pembuktian (status_kelulusan === 'TIDAK DITERIMA') meski berkas diterima
     let targetStudents = allPendaftar.filter(p => {
-        if (!p.status_verifikasi && p.status_verifikasi !== false) return false; // null = belum verif, skip
+        if (!p.status_verifikasi && p.status_verifikasi !== false) return false;
         if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
@@ -771,25 +892,16 @@ function renderPlottingTable() {
     });
     
     if (fTgl) {
-        if (fTgl === 'UNASSIGNED') {
-            targetStudents = targetStudents.filter(p => !p.tanggal_tes);
-        } else {
-            targetStudents = targetStudents.filter(p => p.tanggal_tes === fTgl);
-        }
+        if (fTgl === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !p.tanggal_tes);
+        else targetStudents = targetStudents.filter(p => p.tanggal_tes === fTgl);
     }
     if (fSesi) {
-        if (fSesi === 'UNASSIGNED') {
-            targetStudents = targetStudents.filter(p => !p.sesi_tes);
-        } else {
-            targetStudents = targetStudents.filter(p => p.sesi_tes === fSesi);
-        }
+        if (fSesi === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !p.sesi_tes);
+        else targetStudents = targetStudents.filter(p => p.sesi_tes === fSesi);
     }
     if (fRuang) {
-        if (fRuang === 'UNASSIGNED') {
-            targetStudents = targetStudents.filter(p => !p.ruang_tes);
-        } else {
-            targetStudents = targetStudents.filter(p => p.ruang_tes === fRuang);
-        }
+        if (fRuang === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !p.ruang_tes);
+        else targetStudents = targetStudents.filter(p => p.ruang_tes === fRuang);
     }
 
     const countSpan = document.getElementById('plotCount');
@@ -801,11 +913,22 @@ function renderPlottingTable() {
         return;
     }
 
-    const optDates = '<option value="">- Belum Diatur -</option>' + scheduleConfig.dates.map(d => `<option value="${d}">${d}</option>`).join('');
-    const optSessions = '<option value="">- Belum Diatur -</option>' + scheduleConfig.sessions.map(s => `<option value="${s}">${s}</option>`).join('');
+    let uniqueDates = scheduleConfig.map(h => h.tanggal);
+    let uniqueSessions = new Set();
+    let maxRooms = 0;
+    scheduleConfig.forEach(h => {
+        (h.sesi || []).forEach(s => {
+            uniqueSessions.add(s.nama);
+            if(s.rooms > maxRooms) maxRooms = s.rooms;
+        });
+    });
+    uniqueSessions = Array.from(uniqueSessions);
+
+    const optDates = '<option value="">- Belum Diatur -</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
+    const optSessions = '<option value="">- Belum Diatur -</option>' + uniqueSessions.map(s => `<option value="${s}">${s}</option>`).join('');
     
     let optRooms = '<option value="">- Belum Diatur -</option>';
-    for(let r=1; r<=scheduleConfig.rooms; r++){
+    for(let r=1; r<=maxRooms; r++){
         optRooms += `<option value="Ruang ${r}">Ruang ${r}</option>`;
     }
 
@@ -884,12 +1007,8 @@ window.autoPlotting = async function() {
 
     if (!confirm.isConfirmed) return;
 
-    // Siswa yang belum dijadwalkan dan wajib CBT:
-    // - Jalur REGULER terverifikasi tanpa jadwal
-    // - Jalur PRESTASI berkas ditolak tanpa jadwal
-    // - Jalur PRESTASI gagal tes pembuktian (TIDAK DITERIMA) tanpa jadwal
     let unassigned = allPendaftar.filter(p => {
-        if (p.ruang_tes) return false; // sudah punya jadwal ruang, skip
+        if (p.ruang_tes) return false; 
         if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
@@ -897,24 +1016,23 @@ window.autoPlotting = async function() {
     });
 
     if (unassigned.length === 0) {
-        Swal.fire('Info', 'Semua siswa Reguler murni yang memenuhi syarat sudah memiliki jadwal.', 'info');
+        Swal.fire('Info', 'Semua siswa yang memenuhi syarat sudah memiliki jadwal.', 'info');
         return;
     }
 
     let slots = {};
-    scheduleConfig.dates.forEach(d => {
-        slots[d] = {};
-        scheduleConfig.sessions.forEach(s => {
-            slots[d][s] = {};
-            for (let r = 1; r <= scheduleConfig.rooms; r++) { 
-                slots[d][s][`Ruang ${r}`] = 0; 
+    scheduleConfig.forEach(h => {
+        slots[h.tanggal] = {};
+        (h.sesi || []).forEach(s => {
+            slots[h.tanggal][s.nama] = {};
+            for (let r = 1; r <= s.rooms; r++) { 
+                slots[h.tanggal][s.nama][`Ruang ${r}`] = { current: 0, max: s.capacity }; 
             }
         });
     });
 
-    // Siswa yang sudah dijadwalkan dan wajib CBT (untuk hitung kapasitas):
     let assigned = allPendaftar.filter(p => {
-        if (!p.ruang_tes) return false; // belum ada ruang
+        if (!p.ruang_tes) return false; 
         if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
@@ -923,7 +1041,7 @@ window.autoPlotting = async function() {
 
     assigned.forEach(p => {
         if (slots[p.tanggal_tes] && slots[p.tanggal_tes][p.sesi_tes] && slots[p.tanggal_tes][p.sesi_tes][p.ruang_tes] !== undefined) {
-            slots[p.tanggal_tes][p.sesi_tes][p.ruang_tes]++;
+            slots[p.tanggal_tes][p.sesi_tes][p.ruang_tes].current++;
         }
     });
 
@@ -931,17 +1049,18 @@ window.autoPlotting = async function() {
     for (let student of unassigned) {
         let assignedSlot = null;
         
-        for (let d of scheduleConfig.dates) {
+        for (let h of scheduleConfig) {
             if (assignedSlot) break;
-            for (let s of scheduleConfig.sessions) {
+            for (let s of (h.sesi || [])) {
                 if (assignedSlot) break;
-                for (let r = 1; r <= scheduleConfig.rooms; r++) {
+                for (let r = 1; r <= s.rooms; r++) {
                     let roomName = `Ruang ${r}`;
-                    if (slots[d][s][roomName] < scheduleConfig.capacity) {
-                        slots[d][s][roomName]++;
+                    let slotState = slots[h.tanggal][s.nama][roomName];
+                    if (slotState && slotState.current < slotState.max) {
+                        slotState.current++;
                         assignedSlot = { 
-                            tanggal_tes: d, 
-                            sesi_tes: s, 
+                            tanggal_tes: h.tanggal, 
+                            sesi_tes: s.nama, 
                             ruang_tes: roomName 
                         };
                         break;
@@ -953,7 +1072,7 @@ window.autoPlotting = async function() {
         if (assignedSlot) {
             updates.push({ id: student.id, ...assignedSlot });
         } else {
-            Swal.fire('Peringatan', 'Kapasitas Ruangan & Sesi sudah PENUH.', 'warning');
+            Swal.fire('Peringatan', 'Kapasitas Ruangan & Sesi sudah penuh. Plotting dihentikan sebagian.', 'warning');
             break;
         }
     }
@@ -983,6 +1102,7 @@ window.autoPlotting = async function() {
             Swal.fire('Gagal', 'Terjadi kesalahan sistem.', 'error');
         }
     }
+}
 }
 
 // ==========================================
