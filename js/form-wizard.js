@@ -673,16 +673,32 @@ window.submitForm = async function() {
             return null;
         }
 
-        // Batas upload berkas umum: 2MB, Khusus Sertifikat: 5MB
-        const [fotoUrl, kkUrl, aktaUrl, skbUrl, ktpOrtuUrl, raporUrl, sertifUrl] = await Promise.all([
-            uploadFile('file_foto', 'FOTO', 2048, true),
-            uploadFile('file_kk', 'KK', 2048),
-            uploadFile('file_akta', 'AKTA', 2048),
-            uploadFile('file_skb', 'SKB', 2048),
-            uploadFile('file_ktp_ortu', 'KTP_ORTU', 2048),
-            uploadFile('file_rapor', 'RAPOR', 2048),
-            (jalur === 'PRESTASI') ? uploadFile('file_sertifikat', 'SERTIFIKAT', 5120) : Promise.resolve(null)
-        ]);
+        // Eksekusi upload SECARA SEQUENTIAL (berurutan) agar koneksi HP tidak crash (Failed to fetch)
+        Swal.update({ text: 'Mengupload Pas Foto...' });
+        const fotoUrl = await uploadFile('file_foto', 'FOTO', 2048, true);
+
+        Swal.update({ text: 'Mengupload Kartu Keluarga...' });
+        const kkUrl = await uploadFile('file_kk', 'KK', 2048);
+
+        Swal.update({ text: 'Mengupload Akta Kelahiran...' });
+        const aktaUrl = await uploadFile('file_akta', 'AKTA', 2048);
+
+        Swal.update({ text: 'Mengupload Surat Kelakuan Baik...' });
+        const skbUrl = await uploadFile('file_skb', 'SKB', 2048);
+
+        Swal.update({ text: 'Mengupload KTP Orang Tua...' });
+        const ktpOrtuUrl = await uploadFile('file_ktp_ortu', 'KTP_ORTU', 2048);
+
+        Swal.update({ text: 'Mengupload Scan Rapor...' });
+        const raporUrl = await uploadFile('file_rapor', 'RAPOR', 2048);
+
+        let sertifUrl = null;
+        if (jalur === 'PRESTASI') {
+            Swal.update({ text: 'Mengupload Sertifikat...' });
+            sertifUrl = await uploadFile('file_sertifikat', 'SERTIFIKAT', 5120);
+        }
+        
+        Swal.update({ text: 'Menyiapkan data akhir...' });
 
         const getSelectText = (id) => { const el = document.getElementById(id); return el.options[el.selectedIndex]?.text || ''; };
 
