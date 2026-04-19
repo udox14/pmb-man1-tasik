@@ -1114,6 +1114,171 @@
             .footer-inner { flex-direction: column; gap: 28px; }
             .footer-bottom { flex-direction: column; text-align: center; }
         }
+
+        /* ── Modal Instruksi (Homepage) ────────────────────────────────────── */
+        .instruction-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn .25s ease;
+        }
+
+        .instruction-box-popup {
+            background: white;
+            width: 100%;
+            max-width: 520px;
+            padding: 28px 24px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .15);
+            max-height: 88vh;
+            overflow-y: auto;
+            position: relative;
+            border-top: 3px solid var(--teal);
+        }
+
+        .instruction-box-popup h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--teal);
+            letter-spacing: .3px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--rule);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .instruction-box-popup h3 i {
+            color: var(--teal);
+            font-size: 1.4rem;
+        }
+
+        .nisn-alert {
+            background: var(--teal-dim);
+            border: 1px solid var(--teal);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .nisn-alert-icon {
+            color: var(--teal);
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .nisn-alert-text {
+            font-size: .86rem;
+            color: var(--ink-mid);
+            line-height: 1.6;
+        }
+
+        .nisn-alert-text strong {
+            color: var(--ink);
+            font-size: .95rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .nisn-alert-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--teal);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: .82rem;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 12px;
+            box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
+            transition: all 0.2s;
+        }
+
+        .nisn-alert-link:hover {
+            background: var(--teal-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 121, 107, 0.3);
+        }
+
+        .instruction-list p {
+            font-size: .9rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .instruction-list p i {
+            color: var(--gold);
+            font-size: 1.15rem;
+        }
+
+        .instruction-file-list {
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+            padding: 0;
+            margin-top: 0;
+            list-style: none;
+            overflow: hidden;
+        }
+
+        .instruction-file-list li {
+            font-size: .84rem;
+            color: var(--ink-mid);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--rule);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .instruction-file-list li:last-child {
+            border-bottom: none;
+        }
+
+        .instruction-file-list li i {
+            color: var(--teal);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .instruction-file-list li div {
+            flex: 1;
+            min-width: 0;
+            word-wrap: break-word;
+        }
+        
+        .instruction-file-list li div strong {
+            color: var(--ink);
+            display: block;
+            margin-bottom: 2px;
+            font-size: .88rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -1573,6 +1738,60 @@
     </button>
 </div>
 
+<!-- ══════════════════════════════════════════
+     MODAL INSTRUKSI AWAL
+══════════════════════════════════════════ -->
+<div class="instruction-overlay" id="instructionModalIndex">
+    <div class="instruction-box-popup">
+        <h3><i class="ph ph-warning-circle"></i> Perhatian Sebelum Mendaftar!</h3>
+        
+        <div class="nisn-alert">
+            <div class="nisn-alert-icon"><i class="ph ph-identification-card"></i></div>
+            <div class="nisn-alert-text">
+                <strong>Wajib Validasi NISN</strong>
+                Pastikan NISN Anda valid dan sesuai dengan data yang terdaftar di Pusat Data Kemdikbud agar proses pendaftaran tidak terkendala.<br>
+                <a href="https://nisn.data.kemdikbud.go.id/" target="_blank" class="nisn-alert-link">Cek Data NISN <i class="ph ph-arrow-up-right"></i></a>
+            </div>
+        </div>
+
+        <div class="instruction-list">
+            <p><i class="ph ph-folder-lock"></i> Persiapkan Berkas Berikut:</p>
+            <ul class="instruction-file-list">
+                <li><i class="ph ph-image"></i> <div><strong>Pas Foto Latar Biru</strong>Format JPG/PNG, maksimal ukuran 2MB</div></li>
+                <li><i class="ph ph-users-three"></i> <div><strong>Scan Kartu Keluarga (KK) Asli</strong>Format PDF, maksimal ukuran 2MB</div></li>
+                <li><i class="ph ph-scroll"></i> <div><strong>Scan Akta Kelahiran Asli</strong>Format PDF, maksimal ukuran 2MB</div></li>
+                <li><i class="ph ph-certificate"></i> <div><strong>Scan Surat Kelakuan Baik (SKB)</strong>Format PDF, maksimal ukuran 2MB</div></li>
+                <li><i class="ph ph-identification-badge"></i> <div><strong>Scan KTP Orang Tua (Ayah & Ibu)</strong>Format PDF, maksimal ukuran 2MB. KTP digabungkan dalam 1 file PDF.</div></li>
+                <li><i class="ph ph-book-open-text"></i> <div><strong>Scan Rapor 5 Semester</strong>Format PDF, maksimal ukuran 2MB. Halaman identitas dan nilai semester 1-5 digabung dalam 1 file.</div></li>
+                <li><i class="ph ph-trophy"></i> <div><strong>Sertifikat Prestasi</strong>Khusus Pendaftar Jalur Prestasi (Opsional). Format PDF, maksimal 5MB.</div></li>
+            </ul>
+        </div>
+        
+        <button class="btn btn-primary" onclick="closeInstructionIndex()"
+            style="width:100%;margin-top:24px;justify-content:center;border-radius:var(--radius-sm);font-size:.92rem;font-weight:700;padding:14px;box-shadow:0 4px 14px rgba(0, 121, 107, .2);transition:all .2s;background:var(--teal);color:white;border:none;cursor:pointer;">
+            Saya Mengerti & Siap Mendaftar <i class="ph ph-check-circle" style="font-size:1.15rem;margin-left:6px;"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tampilkan modal saat awal buka halaman index
+        const modal = document.getElementById('instructionModalIndex');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    });
+
+    function closeInstructionIndex() {
+        const modal = document.getElementById('instructionModalIndex');
+        if (modal) {
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity .25s';
+            setTimeout(() => { modal.style.display = 'none'; }, 260);
+        }
+    }
+</script>
 
 <script src="js/config.js"></script>
 <script src="js/main.js"></script>
