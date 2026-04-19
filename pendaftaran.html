@@ -1550,13 +1550,13 @@
                         </div>
 
                         <div class="upload-row-item" id="row-file_rapor">
-                            <input type="file" id="file_rapor" accept=".pdf" required onchange="updateFileName(this)">
+                            <input type="file" id="file_rapor" accept=".pdf" onchange="updateFileName(this)">
                             <div class="upload-row-left">
                                 <div class="upload-row-icon"><i class="ph ph-book-open-text"></i></div>
                                 <div>
                                     <span class="upload-row-title">Scan Rapor <span
-                                            class="upload-badge-required">Wajib</span></span>
-                                    <span class="upload-row-hint">PDF · Maks 2MB · 5 Semester, gabung 1 file</span>
+                                            class="upload-badge-required" id="badge-rapor" style="background:#64748b; color:white;">Opsional (Reguler)</span></span>
+                                    <span class="upload-row-hint">PDF · Maks 2MB · 5 Semester (Opsional untuk Reguler)</span>
                                 </div>
                             </div>
                             <div class="upload-row-status" id="lbl-file_rapor">
@@ -1629,7 +1629,7 @@
                     <li><i class="ph ph-file-pdf"></i> Scan Akta Kelahiran — PDF, Maks 2MB</li>
                     <li><i class="ph ph-file-pdf"></i> Scan Surat Kelakuan Baik — PDF, Maks 2MB</li>
                     <li><i class="ph ph-file-pdf"></i> Scan KTP Orang Tua (gabung) — PDF, Maks 2MB</li>
-                    <li><i class="ph ph-book-open-text"></i> Scan Rapor 5 Semester — PDF, Maks 2MB</li>
+                    <li><i class="ph ph-book-open-text"></i> Scan Rapor 5 Semester (Opsional untuk Reguler) — PDF, Maks 2MB</li>
                     <li><i class="ph ph-trophy"></i> Scan Sertifikat Prestasi (khusus Jalur Prestasi) — PDF, Maks 5MB
                     </li>
                 </ul>
@@ -1665,7 +1665,7 @@
         }
 
         // UPLOAD PROGRESS
-        const UPLOAD_IDS = ['file_foto', 'file_kk', 'file_akta', 'file_skb', 'file_ktp_ortu', 'file_rapor'];
+        var UPLOAD_IDS = ['file_foto', 'file_kk', 'file_akta', 'file_skb', 'file_ktp_ortu', 'file_rapor'];
 
         function updateUploadProgress() {
             const filled = UPLOAD_IDS.filter(id => {

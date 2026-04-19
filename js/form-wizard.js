@@ -43,6 +43,24 @@ function initFormPage() {
         if (stepIcon5) stepIcon5.style.display = 'flex';
         // Inisialisasi UI Prestasi
         setTimeout(initPrestasiUI, 500); 
+
+        // Rapor wajib untuk prestasi
+        const rInput = document.getElementById('file_rapor');
+        if (rInput) rInput.setAttribute('required', 'required');
+        const rBadge = document.getElementById('badge-rapor');
+        if (rBadge) {
+            rBadge.textContent = 'Wajib (Prestasi)';
+            rBadge.style.background = 'var(--teal)';
+            rBadge.style.color = 'white';
+        }
+    } else {
+        // Reguler, Rapor optional
+        if (typeof UPLOAD_IDS !== 'undefined') {
+            UPLOAD_IDS = UPLOAD_IDS.filter(id => id !== 'file_rapor');
+            setTimeout(() => {
+                if (typeof updateUploadProgress === 'function') updateUploadProgress();
+            }, 100);
+        }
     }
 
     // Load Data Awal

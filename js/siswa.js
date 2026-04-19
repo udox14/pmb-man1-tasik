@@ -825,7 +825,7 @@ window.editData = function() {
             ${buildUploadRow('akta',     'Akta Kelahiran',        'ph-scroll',               p.scan_akta_url,               '.pdf',      'akta')}
             ${buildUploadRow('skb',      'Surat Kelakuan Baik',   'ph-certificate',          p.scan_kelakuan_baik_url,      '.pdf',      'skb')}
             ${buildUploadRow('ktp',      'KTP Orang Tua',         'ph-identification-card',  p.scan_ktp_ortu_url,           '.pdf',      'ktp_ortu')}
-            ${buildUploadRow('rapor',    'Rapor (5 Semester)',     'ph-book-open-text',       p.scan_rapor_url,              '.pdf',      'rapor')}
+            ${buildUploadRow('rapor',    `Rapor 5 Semester${p.jalur === 'REGULER' ? ' (Opsional)' : ''}`, 'ph-book-open-text', p.scan_rapor_url, '.pdf', 'rapor')}
             ${p.jalur === 'PRESTASI' || p.scan_sertifikat_prestasi_url
               ? buildUploadRow('sertif', 'Sertifikat Prestasi',   'ph-trophy',               p.scan_sertifikat_prestasi_url,'.pdf',      'sertifikat_prestasi')
               : ''}
