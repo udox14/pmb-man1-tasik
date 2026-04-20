@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berkas Daftar Ulang PMB MAN 1 Tasikmalaya 2026/2027</title>
+    <style>
+        /* ─── RESET & BASE ──────────────────────────────────────── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            color: #000;
+            background: #fff;
+        }
+
+        /* ─── PAGE SETUP ────────────────────────────────────────── */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25.4mm 19.1mm 25.4mm 19.1mm; /* moderate: top/bottom 1in, L/R 0.75in */
+            margin: 0 auto 10mm auto;
+            background: #fff;
+            page-break-after: always;
+            position: relative;
+        }
+        .page:last-child { page-break-after: avoid; }
+
+        /* ─── TYPOGRAPHY ────────────────────────────────────────── */
+        h1.doc-title {
+            font-size: 13pt;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            line-height: 1.5;
+            margin-bottom: 6pt;
+        }
+        h2.doc-sub {
+            font-size: 11pt;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 14pt;
+        }
+        p { line-height: 1.6; margin-bottom: 6pt; text-align: justify; }
+        .indent { margin-left: 16pt; }
+
+        /* ─── FIELD TABLE ───────────────────────────────────────── */
+        .field-table { width: 100%; border-collapse: collapse; margin-bottom: 8pt; }
+        .field-table td { padding: 2pt 0; vertical-align: top; line-height: 1.6; }
+        .field-table .label { width: 50mm; white-space: nowrap; }
+        .field-table .colon { width: 6mm; text-align: center; }
+        .field-table .value { text-decoration-line: underline; font-weight: 600; }
+        .field-table .sub-label { width: 50mm; padding-left: 10mm; }
+
+        /* ─── TATA TERTIB LISTS ─────────────────────────────────── */
+        .section-head {
+            font-weight: bold;
+            margin: 8pt 0 4pt 0;
+        }
+        ol.lv1 { padding-left: 18pt; margin-bottom: 4pt; }
+        ol.lv1 > li {
+            margin-bottom: 3pt;
+            text-align: justify;
+            line-height: 1.5;
+        }
+        ol.lv2 { padding-left: 16pt; margin-top: 3pt; list-style-type: lower-alpha; }
+        ol.lv2 > li { margin-bottom: 2pt; }
+        ol.lv3 { padding-left: 16pt; margin-top: 2pt; list-style-type: decimal; }
+        ol.lv3 > li { margin-bottom: 2pt; }
+
+        /* ─── SIGNATURE BLOCK ───────────────────────────────────── */
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 20pt;
+        }
+        .sig-box {
+            text-align: center;
+            width: 45%;
+        }
+        .sig-box.right { margin-left: auto; }
+        .sig-name { font-weight: bold; text-decoration: underline; margin-top: 50pt; }
+        .sig-label { font-size: 10pt; }
+        .sig-date { margin-bottom: 6pt; }
+
+        .materai-box {
+            border: 1px solid #000;
+            width: 50mm;
+            height: 28mm;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 8pt auto 4pt;
+            font-size: 10pt;
+        }
+
+        /* ─── UKURAN SERAGAM TABLE ──────────────────────────────── */
+        .uniform-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12pt;
+            margin-top: 14pt;
+        }
+        .uniform-section h3 {
+            font-size: 11pt;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding-bottom: 4pt;
+            margin-bottom: 6pt;
+        }
+        .uniform-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+        .uniform-table th, .uniform-table td {
+            border: 1px solid #000;
+            padding: 4pt 6pt;
+            text-align: center;
+        }
+        .uniform-table th { background: #f0f0f0; font-weight: bold; }
+        .check-box {
+            display: inline-block;
+            width: 12pt; height: 12pt;
+            border: 1px solid #000;
+            vertical-align: middle;
+        }
+
+        /* ─── PRINT MEDIA ───────────────────────────────────────── */
+        @media print {
+            body { margin: 0; background: #fff; }
+            .page {
+                margin: 0;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .no-print { display: none !important; }
+        }
+
+        /* ─── SCREEN PREVIEW ────────────────────────────────────── */
+        @media screen {
+            body { background: #e5e7eb; padding: 20px 0; }
+            .page {
+                box-shadow: 0 2px 16px rgba(0,0,0,.18);
+                border: 1px solid #d1d5db;
+            }
+            .print-btn {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: #00796b;
+                color: white;
+                border: none;
+                border-radius: 50px;
+                padding: 14px 26px;
+                font-size: 15px;
+                font-weight: 700;
+                font-family: system-ui, sans-serif;
+                cursor: pointer;
+                box-shadow: 0 4px 16px rgba(0,0,0,.25);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                z-index: 999;
+            }
+            .print-btn:hover { background: #004d40; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     HALAMAN 1 — Surat Pernyataan Murid Baru & Tata Tertib (bagian 1)
+════════════════════════════════════════════════════════ -->
+<div class="page" id="page1">
+
+    <h1 class="doc-title">Surat Pernyataan<br>Murid Baru dan Orangtua<br>Madrasah Aliyah Negeri 1 Tasikmalaya</h1>
+    <h2 class="doc-sub">Tahun Ajaran 2026 / 2027</h2>
+
+    <p>Saya yang bertanda tangan di bawah ini :</p>
+
+    <table class="field-table">
+        <tr>
+            <td class="label">Nama Lengkap</td>
+            <td class="colon">:</td>
+            <td class="value" id="h1-nama">—</td>
+        </tr>
+        <tr>
+            <td class="label">Tempat / Tgl. Lahir</td>
+            <td class="colon">:</td>
+            <td class="value" id="h1-ttl">—</td>
+        </tr>
+        <tr>
+            <td class="label">Jenis Kelamin</td>
+            <td class="colon">:</td>
+            <td class="value" id="h1-jk">—</td>
+        </tr>
+        <tr>
+            <td class="label">Agama</td>
+            <td class="colon">:</td>
+            <td class="value">Islam</td>
+        </tr>
+        <tr>
+            <td class="label">Nomor Pendaftaran</td>
+            <td class="colon">:</td>
+            <td class="value" id="h1-nopend">—</td>
+        </tr>
+        <tr>
+            <td class="label">Diterima di kelas</td>
+            <td class="colon">:</td>
+            <td class="value">10</td>
+        </tr>
+    </table>
+
+    <p><strong>MENYATAKAN</strong> Saya telah membaca dan memahami <strong>TATA TERTIB SISWA MAN 1 TASIKMALAYA</strong> di bawah ini:</p>
+
+    <p class="section-head">A. KEHADIRAN SISWA</p>
+    <ol class="lv1">
+        <li>Siswa harus hadir di madrasah paling lambat 5 menit sebelum bel masuk dan pulang setelah jam pelajaran terakhir selesai.</li>
+        <li>Siswa harus melapor dan meminta surat izin masuk kelas kepada petugas piket jika datang terlambat masuk lebih dari 10 menit.</li>
+        <li>Siswa harus mendapat izin wakil kepala madrasah atau guru piket yang sedang bertugas jika meninggalkan madrasah sebelum waktunya, karena sesuatu kepentingan.</li>
+        <li>Siswa harus mengirimkan surat keterangan orang tua/wali siswa jika berhalangan hadir.</li>
+        <li>Siswa harus menyerahkan keterangan dokter (medis) jika berhalangan hadir lebih dari tiga hari dengan alasan sakit.</li>
+    </ol>
+
+    <p class="section-head">B. KEGIATAN BELAJAR MENGAJAR</p>
+    <ol class="lv1">
+        <li>Siswa harus memasuki kelas secara tertib dan siap menerima pelajaran bila bel masuk dibunyikan.</li>
+        <li>Siswa wajib membaca Al-Qur'an dan do'a bersama dipimpin oleh petugas sebelum jam pertama dimulai setiap hari.</li>
+        <li>Siswa harus memelihara ketertiban dan kelancaran kegiatan belajar mengajar di dalam dan di luar kelas.</li>
+        <li>Ketua kelas harus memberitahukan dan mengingatkan segera kepada Bapak/Ibu Guru bila belum hadir di kelas dan melapor kepada guru piket untuk meminta tugas bila guru yang bersangkutan berhalangan hadir.</li>
+        <li>Siswa harus menjalin hubungan baik dan harmonis dengan semua Guru dan Karyawan.</li>
+    </ol>
+
+    <p class="section-head">C. KODE ETIK SISWA</p>
+    <ol class="lv1">
+        <li>Siswa wajib memelihara tatakrama dan melaksanakan akhlaqul karimah dalam pergaulan sehari-hari.</li>
+        <li>Siswa membiasakan mengucapkan "SALAM" sesuai dengan ketentuan ajaran Islam.</li>
+        <li>Siswa putra harus berambut pendek (maksimal 3 cm), rapih, tidak diwarnai, tidak berkuku panjang, beranting, berkalung, dan gelang.</li>
+        <li>Siswi putri dilarang menggunakan make-up dan aksesoris berlebihan.</li>
+        <li>Siswa dilarang Kholwat, membawa Handphone, rokok, miras, senjata tajam, senjata api, foto/gambar, dan media yang tidak islami atau hal-hal lain yang merusak moral.</li>
+        <li>Siswa dilarang terlibat narkoba, geng motor, tawuran antar pelajaran dan hal lain yang menimbulkan keresahan masyarakat.</li>
+        <li>Siswa dilarang menerima tamu pribadi sebelum melapor kepada petugas piket.</li>
+        <li>Siswa dilarang melakukan tindakan yang mencemarkan nama baik pribadi, keluarga, madrasah, dan lingkungan masyarakat.</li>
+        <li>Siswa harus menaati tata tertib dan ketentuan lainnya baik tertulis maupun lisan yang dilakukan atas kebijakan madrasah.</li>
+    </ol>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     HALAMAN 2 — Tata Tertib lanjutan (D-H)
+════════════════════════════════════════════════════════ -->
+<div class="page" id="page2">
+
+    <p class="section-head">D. CARA BERPAKAIAN</p>
+    <ol class="lv1">
+        <li>Putra:
+            <ol class="lv2">
+                <li>Memakai seragam sesuai dengan ketentuan:
+                    <ol class="lv3">
+                        <li>Senin dan Selasa: baju putih lengan pendek, dasi, dan celana panjang abu.</li>
+                        <li>Rabu dan Kamis: memakai batik MAN 1 Tasikmalaya.</li>
+                        <li>Jum'at : memakai pakaian hitam putih.</li>
+                        <li>Sabtu: memakai pakaian pramuka.</li>
+                    </ol>
+                </li>
+                <li>Memakai ikat pinggang warna hitam ukuran lebar ± 3 cm.</li>
+                <li>Memakai sepatu warna hitam (bukan kulit), tali sepatu putih.</li>
+                <li>Memakai kaos kaki putih.</li>
+                <li>Memakai atribut OSIS, MAN, Lokasi, dan Nama secara lengkap.</li>
+            </ol>
+        </li>
+        <li>Putri
+            <ol class="lv2">
+                <li>Memakai seragam sesuai dengan ketentuan:
+                    <ol class="lv3">
+                        <li>Senin dan Selasa: baju putih lengan panjang, rok abu rempel kecil, kerudung segi empat putih ukuran menutup siku.</li>
+                        <li>Rabu dan Kamis: memakai batik MAN 1 Tasikmalaya.</li>
+                        <li>Jum'at : memakai pakaian hitam putih.</li>
+                        <li>Sabtu: memakai seragam pramuka dan berkerudung segi empat coklat menutup siku.</li>
+                    </ol>
+                </li>
+                <li>Memakai ikat pinggang hitam berukuran ± 3 cm.</li>
+                <li>Memakai sepatu warna hitam (bukan kulit), tali sepatu putih.</li>
+                <li>Memakai kaos kaki putih panjang.</li>
+                <li>Memakai atribut OSIS, MAN, Lokasi, dan Nama secara lengkap.</li>
+            </ol>
+        </li>
+        <li>Siswa harus berseragam olahraga pada waktu kegiatan olahraga.</li>
+    </ol>
+
+    <p class="section-head">E. UPACARA BENDERA</p>
+    <ol class="lv1">
+        <li>Siswa wajib mengikuti pelaksanaan upacara bendera pada hari Senin dan upacara-upacara lain yang diselenggarakan oleh madrasah dengan penuh tanggung jawab.</li>
+        <li>Siswa harus mampu menjadi petugas upacara hari Senin.</li>
+        <li>Siswa harus melapor kepada petugas piket jika terlambat mengikuti upacara.</li>
+        <li>Siswa harus bertanggung jawab terhadap ketertiban dan kelancaran dalam pelaksanaan upacara.</li>
+    </ol>
+
+    <p class="section-head">F. RUANGAN KELAS</p>
+    <ol class="lv1">
+        <li>Siswa harus menjaga dan melaksanakan 5K (keamanan, ketertiban, kekeluargaan, kebersihan, dan keindahan).</li>
+        <li>Siswa harus memelihara sarana dan prasarana madrasah di dalam dan di luar kelas.</li>
+        <li>Siswa harus bertanggung jawab melaporkan fasilitas madrasah yang rusak atau kurang kepada wali kelas.</li>
+        <li>Siswa harus bertanggung jawab atas fasilitas madrasah yang rusak atau hilang akibat kelalaiannya.</li>
+        <li>Siswa petugas kebersihan harus selalu membersihkan kelasnya.</li>
+    </ol>
+
+    <p class="section-head">G. PENGAWASAN DAN BIMBINGAN</p>
+    <ol class="lv1">
+        <li>Siswa diawasi, dibimbing, dan dinilai oleh guru, wali kelas, dan BK selama di madrasah.</li>
+        <li>Siswa yang melakukan pelanggaran berulang kali akan diselesaikan melalui rapat guru dan BK.</li>
+        <li>Siswa wajib melaporkan segala kejadian yang akan merusak ketahanan madrasah kepada guru piket, wali kelas, atau BK.</li>
+        <li>Siswa wajib melaksanakan sholat berjamaah dzuhur sesuai dengan jadwal yang telah ditentukan.</li>
+        <li>Siswa MAN 1 Tasikmalaya wajib tinggal di asrama dan mengikuti pengajian di pesantren.</li>
+    </ol>
+
+    <p class="section-head">H. ORGANISASI</p>
+    <ol class="lv1">
+        <li>Siswa menjadi anggota OSIS secara otomatis.</li>
+        <li>Siswa harus mengikuti kelompok belajar dan kegiatan ekstra kurikuler.</li>
+        <li>Setiap kelas harus memiliki Struktur Organisasi kelas yang benar dan lengkap.</li>
+    </ol>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     HALAMAN 3 — Sanksi + Tanda Tangan Pernyataan
+════════════════════════════════════════════════════════ -->
+<div class="page" id="page3">
+
+    <p class="section-head">I. SANKSI</p>
+    <p>Siswa yang melanggar tata tertib dikenai sanksi:</p>
+    <ol class="lv1">
+        <li>Peringatan atau teguran.</li>
+        <li>Pemanggilan orang tua/wali siswa.</li>
+        <li>Skorsing.</li>
+        <li>Dikembalikan ke orang tua.</li>
+    </ol>
+
+    <br>
+    <p>Pernyataan ini <strong>DIKETAHUI</strong> dan <strong>DISETUJUI</strong> oleh Orangtua / Wali Saya :</p>
+
+    <table class="field-table" style="margin-top:8pt;">
+        <tr>
+            <td class="label">Nama</td>
+            <td class="colon">:</td>
+            <td class="value" id="h3-nama-ortu">—</td>
+        </tr>
+        <tr>
+            <td class="label">Pekerjaan</td>
+            <td class="colon">:</td>
+            <td class="value" id="h3-pekerjaan-ortu">—</td>
+        </tr>
+        <tr>
+            <td class="label">Agama</td>
+            <td class="colon">:</td>
+            <td class="value">Islam</td>
+        </tr>
+        <tr>
+            <td class="label">Alamat</td>
+            <td class="colon">:</td>
+            <td class="value" id="h3-alamat">—</td>
+        </tr>
+        <tr>
+            <td class="label">Nomor Tlp. / HP.</td>
+            <td class="colon">:</td>
+            <td class="value" id="h3-telp">—</td>
+        </tr>
+    </table>
+
+    <br>
+    <p>Yang bersedia membimbing dan mengawasi Saya untuk mematuhi tata tertib dan menyerahkan sepenuhnya tentang sistem pembelajaran kepada pihak madrasah, serta tidak berkeberatan jika Saya diberi sanksi bila melanggar peraturan dan tata tertib sesuai dengan ketentuan yang ditetapkan oleh Madrasah.</p>
+    <p>Demikian pernyataan ini saya buat dengan sebenar-benarnya dan dengan penuh tanggung jawab serta diketahui oleh orang tua/wali.</p>
+
+    <div class="signature-area">
+        <div class="sig-box">
+            <p class="sig-date">Tasikmalaya, ...................</p>
+            <p>Menyetujui Orang Tua / Wali</p>
+            <br><br><br><br><br>
+            <p class="sig-name" id="h3-ttd-ortu">—</p>
+            <p class="sig-label">(Nama Jelas dan Tandatangan)</p>
+        </div>
+        <div class="sig-box right" style="text-align:center;">
+            <p>Yang Membuat Pernyataan</p>
+            <div class="materai-box">
+                <span>Materai</span>
+                <span style="font-size:14pt; font-weight:bold;">10.000</span>
+            </div>
+            <p class="sig-name" id="h3-ttd-siswa">—</p>
+            <p class="sig-label">(Nama Jelas dan Tandatangan)</p>
+        </div>
+    </div>
+
+    <p style="margin-top:16pt; font-size:10pt;"><em>Catatan : Diserahkan pada saat daftar ulang.</em></p>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     HALAMAN 4 — Surat Pernyataan Bersedia Tinggal di Pesantren
+════════════════════════════════════════════════════════ -->
+<div class="page" id="page4">
+
+    <h1 class="doc-title">Surat Pernyataan<br>Bersedia Tinggal di Pondok Pesantren</h1>
+
+    <p>Yang bertanda tangan di bawah ini :</p>
+
+    <table class="field-table" style="margin-top:8pt;">
+        <tr>
+            <td class="label">1. Nama Lengkap</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-nama">—</td>
+        </tr>
+        <tr>
+            <td class="label">2. Tempat / Tgl. Lahir</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-ttl">—</td>
+        </tr>
+        <tr>
+            <td class="label">3. Jenis Kelamin</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-jk">—</td>
+        </tr>
+        <tr>
+            <td class="label">4. Nama Orang Tua / wali</td>
+            <td class="colon"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="sub-label">a. Ayah / wali</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-ayah">—</td>
+        </tr>
+        <tr>
+            <td class="sub-label">b. Ibu / wali</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-ibu">—</td>
+        </tr>
+        <tr>
+            <td class="label">5. Pekerjaan Orang Tua / wali</td>
+            <td class="colon"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="sub-label">a. Ayah / wali</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-pek-ayah">—</td>
+        </tr>
+        <tr>
+            <td class="sub-label">b. Ibu / wali</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-pek-ibu">—</td>
+        </tr>
+        <tr>
+            <td class="label">6. Alamat Orang Tua / Wali</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-alamat">—</td>
+        </tr>
+        <tr>
+            <td class="label">7. No. Telepon / HP</td>
+            <td class="colon">:</td>
+            <td class="value" id="h4-telp">—</td>
+        </tr>
+    </table>
+
+    <br>
+    <p>Dengan ini menyatakan sesungguhnya, bahwa saya bersedia untuk tinggal di Pondok Pesantren, yang berada di lingkungan desa Sukarapih dan Wargakerta.</p>
+    <p>Apabila dikemudian hari, saya keluar dari Pondok Pesantren, saya bersedia untuk mengundurkan diri dari Madrasah Aliyah Negeri 1 Tasikmalaya.</p>
+    <p>Demikian Surat Pernyataan ini saya buat dengan sebenarnya, dan digunakan sebagai mana mestinya.</p>
+
+    <div style="display:flex; justify-content:space-between; margin-top:20pt;">
+        <div style="width:45%; text-align:center;">
+            <p>Menyetujui,<br>Orang Tua / Wali Siswa</p>
+            <br><br><br><br>
+            <p style="text-decoration:underline; font-weight:600;" id="h4-ttd-ortu">—</p>
+            <p style="font-size:10pt;">(Nama Jelas dan Tandatangan)</p>
+        </div>
+        <div style="width:45%; text-align:center;">
+            <p>Tasikmalaya, .................... 2026</p>
+            <p>Yang membuat pernyataan,<br>Calon Siswa MAN 1 Tasikmalaya</p>
+            <br><br><br>
+            <p style="text-decoration:underline; font-weight:600;" id="h4-ttd-siswa">—</p>
+            <p style="font-size:10pt;">(Nama Jelas dan Tandatangan)</p>
+        </div>
+    </div>
+
+    <div style="margin-top:24pt;">
+        <p><strong>MENGETAHUI,</strong></p>
+        <br>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:8pt;">
+            <div>
+                <p>Kepala MAN 1 Tasikmalaya,</p>
+                <br><br><br><br>
+                <p><strong>H. Eka Mulyana, S.Ag., M.Pd.I.</strong></p>
+                <p>NIP. 197601202007101001</p>
+            </div>
+            <div style="text-align:center;">
+                <p>Pimpinan Pondok Pesantren,</p>
+                <br><br><br><br>
+                <p>.............................................</p>
+            </div>
+        </div>
+    </div>
+
+    <p style="margin-top:16pt; font-size:10pt;"><em>Catatan : Diserahkan pada saat daftar ulang.</em></p>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     HALAMAN 5 — Ukuran Seragam
+════════════════════════════════════════════════════════ -->
+<div class="page" id="page5">
+
+    <h1 class="doc-title">Ukuran Seragam Murid Baru<br>Madrasah Aliyah Negeri 1 Tasikmalaya<br>Tahun Ajaran 2026 / 2027</h1>
+
+    <table class="field-table" style="margin-top:16pt;">
+        <tr>
+            <td class="label">Nomor Peserta</td>
+            <td class="colon">:</td>
+            <td class="value" id="h5-nopend">—</td>
+        </tr>
+        <tr>
+            <td class="label">Nama Lengkap</td>
+            <td class="colon">:</td>
+            <td class="value" id="h5-nama">—</td>
+        </tr>
+        <tr>
+            <td class="label">Jenis Kelamin</td>
+            <td class="colon">:</td>
+            <td class="value" id="h5-jk">—</td>
+        </tr>
+        <tr>
+            <td class="label">Kelas</td>
+            <td class="colon">:</td>
+            <td class="value">10</td>
+        </tr>
+        <tr>
+            <td class="label">Asal Sekolah / Madrasah</td>
+            <td class="colon">:</td>
+            <td class="value" id="h5-asal">—</td>
+        </tr>
+    </table>
+
+    <div class="uniform-grid">
+        <!-- Batik -->
+        <div class="uniform-section">
+            <h3>Seragam Batik</h3>
+            <table class="uniform-table">
+                <thead>
+                    <tr><th>Ukuran</th><th>Beri Tanda Cek List</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>M</td><td id="cek-batik-m"></td></tr>
+                    <tr><td>L</td><td id="cek-batik-l"></td></tr>
+                    <tr><td>XL</td><td id="cek-batik-xl"></td></tr>
+                    <tr><td>XXL</td><td id="cek-batik-xxl"></td></tr>
+                    <tr><td>XXXL</td><td id="cek-batik-xxxl"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Kaos Olah Raga -->
+        <div class="uniform-section">
+            <h3>Seragam Kaos Olah Raga</h3>
+            <table class="uniform-table">
+                <thead>
+                    <tr><th>Ukuran</th><th>Beri Tanda Cek List</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>M</td><td></td></tr>
+                    <tr><td>L</td><td></td></tr>
+                    <tr><td>XL</td><td></td></tr>
+                    <tr><td>XXL</td><td></td></tr>
+                    <tr><td>XXXL</td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Jaket Almamater -->
+        <div class="uniform-section" style="grid-column: 1 / -1; max-width: 50%;">
+            <h3>Seragam Jaket Almamater</h3>
+            <table class="uniform-table">
+                <thead>
+                    <tr><th>Ukuran</th><th>Beri Tanda Cek List</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>M</td><td></td></tr>
+                    <tr><td>L</td><td></td></tr>
+                    <tr><td>XL</td><td></td></tr>
+                    <tr><td>XXL</td><td></td></tr>
+                    <tr><td>XXXL</td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:24pt;">
+        <p style="font-size:10pt;"><em>Catatan : Diserahkan pada saat daftar Ulang</em></p>
+        <div style="text-align:center; width:120pt;">
+            <p>Tasikmalaya, ........... 2026</p>
+            <p>Tanda Tangan Calon Siswa</p>
+            <br><br><br>
+            <p style="text-decoration:underline;" id="h5-ttd">—</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─── Tombol Cetak ──────────────────────────────────── -->
+<button class="print-btn no-print" onclick="window.print()">
+    🖨️ Cetak Semua Halaman
+</button>
+
+<script>
+    // ─── Ambil data dari localStorage (dikirim dari siswa/index.html) ─────────
+    (function() {
+        const raw = localStorage.getItem('du_data');
+        if (!raw) {
+            console.warn('Tidak ada data daftar ulang. Pastikan dibuka dari dashboard siswa.');
+            return;
+        }
+
+        const d = JSON.parse(raw);
+
+        // Helper: format tanggal lahir
+        const formatTTL = () => {
+            const ttl = d.tempat_lahir || '—';
+            if (!d.tanggal_lahir) return ttl;
+            const tgl = new Date(d.tanggal_lahir);
+            const bulan = ['Januari','Februari','Maret','April','Mei','Juni',
+                           'Juli','Agustus','September','Oktober','November','Desember'];
+            return `${ttl}, ${tgl.getDate()} ${bulan[tgl.getMonth()]} ${tgl.getFullYear()}`;
+        };
+
+        const jk = d.jenis_kelamin === 'L' ? 'Laki-laki' : d.jenis_kelamin === 'P' ? 'Perempuan' : (d.jenis_kelamin || '—');
+        const ttl = formatTTL();
+        const alamatLengkap = [d.alamat_lengkap, d.desa_kelurahan, d.kecamatan, d.kabupaten_kota]
+            .filter(Boolean).join(', ');
+
+        // Nama wali (prioritas orang tua ayah, fallback ibu)
+        const namaWali = d.nama_ayah || d.nama_ibu || '—';
+        const pekerjaanWali = d.pekerjaan_ayah || d.pekerjaan_ibu || '—';
+
+        // ── Halaman 1 ──
+        setText('h1-nama',   d.nama_lengkap);
+        setText('h1-ttl',    ttl);
+        setText('h1-jk',     jk);
+        setText('h1-nopend', d.no_pendaftaran);
+
+        // ── Halaman 3 ──
+        setText('h3-nama-ortu',      namaWali);
+        setText('h3-pekerjaan-ortu', pekerjaanWali);
+        setText('h3-alamat',         alamatLengkap);
+        setText('h3-telp',           d.no_telepon_ortu);
+        setText('h3-ttd-ortu',       namaWali);
+        setText('h3-ttd-siswa',      d.nama_lengkap);
+
+        // ── Halaman 4 ──
+        setText('h4-nama',     d.nama_lengkap);
+        setText('h4-ttl',      ttl);
+        setText('h4-jk',       jk);
+        setText('h4-ayah',     d.nama_ayah);
+        setText('h4-ibu',      d.nama_ibu);
+        setText('h4-pek-ayah', d.pekerjaan_ayah);
+        setText('h4-pek-ibu',  d.pekerjaan_ibu);
+        setText('h4-alamat',   alamatLengkap);
+        setText('h4-telp',     d.no_telepon_ortu);
+        setText('h4-ttd-ortu', namaWali);
+        setText('h4-ttd-siswa',d.nama_lengkap);
+
+        // ── Halaman 5 ──
+        setText('h5-nopend', d.no_pendaftaran);
+        setText('h5-nama',   d.nama_lengkap);
+        setText('h5-jk',     jk);
+        setText('h5-asal',   d.asal_sekolah);
+        setText('h5-ttd',    d.nama_lengkap);
+
+        // Auto print setelah data terisi
+        setTimeout(() => window.print(), 600);
+    })();
+
+    function setText(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val || '—';
+    }
+</script>
+
+</body>
+</html>

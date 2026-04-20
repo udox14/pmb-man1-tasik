@@ -218,14 +218,10 @@ function renderTable() {
         // Badge Daftar Ulang (hanya untuk yang DITERIMA)
         let badgeDU = '';
         if (p.status_kelulusan === 'DITERIMA') {
-            const done1 = !!p.daftar_ulang_pesantren_url;
-            const done2 = !!p.daftar_ulang_tertib_url;
-            if (done1 && done2) {
-                badgeDU = '<span class="badge-modern badge-green" style="font-size:.65rem;"><i class="ph ph-check-circle"></i> Lengkap</span>';
-            } else if (done1 || done2) {
-                badgeDU = '<span class="badge-modern badge-yellow" style="font-size:.65rem;"><i class="ph ph-minus-circle"></i> Sebagian</span>';
+            if (p.daftar_ulang_pesantren_url) {
+                badgeDU = '<span class="badge-modern badge-green" style="font-size:.65rem;"><i class="ph ph-check-circle"></i> Sudah Upload</span>';
             } else {
-                badgeDU = '<span class="badge-modern badge-red" style="font-size:.65rem;"><i class="ph ph-clock"></i> Belum</span>';
+                badgeDU = '<span class="badge-modern badge-red" style="font-size:.65rem;"><i class="ph ph-clock"></i> Belum Upload</span>';
             }
         } else {
             badgeDU = '<span style="color:#94a3b8; font-size:.7rem;">—</span>';

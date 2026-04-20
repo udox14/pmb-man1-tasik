@@ -1073,8 +1073,7 @@
                 <!-- Instruksi singkat -->
                 <div class="du-instructions">
                     <ol>
-                        <li>Download kedua surat di bawah.</li>
-                        <li>Print, isi, dan tandatangani secara manual.</li>
+                        <li>Cetak surat, isi data yang diminta, lalu tandatangani secara manual.</li>
                         <li>Scan atau foto dokumen yang sudah ditandatangani, lalu upload di sini.</li>
                     </ol>
                 </div>
@@ -1082,19 +1081,18 @@
                 <!-- Daftar dokumen -->
                 <div class="du-docs">
 
-                    <!-- Dokumen 1 -->
+                    <!-- Dokumen: Surat Pernyataan Murid Baru dan Orang Tua -->
                     <div class="du-doc-row">
-                        <div class="du-doc-num">1</div>
                         <div class="du-doc-info">
-                            <div class="du-doc-title">Surat Pernyataan Bersedia Tinggal di Pesantren</div>
+                            <div class="du-doc-title">Surat Pernyataan Murid Baru dan Orang Tua</div>
                             <div id="du-status-pesantren">
                                 <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
                             </div>
                         </div>
                         <div class="du-doc-actions">
-                            <a href="/SUPER_TINGGAL_DI_PESANTREN.pdf" target="_blank" download class="du-btn-dl">
-                                <i class="ph ph-download-simple"></i> Download
-                            </a>
+                            <button class="du-btn-dl" onclick="cetakDaftarUlang()">
+                                <i class="ph ph-printer"></i> Cetak Surat
+                            </button>
                             <button class="du-btn-up" id="btn-upload-pesantren"
                                 onclick="document.getElementById('file-du-pesantren').click()">
                                 <i class="ph ph-upload-simple"></i> Upload Scan
@@ -1105,30 +1103,19 @@
                         </div>
                     </div>
 
-                    <!-- Dokumen 2 -->
-                    <div class="du-doc-row">
-                        <div class="du-doc-num">2</div>
-                        <div class="du-doc-info">
-                            <div class="du-doc-title">Surat Pernyataan Murid Baru dan Orang Tua</div>
-                            <div id="du-status-tertib">
-                                <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
-                            </div>
-                        </div>
-                        <div class="du-doc-actions">
-                            <a href="/SUPER-MENAATI_TATA_TERTIB.pdf" target="_blank" download class="du-btn-dl">
-                                <i class="ph ph-download-simple"></i> Download
-                            </a>
-                            <button class="du-btn-up" id="btn-upload-tertib"
-                                onclick="document.getElementById('file-du-tertib').click()">
-                                <i class="ph ph-upload-simple"></i> Upload Scan
-                            </button>
-                            <input type="file" id="file-du-tertib" class="du-input-file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onchange="uploadDU(this, 'tertib')">
-                        </div>
-                    </div>
-
                 </div><!-- /du-docs -->
+
+                <!-- Keterangan hardcopy -->
+                <div style="padding: 10px 22px 14px; display:flex; align-items:flex-start; gap:10px; background:var(--bg); border-top:1px solid var(--rule);">
+                    <i class="ph ph-info" style="color:var(--teal); font-size:1rem; flex-shrink:0; margin-top:2px;"></i>
+                    <p style="font-size:.76rem; color:var(--ink-mid); margin:0; line-height:1.6;">
+                        <strong style="color:var(--ink);">Perhatian:</strong>
+                        Dokumen yang telah dicetak, diisi, dan ditandatangani <strong>wajib dibawa dalam bentuk fisik (hardcopy)</strong>
+                        dan diserahkan kepada panitia pada saat <strong>Rapat Orang Tua</strong>.
+                        Tanda bukti upload di atas bukan pengganti dokumen fisik.
+                    </p>
+                </div>
+
             </div><!-- /du-wrapper -->
 
             <!-- Status cards -->

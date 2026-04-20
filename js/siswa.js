@@ -480,18 +480,26 @@ function renderDaftarUlang(data) {
   };
 
   updateBadge('du-status-pesantren', data.daftar_ulang_pesantren_url);
-  updateBadge('du-status-tertib',    data.daftar_ulang_tertib_url);
 
   // Update teks tombol upload jika sudah terupload
   if (data.daftar_ulang_pesantren_url) {
     const btn = document.getElementById('btn-upload-pesantren');
     if (btn) btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang';
   }
-  if (data.daftar_ulang_tertib_url) {
-    const btn = document.getElementById('btn-upload-tertib');
-    if (btn) btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang';
-  }
 }
+
+// ===========================================================
+// CETAK BERKAS DAFTAR ULANG
+// ===========================================================
+window.cetakDaftarUlang = function() {
+  if (!_cachedData) {
+    Swal.fire('Tunggu', 'Data belum termuat, coba lagi sebentar.', 'info');
+    return;
+  }
+  // Kirim data ke halaman cetak via localStorage
+  localStorage.setItem('du_data', JSON.stringify(_cachedData));
+  window.open('../cetak-daftar-ulang.html', '_blank');
+};
 
 window.uploadDU = async function(input, jenis) {
   const file = input.files[0];
@@ -499,7 +507,6 @@ window.uploadDU = async function(input, jenis) {
 
   const fieldMap = {
     pesantren: { field: 'daftar_ulang_pesantren_url', btnId: 'btn-upload-pesantren', statusId: 'du-status-pesantren' },
-    tertib:    { field: 'daftar_ulang_tertib_url',    btnId: 'btn-upload-tertib',    statusId: 'du-status-tertib'    },
   };
   const cfg = fieldMap[jenis];
   if (!cfg || !userSession?.id) return;
