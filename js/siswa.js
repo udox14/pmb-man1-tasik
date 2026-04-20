@@ -488,19 +488,6 @@ function renderDaftarUlang(data) {
   }
 }
 
-// ===========================================================
-// CETAK BERKAS DAFTAR ULANG
-// ===========================================================
-window.cetakDaftarUlang = function() {
-  if (!_cachedData) {
-    Swal.fire('Tunggu', 'Data belum termuat, coba lagi sebentar.', 'info');
-    return;
-  }
-  // Kirim data ke halaman cetak via localStorage
-  localStorage.setItem('du_data', JSON.stringify(_cachedData));
-  window.open('../cetak-daftar-ulang.html', '_blank');
-};
-
 window.uploadDU = async function(input, jenis) {
   const file = input.files[0];
   if (!file) return;
