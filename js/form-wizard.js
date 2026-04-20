@@ -827,6 +827,10 @@ window.submitForm = async function() {
 
     } catch (err) {
         console.error(err);
-        Swal.fire('Gagal Mengirim', 'Terjadi kesalahan: ' + err.message, 'error');
+        let msg = err.message;
+        if (msg.toLowerCase().includes('fetch')) {
+            msg = 'Koneksi internet Anda terputus atau tidak stabil. Silakan periksa jaringan Anda dan coba lagi.';
+        }
+        Swal.fire('Gagal Mengirim', 'Terjadi kesalahan: ' + msg, 'error');
     }
 }

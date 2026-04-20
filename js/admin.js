@@ -1298,6 +1298,7 @@ window.viewDetail = async function(id) {
         }
 
         const val = (v) => v ? v : '-';
+        const tglVal = (v) => { if(!v) return '-'; const p = v.split('-'); return p.length===3 ? `${p[2]}-${p[1]}-${p[0]}` : v; };
         const money = (v) => v ? 'Rp ' + parseInt(v).toLocaleString('id-ID') : '-';
         
         const isVerifTrue = p.status_verifikasi === true ? 'active' : '';
@@ -1522,6 +1523,9 @@ window.viewDetail = async function(id) {
                             <i class="ph ph-book-open-text"></i> Rapor
                         </a>
                         ${p.scan_sertifikat_prestasi_url ? `<a href="#" onclick="openFileViewer(6);return false;" class="file-btn" id="fb-6"><i class="ph ph-trophy"></i> Sertifikat Prestasi</a>` : ''}
+                        
+                        ${p.daftar_ulang_pesantren_url ? `<span class="d-files-label" style="margin-top:15px;">Berkas Daftar Ulang</span>` : ''}
+                        ${p.daftar_ulang_pesantren_url ? `<a href="#" onclick="openFileViewer(7);return false;" class="file-btn" id="fb-7"><i class="ph ph-file-pdf"></i> Surat Pesantren</a>` : ''}
 
                         <!-- FLAG BERKAS BERMASALAH -->
                         <div class="flag-section">
@@ -1609,7 +1613,7 @@ window.viewDetail = async function(id) {
                             <div class="detail-title" ${isBebasTes ? 'style="margin-top:0;"' : ''}>Data Pribadi</div>
                             <div class="detail-grid">
                                 <div class="detail-item"><label>NIK</label><b>${val(p.nik)}</b></div>
-                                <div class="detail-item"><label>Tempat, Tanggal Lahir</label><b>${val(p.tempat_lahir)}, ${val(p.tanggal_lahir)}</b></div>
+                                <div class="detail-item"><label>Tempat, Tanggal Lahir</label><b>${val(p.tempat_lahir)}, ${tglVal(p.tanggal_lahir)}</b></div>
                                 <div class="detail-item"><label>Jenis Kelamin</label><b>${val(p.jenis_kelamin)}</b></div>
                                 <div class="detail-item"><label>Agama</label><b>${val(p.agama)}</b></div>
                                 <div class="detail-item"><label>Anak Ke</label><b>${val(p.anak_ke)} dari ${val(p.jumlah_saudara)}</b></div>
@@ -1690,6 +1694,7 @@ window.viewDetail = async function(id) {
             { label: 'KTP Orang Tua',        url: p.scan_ktp_ortu_url,             type: 'pdf' },
             { label: 'Rapor',                url: p.scan_rapor_url,                type: 'pdf' },
             { label: 'Sertifikat Prestasi',  url: p.scan_sertifikat_prestasi_url,  type: 'pdf' },
+            { label: 'Surat Pesantren',      url: p.daftar_ulang_pesantren_url,    type: 'pdf' },
         ].filter(f => f.url);   // hanya yang ada URL-nya
 
         let fvCurrent = 0;
@@ -1793,6 +1798,7 @@ window.viewDetail = async function(id) {
                 { label: 'KTP Orang Tua',        url: p.scan_ktp_ortu_url,             type: 'pdf' },
                 { label: 'Rapor',                url: p.scan_rapor_url,                type: 'pdf' },
                 { label: 'Sertifikat Prestasi',  url: p.scan_sertifikat_prestasi_url,  type: 'pdf' },
+                { label: 'Surat Pesantren',      url: p.daftar_ulang_pesantren_url,    type: 'pdf' },
             ];
             const clicked = allFiles[btnIndex];
             if (!clicked || !clicked.url) return;
@@ -1818,7 +1824,8 @@ window.viewDetail = async function(id) {
             const origUrls = [
                 p.foto_url, p.scan_kk_url, p.scan_akta_url,
                 p.scan_skb_url, p.scan_ktp_ortu_url,
-                p.scan_rapor_url, p.scan_sertifikat_prestasi_url
+                p.scan_rapor_url, p.scan_sertifikat_prestasi_url,
+                p.daftar_ulang_pesantren_url
             ];
             const origIdx = origUrls.indexOf(f.url);
             if (origIdx >= 0) {
