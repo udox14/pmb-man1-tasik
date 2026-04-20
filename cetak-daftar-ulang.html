@@ -17,13 +17,13 @@
         .page {
             width: 210mm;
             min-height: 297mm;
-            padding: 25mm 25mm 25mm 25mm;
+            padding: 20mm 20mm 20mm 20mm; /* Margin dilayar */
             margin: 0 auto 10mm auto;
             background: #fff;
             page-break-after: always;
             position: relative;
         }
-        .page:last-child { page-break-after: avoid; }
+        .page:last-child { page-break-after: auto; }
 
         /* Typography */
         p { margin-bottom: 4pt; text-align: justify; }
@@ -70,8 +70,21 @@
         .catatan { font-size: 9.5pt; font-style: italic; font-weight: bold; margin-top: 20pt;}
 
         @media print {
+            @page {
+                size: A4;
+                margin: 15mm; /* Margin asli saat diprint */
+            }
             body { margin: 0; background: #fff; }
-            .page { margin: 0; border: none !important; box-shadow: none !important; padding: 25.4mm 19.1mm; }
+            .page { 
+                width: auto; 
+                min-height: auto; /* Hilangkan min-height agar tidak tumpah */
+                margin: 0; 
+                border: none !important; 
+                box-shadow: none !important; 
+                padding: 0; /* Padding di-handle oleh margin @page di atas */
+                page-break-after: always;
+            }
+            .page:last-child { page-break-after: auto; }
             .no-print { display: none !important; }
         }
         @media screen {
@@ -331,7 +344,7 @@
                 <span style="display:inline-block; border-bottom:1px dotted #000; width:65%; min-height:16pt;" id="h3-ttd-ortu" class="bold"></span><br>
                 (Nama Jelas dan Tandatangan)
             </td>
-            <td style="">
+            <td>
                 <span style="margin-left:38px; display:inline-block; border-bottom:1px dotted #000; width:60%; min-height:16pt;" id="h3-ttd-siswa" class="bold"></span> (Nama<br>
                 <span style="margin-left:38px;">Jelas dan Tandatangan)</span>
             </td>
