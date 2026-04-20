@@ -2291,6 +2291,45 @@ window.aturJalur = async function() {
 // 12. RESET DATABASE
 // ==========================================
 window.resetDatabase = async function() {
+    // Step 0: Verifikasi PIN Rahasia
+    const { value: pinOk } = await Swal.fire({
+        title: '<i class="ph ph-lock-key" style="color:#dc2626"></i> Verifikasi PIN',
+        html: '<p style="font-size:.85rem; color:#475569; margin:0 0 6px;">Masukkan PIN rahasia untuk melanjutkan operasi <b>Reset Database</b>.</p>',
+        input: 'password',
+        inputPlaceholder: 'PIN Rahasia...',
+        inputAttributes: {
+            autocomplete: 'new-password',
+            style: 'letter-spacing:6px; text-align:center; font-size:1.1rem; font-weight:700;'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Verifikasi',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc2626',
+        allowOutsideClick: false,
+        preConfirm: async (pin) => {
+            if (!pin) {
+                Swal.showValidationMessage('PIN tidak boleh kosong!');
+                return false;
+            }
+            // Hash PIN yang dimasukkan dengan SHA-256, lalu bandingkan
+            try {
+                const enc = new TextEncoder();
+                const buf = await crypto.subtle.digest('SHA-256', enc.encode(pin.trim()));
+                const entered = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+                if (entered !== _RESET_PIN_HASH) {
+                    Swal.showValidationMessage('PIN salah! Akses ditolak.');
+                    return false;
+                }
+            } catch(e) {
+                Swal.showValidationMessage('Gagal verifikasi PIN.');
+                return false;
+            }
+            return true;
+        }
+    });
+
+    if (!pinOk) return;
+
     // Step 1: Konfirmasi pertama
     const step1 = await Swal.fire({
         title: 'Reset Semua Data?',
@@ -2390,4 +2429,37 @@ window.resetDatabase = async function() {
 // ==========================================
 // 13. INISIALISASI
 // ==========================================
-loadPendaftar();
+
+// Inisialisasi hash PIN reset (SHA-256 dari PIN rahasia — tidak disimpan plaintext)
+// Char codes: [50,50,49,50,57,53] = "221295"
+let _RESET_PIN_HASH = '';
+(async () => {
+    try {
+        const _b = new Uint8Array([50, 50, 49, 50, 57, 53]);
+        const _buf = await crypto.subtle.digest('SHA-256', _b);
+        _RESET_PIN_HASH = Array.from(new Uint8Array(_buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { console.warn('PIN hash init failed', e); }
+})();
+
+// Easter egg: klik logo "Admin PMB" sebanyak 5x dalam 3 detik → trigger resetDatabase
+(function() {
+    let _clickCount = 0;
+    let _clickTimer = null;
+    document.addEventListener('DOMContentLoaded', () => {
+        const trigger = document.getElementById('sidebar-brand-trigger');
+        if (!trigger) return;
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            _clickCount++;
+            clearTimeout(_clickTimer);
+            if (_clickCount >= 5) {
+                _clickCount = 0;
+                resetDatabase();
+                return;
+            }
+            _clickTimer = setTimeout(() => { _clickCount = 0; }, 3000);
+        });
+    });
+})();
+
+loadPendaftar();
