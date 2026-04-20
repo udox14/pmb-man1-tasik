@@ -377,6 +377,8 @@ function renderStatus(data) {
   } else if (data.status_kelulusan === 'DITERIMA') {
     cardLulus.className = 'status-card-lg st-green';
     valLulus.innerHTML  = '<i class="ph ph-confetti"></i> Lulus Seleksi';
+    // Tampilkan section Daftar Ulang
+    renderDaftarUlang(data);
   } else if (data.status_kelulusan === 'TIDAK DITERIMA') {
     cardLulus.className = 'status-card-lg st-red';
     valLulus.innerHTML  = '<i class="ph ph-x-circle"></i> Tidak Lulus';
@@ -451,6 +453,102 @@ function renderStatus(data) {
     showPrint(false);
   }
 }
+
+// ===========================================================
+// DAFTAR ULANG
+// ===========================================================
+function renderDaftarUlang(data) {
+  const section = document.getElementById('daftar-ulang-section');
+  if (!section) return;
+
+  section.style.display = 'block';
+
+  // Update status badge masing-masing dokumen
+  const updateBadge = (elId, url) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (url) {
+      el.innerHTML = `<span class="du-status-badge du-status-uploaded">
+        <i class="ph ph-check-circle"></i> Sudah Upload
+        <a href="${url}" target="_blank" style="color:#065f46; margin-left:4px; font-size:.62rem;">Lihat</a>
+      </span>`;
+    } else {
+      el.innerHTML = `<span class="du-status-badge du-status-pending">
+        <i class="ph ph-clock"></i> Belum Upload
+      </span>`;
+    }
+  };
+
+  updateBadge('du-status-pesantren', data.daftar_ulang_pesantren_url);
+  updateBadge('du-status-tertib',    data.daftar_ulang_tertib_url);
+
+  // Update teks tombol upload jika sudah terupload
+  if (data.daftar_ulang_pesantren_url) {
+    const btn = document.getElementById('btn-upload-pesantren');
+    if (btn) btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang';
+  }
+  if (data.daftar_ulang_tertib_url) {
+    const btn = document.getElementById('btn-upload-tertib');
+    if (btn) btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang';
+  }
+}
+
+window.uploadDU = async function(input, jenis) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const fieldMap = {
+    pesantren: { field: 'daftar_ulang_pesantren_url', btnId: 'btn-upload-pesantren', statusId: 'du-status-pesantren' },
+    tertib:    { field: 'daftar_ulang_tertib_url',    btnId: 'btn-upload-tertib',    statusId: 'du-status-tertib'    },
+  };
+  const cfg = fieldMap[jenis];
+  if (!cfg || !userSession?.id) return;
+
+  const btn = document.getElementById(cfg.btnId);
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph ph-spinner"></i> Mengupload...'; }
+
+  try {
+    // Upload file ke R2
+    const form = new FormData();
+    form.append('file', file);
+    form.append('folder', `daftar-ulang/${userSession.id}`);
+    form.append('docName', jenis.toUpperCase());
+
+    const upRes = await fetch('/api/upload', { method: 'POST', body: form });
+    const upJson = await upRes.json();
+
+    if (upJson.error) throw new Error(upJson.error);
+
+    // Simpan URL ke database
+    const saveRes = await fetch('/api/pendaftar-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: userSession.id, [cfg.field]: upJson.url }),
+    });
+    const saveJson = await saveRes.json();
+    if (saveJson.error) throw new Error(saveJson.error);
+
+    // Update cache & UI
+    if (_cachedData) _cachedData[cfg.field] = upJson.url;
+    const statusEl = document.getElementById(cfg.statusId);
+    if (statusEl) {
+      statusEl.innerHTML = `<span class="du-status-badge du-status-uploaded">
+        <i class="ph ph-check-circle"></i> Sudah Upload
+        <a href="${upJson.url}" target="_blank" style="color:#065f46; margin-left:4px; font-size:.62rem;">Lihat</a>
+      </span>`;
+    }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang'; }
+
+    Swal.fire({ icon: 'success', title: 'Upload Berhasil!', text: 'Dokumen daftar ulang Anda telah tersimpan.', timer: 2000, showConfirmButton: false });
+
+  } catch (err) {
+    console.error('Upload DU error:', err);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-upload-simple"></i> Upload Scan'; }
+    Swal.fire('Gagal Upload', err.message, 'error');
+  }
+
+  input.value = ''; // reset input
+};
 
 // ===========================================================
 // CETAK ULANG BUKTI PENDAFTARAN

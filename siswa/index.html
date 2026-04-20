@@ -782,6 +782,156 @@
         .mob-btn i {
             font-size: .9rem;
         }
+        /* ── Daftar Ulang ─────────────────────────────────────────── */
+        .daftar-ulang-banner {
+            background: linear-gradient(135deg, #0d4f3c 0%, #065f46 60%, #047857 100%);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 16px;
+            display: none; /* ditampilkan oleh JS jika DITERIMA */
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #059669;
+        }
+        .daftar-ulang-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
+            background: rgba(255,255,255,.05);
+            border-radius: 50%;
+        }
+        .daftar-ulang-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; left: 60px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,.04);
+            border-radius: 50%;
+        }
+        .du-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .du-icon-badge {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,.15);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: #6ee7b7;
+            flex-shrink: 0;
+        }
+        .du-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 0 0 4px;
+        }
+        .du-subtitle {
+            color: rgba(255,255,255,.65);
+            font-size: .78rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .du-steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .du-step {
+            background: rgba(255,255,255,.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,.12);
+        }
+        .du-step-num {
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #6ee7b7;
+            margin-bottom: 6px;
+        }
+        .du-step p {
+            font-size: .78rem;
+            color: rgba(255,255,255,.8);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .du-doc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .du-doc-card {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .du-doc-name {
+            font-size: .78rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.4;
+        }
+        .du-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 99px;
+            font-size: .65rem;
+            font-weight: 700;
+        }
+        .du-status-uploaded { background: #d1fae5; color: #065f46; }
+        .du-status-pending  { background: rgba(255,255,255,.15); color: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.2); }
+        .du-btn-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 8px;
+            color: white;
+            font-size: .74rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background .15s;
+            cursor: pointer;
+        }
+        .du-btn-download:hover { background: rgba(255,255,255,.25); }
+        .du-btn-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #059669;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            color: white;
+            font-size: .74rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .15s;
+            font-family: inherit;
+        }
+        .du-btn-upload:hover { background: #047857; }
+        .du-btn-upload:disabled { opacity: .6; cursor: not-allowed; }
+        .du-input-file { display: none; }
+        @media (max-width: 600px) {
+            .du-steps, .du-doc-grid { grid-template-columns: 1fr; }
+            .daftar-ulang-banner { padding: 18px 16px; }
+        }
     </style>
 </head>
 
@@ -883,6 +1033,73 @@
                     <p>Hasil Seleksi PMB 2026/2027</p>
                 </div>
                 <div class="timer-grid" id="timer"></div>
+            </div>
+
+            <!-- ✦ DAFTAR ULANG BANNER (hanya jika DITERIMA) -->
+            <div class="daftar-ulang-banner" id="daftar-ulang-section">
+                <div class="du-header">
+                    <div class="du-icon-badge"><i class="ph ph-clipboard-text"></i></div>
+                    <div>
+                        <h2 class="du-title">📋 Daftar Ulang — Wajib Diselesaikan!</h2>
+                        <p class="du-subtitle">
+                            Selamat, Anda dinyatakan <strong style="color:#6ee7b7;">DITERIMA</strong>.
+                            Untuk memastikan tempat Anda, segera selesaikan proses daftar ulang berikut.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="du-steps">
+                    <div class="du-step">
+                        <div class="du-step-num">📥 Langkah 1</div>
+                        <p>Download kedua surat di bawah, print, lalu isi & tandatangani secara manual.</p>
+                    </div>
+                    <div class="du-step">
+                        <div class="du-step-num">📤 Langkah 2</div>
+                        <p>Scan/foto dokumen yang telah ditandatangani, lalu upload kembali di sini.</p>
+                    </div>
+                </div>
+
+                <div class="du-doc-grid">
+                    <!-- Dokumen 1: Surat Tinggal di Pesantren -->
+                    <div class="du-doc-card">
+                        <div>
+                            <div class="du-doc-name">📄 Surat Pernyataan Bersedia Tinggal di Pesantren</div>
+                            <div style="margin-top:6px;" id="du-status-pesantren">
+                                <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
+                            </div>
+                        </div>
+                        <a href="/SUPER_TINGGAL_DI_PESANTREN.pdf" target="_blank" download class="du-btn-download">
+                            <i class="ph ph-download-simple"></i> Download Surat
+                        </a>
+                        <button class="du-btn-upload" id="btn-upload-pesantren"
+                            onclick="document.getElementById('file-du-pesantren').click()">
+                            <i class="ph ph-upload-simple"></i> Upload Scan
+                        </button>
+                        <input type="file" id="file-du-pesantren" class="du-input-file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onchange="uploadDU(this, 'pesantren')">
+                    </div>
+
+                    <!-- Dokumen 2: Surat Tata Tertib -->
+                    <div class="du-doc-card">
+                        <div>
+                            <div class="du-doc-name">📄 Surat Pernyataan Siap Menaati Tata Tertib MAN 1 Tasikmalaya</div>
+                            <div style="margin-top:6px;" id="du-status-tertib">
+                                <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
+                            </div>
+                        </div>
+                        <a href="/SUPER-MENAATI_TATA_TERTIB.pdf" target="_blank" download class="du-btn-download">
+                            <i class="ph ph-download-simple"></i> Download Surat
+                        </a>
+                        <button class="du-btn-upload" id="btn-upload-tertib"
+                            onclick="document.getElementById('file-du-tertib').click()">
+                            <i class="ph ph-upload-simple"></i> Upload Scan
+                        </button>
+                        <input type="file" id="file-du-tertib" class="du-input-file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onchange="uploadDU(this, 'tertib')">
+                    </div>
+                </div>
             </div>
 
             <!-- Status cards -->

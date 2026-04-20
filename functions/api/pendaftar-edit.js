@@ -20,6 +20,8 @@ const ALLOWED_FIELDS = [
   // URL berkas (untuk upload ulang)
   'foto_url', 'scan_kk_url', 'scan_akta_url', 'scan_kelakuan_baik_url',
   'scan_ktp_ortu_url', 'scan_sertifikat_prestasi_url', 'scan_rapor_url',
+  // URL dokumen daftar ulang (hanya untuk yang DITERIMA)
+  'daftar_ulang_pesantren_url', 'daftar_ulang_tertib_url',
 ];
 
 export async function onRequestPost(context) {

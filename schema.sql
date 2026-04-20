@@ -75,7 +75,9 @@ CREATE TABLE IF NOT EXISTS pendaftar (
   scan_sertifikat_prestasi_url TEXT,
   scan_rapor_url              TEXT,
   tanggal_tes                 TEXT,
-  sesi_tes                    TEXT
+  sesi_tes                    TEXT,
+  daftar_ulang_pesantren_url  TEXT,   -- Surat bersedia tinggal di pesantren (upload siswa)
+  daftar_ulang_tertib_url     TEXT    -- Surat siap menaati tata tertib (upload siswa)
 );
 
 CREATE TABLE IF NOT EXISTS prestasi (

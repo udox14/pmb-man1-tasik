@@ -193,7 +193,7 @@ function renderTable() {
 
     tbody.innerHTML = '';
     if (pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px;">Tidak ada data ditemukan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 30px;">Tidak ada data ditemukan.</td></tr>';
         renderPagination(0); 
         return;
     }
@@ -213,6 +213,22 @@ function renderTable() {
             badgeLulus = '<span class="badge-modern badge-green">DITERIMA</span>';
         } else if (p.status_kelulusan === 'TIDAK DITERIMA') {
             badgeLulus = '<span class="badge-modern badge-red">TIDAK LULUS</span>';
+        }
+
+        // Badge Daftar Ulang (hanya untuk yang DITERIMA)
+        let badgeDU = '';
+        if (p.status_kelulusan === 'DITERIMA') {
+            const done1 = !!p.daftar_ulang_pesantren_url;
+            const done2 = !!p.daftar_ulang_tertib_url;
+            if (done1 && done2) {
+                badgeDU = '<span class="badge-modern badge-green" style="font-size:.65rem;"><i class="ph ph-check-circle"></i> Lengkap</span>';
+            } else if (done1 || done2) {
+                badgeDU = '<span class="badge-modern badge-yellow" style="font-size:.65rem;"><i class="ph ph-minus-circle"></i> Sebagian</span>';
+            } else {
+                badgeDU = '<span class="badge-modern badge-red" style="font-size:.65rem;"><i class="ph ph-clock"></i> Belum</span>';
+            }
+        } else {
+            badgeDU = '<span style="color:#94a3b8; font-size:.7rem;">—</span>';
         }
 
         const isChecked = selectedIds.has(p.id) ? 'checked' : '';
@@ -242,6 +258,9 @@ function renderTable() {
             </td>
             <td data-label="Kelulusan">
                 ${badgeLulus}
+            </td>
+            <td data-label="Daftar Ulang">
+                ${badgeDU}
             </td>
             <td data-label="Aksi" style="text-align: right;">
                 <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="viewDetail('${p.id}')">
@@ -1671,7 +1690,7 @@ window.viewDetail = async function(id) {
             { label: 'Foto Siswa',          url: p.foto_url,                      type: 'img' },
             { label: 'Kartu Keluarga',       url: p.scan_kk_url,                   type: 'pdf' },
             { label: 'Akta Kelahiran',       url: p.scan_akta_url,                 type: 'pdf' },
-            { label: 'Surat Kelakuan Baik',  url: p.scan_skb_url,                  type: 'pdf' },
+            { label: 'Surat Kelakuan Baik',  url: p.scan_kelakuan_baik_url,        type: 'pdf' },
             { label: 'KTP Orang Tua',        url: p.scan_ktp_ortu_url,             type: 'pdf' },
             { label: 'Rapor',                url: p.scan_rapor_url,                type: 'pdf' },
             { label: 'Sertifikat Prestasi',  url: p.scan_sertifikat_prestasi_url,  type: 'pdf' },
@@ -1774,7 +1793,7 @@ window.viewDetail = async function(id) {
                 { label: 'Foto Siswa',          url: p.foto_url,                      type: 'img' },
                 { label: 'Kartu Keluarga',       url: p.scan_kk_url,                   type: 'pdf' },
                 { label: 'Akta Kelahiran',       url: p.scan_akta_url,                 type: 'pdf' },
-                { label: 'Surat Kelakuan Baik',  url: p.scan_skb_url,                  type: 'pdf' },
+                { label: 'Surat Kelakuan Baik',  url: p.scan_kelakuan_baik_url,        type: 'pdf' },
                 { label: 'KTP Orang Tua',        url: p.scan_ktp_ortu_url,             type: 'pdf' },
                 { label: 'Rapor',                url: p.scan_rapor_url,                type: 'pdf' },
                 { label: 'Sertifikat Prestasi',  url: p.scan_sertifikat_prestasi_url,  type: 'pdf' },
