@@ -276,40 +276,57 @@
             background: var(--surface);
             border: 1px solid var(--rule);
             border-radius: 12px;
-            padding: 18px 20px;
+            padding: 16px 18px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
         }
+        .stat-card-modern::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 12px 0 0 12px;
+        }
+        .stat-card-modern.c-blue::before   { background: #3b82f6; }
+        .stat-card-modern.c-teal::before   { background: #0d9488; }
+        .stat-card-modern.c-indigo::before { background: #6366f1; }
+        .stat-card-modern.c-amber::before  { background: #f59e0b; }
+        .stat-card-modern.c-green::before  { background: #22c55e; }
 
         .stat-icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             flex-shrink: 0;
         }
-        .bg-blue   { background: #eff6ff; color: #2563eb; }
-        .bg-yellow { background: #fefce8; color: #ca8a04; }
-        .bg-green  { background: #f0fdf4; color: var(--ok); }
+        .ic-blue   { background: #eff6ff; color: #3b82f6; }
+        .ic-teal   { background: #f0fdfa; color: #0d9488; }
+        .ic-indigo { background: #eef2ff; color: #6366f1; }
+        .ic-amber  { background: #fffbeb; color: #f59e0b; }
+        .ic-green  { background: #f0fdf4; color: #22c55e; }
 
         .stat-card-modern h2 {
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             font-weight: 800;
             color: var(--ink);
             line-height: 1;
-            margin: 0 0 3px;
+            margin: 0 0 4px;
             letter-spacing: -1px;
         }
         .stat-card-modern small {
-            font-size: .72rem;
-            font-weight: 600;
+            font-size: .68rem;
+            font-weight: 700;
             color: var(--ink-faint);
             text-transform: uppercase;
-            letter-spacing: .5px;
+            letter-spacing: .6px;
+            display: block;
         }
 
         /* ================================================================
@@ -783,8 +800,8 @@
             .admin-main.expanded { margin-left: 0 !important; }
 
             .stats-grid-modern { grid-template-columns: 1fr 1fr 1fr; }
-            .stat-card-modern { padding: 14px; gap: 12px; }
-            .stat-card-modern h2 { font-size: 1.3rem; }
+            .stat-card-modern { padding: 12px 10px; gap: 10px; }
+            .stat-card-modern h2 { font-size: 1.25rem; }
 
             .admin-content-pad { padding: 14px; }
             .table-controls { flex-direction: column; align-items: stretch; gap: 8px; }
@@ -976,8 +993,8 @@
 
                 <!-- Stats -->
                 <div class="stats-grid-modern">
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box bg-blue">
+                    <div class="stat-card-modern c-blue">
+                        <div class="stat-icon-box ic-blue">
                             <i class="ph ph-users-three"></i>
                         </div>
                         <div>
@@ -985,36 +1002,36 @@
                             <small>Total Pendaftar</small>
                         </div>
                     </div>
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box" style="background:#f0fdf4; color:#16a34a;">
-                            <i class="ph ph-student"></i>
+                    <div class="stat-card-modern c-teal">
+                        <div class="stat-icon-box ic-teal">
+                            <i class="ph ph-clipboard-text"></i>
                         </div>
                         <div>
                             <h2 id="count-reguler">0</h2>
                             <small>Jalur Reguler</small>
                         </div>
                     </div>
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box" style="background:#eff6ff; color:#2563eb;">
-                            <i class="ph ph-trophy"></i>
+                    <div class="stat-card-modern c-indigo">
+                        <div class="stat-icon-box ic-indigo">
+                            <i class="ph ph-medal"></i>
                         </div>
                         <div>
                             <h2 id="count-prestasi">0</h2>
                             <small>Jalur Prestasi</small>
                         </div>
                     </div>
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box bg-yellow">
-                            <i class="ph ph-clock"></i>
+                    <div class="stat-card-modern c-amber">
+                        <div class="stat-icon-box ic-amber">
+                            <i class="ph ph-hourglass-medium"></i>
                         </div>
                         <div>
                             <h2 id="count-pending">0</h2>
                             <small>Perlu Verifikasi</small>
                         </div>
                     </div>
-                    <div class="stat-card-modern">
-                        <div class="stat-icon-box bg-green">
-                            <i class="ph ph-check-circle"></i>
+                    <div class="stat-card-modern c-green">
+                        <div class="stat-icon-box ic-green">
+                            <i class="ph ph-seal-check"></i>
                         </div>
                         <div>
                             <h2 id="count-lulus">0</h2>
