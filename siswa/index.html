@@ -820,60 +820,24 @@
             margin: 0;
             line-height: 1.5;
         }
-        /* 3-step bar */
-        .du-stepbar {
-            display: flex;
-            align-items: flex-start;
-            gap: 0;
-            padding: 16px 22px;
+        /* Instruksi daftar ulang */
+        .du-instructions {
+            padding: 12px 22px;
             border-bottom: 1px solid var(--rule);
             background: var(--bg);
         }
-        .du-step-item {
-            flex: 1;
+        .du-instructions ol {
+            margin: 0;
+            padding-left: 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
+            gap: 0 28px;
+            flex-wrap: wrap;
         }
-        .du-step-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 16px;
-            left: calc(50% + 16px);
-            right: calc(-50% + 16px);
-            height: 2px;
-            background: var(--rule-dark);
-        }
-        .du-step-circle {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            border: 2px solid var(--rule-dark);
-            background: var(--surface);
-            color: var(--ink-faint);
+        .du-instructions li {
             font-size: .78rem;
-            font-weight: 800;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-        .du-step-circle.active {
-            border-color: var(--teal);
-            background: var(--teal);
-            color: white;
-        }
-        .du-step-circle.done {
-            border-color: var(--ok);
-            background: var(--ok);
-            color: white;
-        }
-        .du-step-label {
-            font-size: .68rem;
-            font-weight: 700;
-            color: var(--ink-faint);
-            line-height: 1.4;
+            color: var(--ink-mid);
+            line-height: 1.6;
+            min-width: 180px;
         }
         /* Dokumen cards */
         .du-docs {
@@ -955,12 +919,40 @@
         .du-btn-up:hover { background: var(--teal-dark); }
         .du-btn-up:disabled { opacity:.55; cursor: not-allowed; }
         .du-input-file { display: none; }
-        @media (max-width: 600px) {
-            .du-doc-row { flex-wrap: wrap; gap: 10px; }
-            .du-doc-actions { flex-wrap: wrap; }
-            .du-stepbar { gap: 4px; padding: 12px 14px; }
-            .du-docs { padding: 14px 16px; }
-            .du-head { padding: 14px 16px 12px; }
+        @media (max-width: 640px) {
+            /* Header */
+            .du-head { padding: 14px 16px 12px; gap: 10px; }
+            .du-head h3 { font-size: .88rem; }
+
+            /* Instruksi: stack vertikal */
+            .du-instructions { padding: 10px 14px; }
+            .du-instructions ol { flex-direction: column; gap: 2px; }
+
+            /* Dokumen rows: stack vertikal */
+            .du-docs { padding: 12px 14px; }
+            .du-doc-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 14px 0;
+            }
+            .du-doc-info { width: 100%; }
+            .du-doc-title { font-size: .8rem; }
+
+            /* Tombol: 2 kolom sejajar, penuh */
+            .du-doc-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .du-btn-dl, .du-btn-up {
+                justify-content: center;
+                white-space: normal;
+                text-align: center;
+                padding: 9px 8px;
+                font-size: .72rem;
+            }
         }
     </style>
 </head>
@@ -1078,20 +1070,13 @@
                     </div>
                 </div>
 
-                <!-- Step indicator -->
-                <div class="du-stepbar">
-                    <div class="du-step-item">
-                        <div class="du-step-circle active"><i class="ph ph-download-simple"></i></div>
-                        <div class="du-step-label">Download<br>Surat</div>
-                    </div>
-                    <div class="du-step-item">
-                        <div class="du-step-circle active">2</div>
-                        <div class="du-step-label">Print, Isi &amp;<br>Tandatangani</div>
-                    </div>
-                    <div class="du-step-item">
-                        <div class="du-step-circle active"><i class="ph ph-scan"></i></div>
-                        <div class="du-step-label">Scan &amp;<br>Upload</div>
-                    </div>
+                <!-- Instruksi singkat -->
+                <div class="du-instructions">
+                    <ol>
+                        <li>Download kedua surat di bawah.</li>
+                        <li>Print, isi, dan tandatangani secara manual.</li>
+                        <li>Scan atau foto dokumen yang sudah ditandatangani, lalu upload di sini.</li>
+                    </ol>
                 </div>
 
                 <!-- Daftar dokumen -->
