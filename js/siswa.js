@@ -537,7 +537,7 @@ window.uploadDU = async function(input, jenis) {
         <a href="${upJson.url}" target="_blank" style="color:#065f46; margin-left:4px; font-size:.62rem;">Lihat</a>
       </span>`;
     }
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang'; }
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang'; }
 
     Swal.fire({ icon: 'success', title: 'Upload Berhasil!', text: 'Dokumen daftar ulang Anda telah tersimpan.', timer: 2000, showConfirmButton: false });
 

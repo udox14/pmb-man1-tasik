@@ -783,154 +783,184 @@
             font-size: .9rem;
         }
         /* ── Daftar Ulang ─────────────────────────────────────────── */
-        .daftar-ulang-banner {
-            background: linear-gradient(135deg, #0d4f3c 0%, #065f46 60%, #047857 100%);
-            border-radius: 16px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
-            display: none; /* ditampilkan oleh JS jika DITERIMA */
-            position: relative;
+        .du-wrapper {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-top: 4px solid var(--teal);
+            border-radius: 14px;
             overflow: hidden;
-            border: 1px solid #059669;
+            margin-bottom: 16px;
+            display: none; /* ditampilkan JS jika DITERIMA */
         }
-        .daftar-ulang-banner::before {
-            content: '';
-            position: absolute;
-            top: -40px; right: -40px;
-            width: 180px; height: 180px;
-            background: rgba(255,255,255,.05);
-            border-radius: 50%;
-        }
-        .daftar-ulang-banner::after {
-            content: '';
-            position: absolute;
-            bottom: -30px; left: 60px;
-            width: 120px; height: 120px;
-            background: rgba(255,255,255,.04);
-            border-radius: 50%;
-        }
-        .du-header {
+        .du-head {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid var(--rule);
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 14px;
-            margin-bottom: 18px;
         }
-        .du-icon-badge {
-            width: 48px; height: 48px;
-            background: rgba(255,255,255,.15);
-            border-radius: 12px;
+        .du-head-icon {
+            width: 40px; height: 40px;
+            background: var(--teal-dim);
+            border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: #6ee7b7;
+            font-size: 1.2rem;
+            color: var(--teal);
             flex-shrink: 0;
         }
-        .du-title {
-            color: white;
-            font-size: 1.1rem;
+        .du-head h3 {
+            font-size: .95rem;
             font-weight: 800;
-            margin: 0 0 4px;
+            color: var(--ink);
+            margin: 0 0 2px;
         }
-        .du-subtitle {
-            color: rgba(255,255,255,.65);
-            font-size: .78rem;
-            line-height: 1.6;
-            margin: 0;
-        }
-        .du-steps {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-        .du-step {
-            background: rgba(255,255,255,.1);
-            border-radius: 10px;
-            padding: 14px 16px;
-            border: 1px solid rgba(255,255,255,.12);
-        }
-        .du-step-num {
-            font-size: .62rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #6ee7b7;
-            margin-bottom: 6px;
-        }
-        .du-step p {
-            font-size: .78rem;
-            color: rgba(255,255,255,.8);
+        .du-head p {
+            font-size: .76rem;
+            color: var(--ink-soft);
             margin: 0;
             line-height: 1.5;
         }
-        .du-doc-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        /* 3-step bar */
+        .du-stepbar {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--rule);
+            background: var(--bg);
         }
-        .du-doc-card {
-            background: rgba(255,255,255,.08);
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 12px;
-            padding: 14px 16px;
+        .du-step-item {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            text-align: center;
+            position: relative;
         }
-        .du-doc-name {
+        .du-step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: calc(50% + 16px);
+            right: calc(-50% + 16px);
+            height: 2px;
+            background: var(--rule-dark);
+        }
+        .du-step-circle {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--rule-dark);
+            background: var(--surface);
+            color: var(--ink-faint);
             font-size: .78rem;
-            font-weight: 700;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .du-step-circle.active {
+            border-color: var(--teal);
+            background: var(--teal);
             color: white;
+        }
+        .du-step-circle.done {
+            border-color: var(--ok);
+            background: var(--ok);
+            color: white;
+        }
+        .du-step-label {
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--ink-faint);
             line-height: 1.4;
+        }
+        /* Dokumen cards */
+        .du-docs {
+            padding: 18px 22px;
+        }
+        .du-doc-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--rule);
+        }
+        .du-doc-row:last-child { border-bottom: none; }
+        .du-doc-num {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--teal-dim);
+            color: var(--teal);
+            font-size: .72rem; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .du-doc-info { flex: 1; min-width: 0; }
+        .du-doc-title {
+            font-size: .82rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+        .du-doc-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
         }
         .du-status-badge {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            padding: 3px 8px;
+            padding: 3px 10px;
             border-radius: 99px;
             font-size: .65rem;
             font-weight: 700;
         }
-        .du-status-uploaded { background: #d1fae5; color: #065f46; }
-        .du-status-pending  { background: rgba(255,255,255,.15); color: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.2); }
-        .du-btn-download {
-            display: flex;
+        .du-status-uploaded { background: #dcfce7; color: #15803d; }
+        .du-status-pending  { background: #fef9c3; color: #854d0e; }
+        .du-btn-dl {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: rgba(255,255,255,.15);
-            border: 1px solid rgba(255,255,255,.2);
+            gap: 5px;
+            padding: 7px 12px;
+            border: 1px solid var(--rule-dark);
             border-radius: 8px;
-            color: white;
+            background: var(--surface);
+            color: var(--ink-mid);
             font-size: .74rem;
             font-weight: 700;
             text-decoration: none;
-            transition: background .15s;
-            cursor: pointer;
+            transition: background .15s, border-color .15s;
+            white-space: nowrap;
         }
-        .du-btn-download:hover { background: rgba(255,255,255,.25); }
-        .du-btn-upload {
-            display: flex;
+        .du-btn-dl:hover { background: var(--bg); border-color: var(--teal); color: var(--teal); }
+        .du-btn-up {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: #059669;
-            border: 1px solid #10b981;
+            gap: 5px;
+            padding: 7px 12px;
+            border: 1px solid var(--teal);
             border-radius: 8px;
+            background: var(--teal);
             color: white;
             font-size: .74rem;
             font-weight: 700;
             cursor: pointer;
             transition: background .15s;
             font-family: inherit;
+            white-space: nowrap;
         }
-        .du-btn-upload:hover { background: #047857; }
-        .du-btn-upload:disabled { opacity: .6; cursor: not-allowed; }
+        .du-btn-up:hover { background: var(--teal-dark); }
+        .du-btn-up:disabled { opacity:.55; cursor: not-allowed; }
         .du-input-file { display: none; }
         @media (max-width: 600px) {
-            .du-steps, .du-doc-grid { grid-template-columns: 1fr; }
-            .daftar-ulang-banner { padding: 18px 16px; }
+            .du-doc-row { flex-wrap: wrap; gap: 10px; }
+            .du-doc-actions { flex-wrap: wrap; }
+            .du-stepbar { gap: 4px; padding: 12px 14px; }
+            .du-docs { padding: 14px 16px; }
+            .du-head { padding: 14px 16px 12px; }
         }
     </style>
 </head>
@@ -1035,72 +1065,86 @@
                 <div class="timer-grid" id="timer"></div>
             </div>
 
-            <!-- ✦ DAFTAR ULANG BANNER (hanya jika DITERIMA) -->
-            <div class="daftar-ulang-banner" id="daftar-ulang-section">
-                <div class="du-header">
-                    <div class="du-icon-badge"><i class="ph ph-clipboard-text"></i></div>
+            <!-- DAFTAR ULANG (muncul hanya jika DITERIMA) -->
+            <div class="du-wrapper" id="daftar-ulang-section">
+
+                <!-- Header -->
+                <div class="du-head">
+                    <div class="du-head-icon"><i class="ph ph-clipboard-text"></i></div>
                     <div>
-                        <h2 class="du-title">📋 Daftar Ulang — Wajib Diselesaikan!</h2>
-                        <p class="du-subtitle">
-                            Selamat, Anda dinyatakan <strong style="color:#6ee7b7;">DITERIMA</strong>.
-                            Untuk memastikan tempat Anda, segera selesaikan proses daftar ulang berikut.
-                        </p>
+                        <h3>Daftar Ulang &mdash; Selesaikan Sekarang</h3>
+                        <p>Selamat, Anda dinyatakan <strong style="color:var(--teal);">DITERIMA</strong>.
+                           Lengkapi dokumen berikut untuk memastikan tempat Anda.</p>
                     </div>
                 </div>
 
-                <div class="du-steps">
-                    <div class="du-step">
-                        <div class="du-step-num">📥 Langkah 1</div>
-                        <p>Download kedua surat di bawah, print, lalu isi & tandatangani secara manual.</p>
+                <!-- Step indicator -->
+                <div class="du-stepbar">
+                    <div class="du-step-item">
+                        <div class="du-step-circle active"><i class="ph ph-download-simple"></i></div>
+                        <div class="du-step-label">Download<br>Surat</div>
                     </div>
-                    <div class="du-step">
-                        <div class="du-step-num">📤 Langkah 2</div>
-                        <p>Scan/foto dokumen yang telah ditandatangani, lalu upload kembali di sini.</p>
+                    <div class="du-step-item">
+                        <div class="du-step-circle active">2</div>
+                        <div class="du-step-label">Print, Isi &amp;<br>Tandatangani</div>
+                    </div>
+                    <div class="du-step-item">
+                        <div class="du-step-circle active"><i class="ph ph-scan"></i></div>
+                        <div class="du-step-label">Scan &amp;<br>Upload</div>
                     </div>
                 </div>
 
-                <div class="du-doc-grid">
-                    <!-- Dokumen 1: Surat Tinggal di Pesantren -->
-                    <div class="du-doc-card">
-                        <div>
-                            <div class="du-doc-name">📄 Surat Pernyataan Bersedia Tinggal di Pesantren</div>
-                            <div style="margin-top:6px;" id="du-status-pesantren">
+                <!-- Daftar dokumen -->
+                <div class="du-docs">
+
+                    <!-- Dokumen 1 -->
+                    <div class="du-doc-row">
+                        <div class="du-doc-num">1</div>
+                        <div class="du-doc-info">
+                            <div class="du-doc-title">Surat Pernyataan Bersedia Tinggal di Pesantren</div>
+                            <div id="du-status-pesantren">
                                 <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
                             </div>
                         </div>
-                        <a href="/SUPER_TINGGAL_DI_PESANTREN.pdf" target="_blank" download class="du-btn-download">
-                            <i class="ph ph-download-simple"></i> Download Surat
-                        </a>
-                        <button class="du-btn-upload" id="btn-upload-pesantren"
-                            onclick="document.getElementById('file-du-pesantren').click()">
-                            <i class="ph ph-upload-simple"></i> Upload Scan
-                        </button>
-                        <input type="file" id="file-du-pesantren" class="du-input-file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onchange="uploadDU(this, 'pesantren')">
+                        <div class="du-doc-actions">
+                            <a href="/SUPER_TINGGAL_DI_PESANTREN.pdf" target="_blank" download class="du-btn-dl">
+                                <i class="ph ph-download-simple"></i> Download
+                            </a>
+                            <button class="du-btn-up" id="btn-upload-pesantren"
+                                onclick="document.getElementById('file-du-pesantren').click()">
+                                <i class="ph ph-upload-simple"></i> Upload Scan
+                            </button>
+                            <input type="file" id="file-du-pesantren" class="du-input-file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="uploadDU(this, 'pesantren')">
+                        </div>
                     </div>
 
-                    <!-- Dokumen 2: Surat Tata Tertib -->
-                    <div class="du-doc-card">
-                        <div>
-                            <div class="du-doc-name">📄 Surat Pernyataan Siap Menaati Tata Tertib MAN 1 Tasikmalaya</div>
-                            <div style="margin-top:6px;" id="du-status-tertib">
+                    <!-- Dokumen 2 -->
+                    <div class="du-doc-row">
+                        <div class="du-doc-num">2</div>
+                        <div class="du-doc-info">
+                            <div class="du-doc-title">Surat Pernyataan Siap Menaati Tata Tertib MAN 1 Tasikmalaya</div>
+                            <div id="du-status-tertib">
                                 <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
                             </div>
                         </div>
-                        <a href="/SUPER-MENAATI_TATA_TERTIB.pdf" target="_blank" download class="du-btn-download">
-                            <i class="ph ph-download-simple"></i> Download Surat
-                        </a>
-                        <button class="du-btn-upload" id="btn-upload-tertib"
-                            onclick="document.getElementById('file-du-tertib').click()">
-                            <i class="ph ph-upload-simple"></i> Upload Scan
-                        </button>
-                        <input type="file" id="file-du-tertib" class="du-input-file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onchange="uploadDU(this, 'tertib')">
+                        <div class="du-doc-actions">
+                            <a href="/SUPER-MENAATI_TATA_TERTIB.pdf" target="_blank" download class="du-btn-dl">
+                                <i class="ph ph-download-simple"></i> Download
+                            </a>
+                            <button class="du-btn-up" id="btn-upload-tertib"
+                                onclick="document.getElementById('file-du-tertib').click()">
+                                <i class="ph ph-upload-simple"></i> Upload Scan
+                            </button>
+                            <input type="file" id="file-du-tertib" class="du-input-file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="uploadDU(this, 'tertib')">
+                        </div>
                     </div>
-                </div>
-            </div>
+
+                </div><!-- /du-docs -->
+            </div><!-- /du-wrapper -->
 
             <!-- Status cards -->
             <div class="status-main-grid">
