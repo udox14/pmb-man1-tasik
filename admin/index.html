@@ -267,7 +267,7 @@
         ================================================================ */
         .stats-grid-modern {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 14px;
             margin-bottom: 20px;
         }
@@ -782,7 +782,7 @@
             .admin-main { margin-left: 0 !important; width: 100% !important; }
             .admin-main.expanded { margin-left: 0 !important; }
 
-            .stats-grid-modern { grid-template-columns: 1fr 1fr; }
+            .stats-grid-modern { grid-template-columns: 1fr 1fr 1fr; }
             .stat-card-modern { padding: 14px; gap: 12px; }
             .stat-card-modern h2 { font-size: 1.3rem; }
 
@@ -867,7 +867,7 @@
         }
 
         @media (max-width: 480px) {
-            .stats-grid-modern { grid-template-columns: 1fr; }
+            .stats-grid-modern { grid-template-columns: 1fr 1fr; }
         }
 
         /* ── Print styles ─────────────────────────────────────────── */
@@ -986,6 +986,24 @@
                         </div>
                     </div>
                     <div class="stat-card-modern">
+                        <div class="stat-icon-box" style="background:#f0fdf4; color:#16a34a;">
+                            <i class="ph ph-student"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-reguler">0</h2>
+                            <small>Jalur Reguler</small>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon-box" style="background:#eff6ff; color:#2563eb;">
+                            <i class="ph ph-trophy"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-prestasi">0</h2>
+                            <small>Jalur Prestasi</small>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern">
                         <div class="stat-icon-box bg-yellow">
                             <i class="ph ph-clock"></i>
                         </div>
@@ -1030,6 +1048,12 @@
                                 <option value="25">25 baris</option>
                                 <option value="50">50 baris</option>
                                 <option value="100">100 baris</option>
+                                <option value="99999">Semua</option>
+                            </select>
+                            <select id="filterJalur" onchange="filterTable()" class="ctrl-input">
+                                <option value="">Semua Jalur</option>
+                                <option value="REGULER">Reguler</option>
+                                <option value="PRESTASI">Prestasi</option>
                             </select>
                             <select id="filterVerif" onchange="filterTable()" class="ctrl-input">
                                 <option value="">Semua Status Berkas</option>

@@ -130,6 +130,8 @@ async function loadPendaftar() {
 // ==========================================
 function updateStats(data) {
     document.getElementById('count-total').innerText = data.length;
+    document.getElementById('count-reguler').innerText = data.filter(p => p.jalur === 'REGULER').length;
+    document.getElementById('count-prestasi').innerText = data.filter(p => p.jalur === 'PRESTASI').length;
     document.getElementById('count-pending').innerText = data.filter(p => p.status_verifikasi === null).length;
     document.getElementById('count-lulus').innerText = data.filter(p => p.status_kelulusan === 'DITERIMA').length;
 }
@@ -148,6 +150,12 @@ function renderTable() {
                             p.nisn.includes(searchVal) ||
                             p.no_pendaftaran.toLowerCase().includes(searchVal);
         
+        const filterJalur = document.getElementById('filterJalur').value;
+        let matchJalur = true;
+        if (filterJalur !== '') {
+            matchJalur = p.jalur === filterJalur;
+        }
+        
         let matchVerif = true;
         if (filterVerif !== "") {
             matchVerif = String(p.status_verifikasi) === filterVerif;
@@ -158,7 +166,7 @@ function renderTable() {
             matchLulus = (p.status_kelulusan || 'PENDING') === filterLulus;
         }
         
-        return matchSearch && matchVerif && matchLulus;
+        return matchSearch && matchJalur && matchVerif && matchLulus;
     });
 
     filteredData.sort((a, b) => {
@@ -173,12 +181,14 @@ function renderTable() {
         return 0;
     });
 
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    // Jika rowsPerPage sangat besar (mode "Semua"), tampilkan semua langsung
+    const isShowAll = rowsPerPage >= 99999;
+    const totalPages = isShowAll ? 1 : Math.ceil(filteredData.length / rowsPerPage);
     if (currentPage > totalPages) currentPage = 1;
     if (currentPage < 1) currentPage = 1;
     
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + parseInt(rowsPerPage);
+    const start = isShowAll ? 0 : (currentPage - 1) * rowsPerPage;
+    const end   = isShowAll ? filteredData.length : start + parseInt(rowsPerPage);
     const pageData = filteredData.slice(start, end);
 
     tbody.innerHTML = '';
@@ -253,7 +263,8 @@ function renderPagination(totalPages) {
     const container = document.getElementById('pagination');
     container.innerHTML = '';
     
-    if (totalPages <= 1) return;
+    // Jika mode Semua, sembunyikan pagination
+    if (rowsPerPage >= 99999 || totalPages <= 1) return;
     
     const prevBtn = document.createElement('button');
     prevBtn.className = 'page-btn'; 
@@ -265,16 +276,38 @@ function renderPagination(totalPages) {
     }; 
     container.appendChild(prevBtn);
     
-    for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button'); 
-        btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-        btn.innerText = i; 
-        btn.onclick = () => { 
-            currentPage = i; 
-            renderTable(); 
-        }; 
-        container.appendChild(btn);
+    // Tampilkan max 7 tombol halaman dengan elipsis
+    const maxVisible = 7;
+    let pages = [];
+    if (totalPages <= maxVisible) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('...');
+        const start = Math.max(2, currentPage - 1);
+        const end   = Math.min(totalPages - 1, currentPage + 1);
+        for (let i = start; i <= end; i++) pages.push(i);
+        if (currentPage < totalPages - 2) pages.push('...');
+        pages.push(totalPages);
     }
+
+    pages.forEach(p => {
+        if (p === '...') {
+            const span = document.createElement('span');
+            span.textContent = '...';
+            span.style.cssText = 'padding:0 4px; color:var(--ink-faint); font-size:.75rem; display:flex; align-items:center;';
+            container.appendChild(span);
+        } else {
+            const btn = document.createElement('button'); 
+            btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+            btn.innerText = p; 
+            btn.onclick = () => { 
+                currentPage = p; 
+                renderTable(); 
+            }; 
+            container.appendChild(btn);
+        }
+    });
     
     const nextBtn = document.createElement('button');
     nextBtn.className = 'page-btn'; 
