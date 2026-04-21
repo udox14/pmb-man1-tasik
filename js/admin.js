@@ -455,7 +455,7 @@ window.bulkAction = async function(action) {
     // TANGANI DOWNLOAD ZIP PILIHAN
     if (action === 'DOWNLOAD_ZIP') {
         const selectedPendaftar = allPendaftar.filter(p => ids.includes(p.id));
-        const tgl = new Date().toISOString().slice(0,10);
+        const tgl = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
         processZipDownload(selectedPendaftar, `Berkas_TERPILIH_PMB_${tgl}.zip`);
         return; 
     }
@@ -481,7 +481,7 @@ window.bulkAction = async function(action) {
 
         const selectedPendaftar = allPendaftar.filter(p => prestasiIds.includes(p.id));
         let printAreaHTML = '';
-        const tglCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        const tglCetak = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', day:'numeric', month:'long', year:'numeric' });
 
         for (let p of selectedPendaftar) {
             let cats = [];
@@ -2026,7 +2026,7 @@ window.exportToExcel = function() {
 
         // SEMUA DATA FORMULIR MASUK DI SINI
         return {
-            "Waktu Daftar": p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : "-",
+            "Waktu Daftar": p.created_at ? new Date(p.created_at + 'Z').toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : "-",
             "No Pendaftaran": p.no_pendaftaran || "-", 
             "Jalur": p.jalur || "-", 
             "Status Verifikasi": statVerif, 
@@ -2087,7 +2087,7 @@ window.exportToExcel = function() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pendaftar");
     
-    const tgl = new Date().toISOString().slice(0,10);
+    const tgl = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
     XLSX.writeFile(workbook, `Rekap_Lengkap_PMB_MAN1Tasik_${tgl}.xlsx`);
 }
 
@@ -2179,7 +2179,7 @@ window.processZipDownload = async function(pendaftarList, zipFilename) {
 }
 
 window.downloadAllFilesZip = function() {
-    processZipDownload(allPendaftar, `Berkas_ALL_PMB_MAN1Tasik_${new Date().toISOString().slice(0,10)}.zip`);
+    processZipDownload(allPendaftar, `Berkas_ALL_PMB_MAN1Tasik_${new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-')}.zip`);
 }
 
 // ==========================================
