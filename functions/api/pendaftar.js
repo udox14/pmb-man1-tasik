@@ -56,10 +56,11 @@ export async function onRequestPost(context) {
     }
     // Generate no_pendaftaran format 2627XXX — berurutan
     // 26 = tahun masuk, 27 = tahun lulus, XXX = nomor urut 3 digit
-    const countRow = await env.DB.prepare(
-      'SELECT COUNT(*) as total FROM pendaftar'
+    // Gunakan MAX bukan COUNT agar tetap berurutan meski ada data yang dihapus
+    const maxRow = await env.DB.prepare(
+      "SELECT MAX(CAST(SUBSTR(no_pendaftaran, 5) AS INTEGER)) as max_urut FROM pendaftar WHERE no_pendaftaran LIKE '2627%'"
     ).first();
-    const urut = (countRow.total || 0) + 1;
+    const urut = (maxRow.max_urut || 0) + 1;
     const no_pendaftaran = `2627${String(urut).padStart(3, '0')}`;
 
     const id = crypto.randomUUID();

@@ -596,7 +596,15 @@ function clearDraftData() {
 }
 
 // --- SUBMIT FORM ---
+let _isSubmitting = false; // Guard flag untuk mencegah double submit
+
 window.submitForm = async function() {
+    // === GUARD: Cegah double submit ===
+    if (_isSubmitting) {
+        console.warn('submitForm: sudah dalam proses, diabaikan.');
+        return;
+    }
+
     if (!validateSection(window.currentStep)) return;
     const jalur = localStorage.getItem('pmb_jalur');
 
@@ -640,6 +648,11 @@ window.submitForm = async function() {
     });
 
     if (!confirm.isConfirmed) return;
+
+    // === KUNCI tombol & set flag agar tidak bisa diklik ulang ===
+    _isSubmitting = true;
+    const btnSubmit = document.getElementById('btn-submit');
+    if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.style.opacity = '0.6'; btnSubmit.style.cursor = 'not-allowed'; }
 
     Swal.fire({
         title: 'Sedang Mengirim...',
@@ -827,6 +840,9 @@ window.submitForm = async function() {
 
     } catch (err) {
         console.error(err);
+        // === BUKA kembali tombol jika gagal ===
+        _isSubmitting = false;
+        if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.style.opacity = ''; btnSubmit.style.cursor = ''; }
         let msg = err.message;
         if (msg.toLowerCase().includes('fetch')) {
             msg = 'Koneksi internet Anda terputus atau tidak stabil. Silakan periksa jaringan Anda dan coba lagi.';
