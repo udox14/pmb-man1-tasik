@@ -54,13 +54,34 @@ export async function onRequestPost(context) {
       ).bind(nilai_rapor ?? null, id).run();
       return Response.json({ success: true }, { headers: CORS });
     }
+
+    // GUARD DUPLIKAT: Cek apakah NIK atau NISN sudah terdaftar
+    const dupNik = await env.DB.prepare(
+      'SELECT id, no_pendaftaran FROM pendaftar WHERE nik = ? LIMIT 1'
+    ).bind(body.nik).first();
+    if (dupNik) {
+      return Response.json({
+        error: `NIK ini sudah terdaftar sebelumnya (No. Pendaftaran: ${dupNik.no_pendaftaran}). Jika ada kendala, hubungi panitia PMB.`
+      }, { status: 409, headers: CORS });
+    }
+
+    if (body.nisn) {
+      const dupNisn = await env.DB.prepare(
+        'SELECT id, no_pendaftaran FROM pendaftar WHERE nisn = ? LIMIT 1'
+      ).bind(body.nisn).first();
+      if (dupNisn) {
+        return Response.json({
+          error: `NISN ini sudah terdaftar sebelumnya (No. Pendaftaran: ${dupNisn.no_pendaftaran}). Jika ada kendala, hubungi panitia PMB.`
+        }, { status: 409, headers: CORS });
+      }
+    }
+
     // Generate no_pendaftaran format 2627XXX — berurutan
-    // 26 = tahun masuk, 27 = tahun lulus, XXX = nomor urut 3 digit
-    // Gunakan MAX bukan COUNT agar tetap berurutan meski ada data yang dihapus
+    // Gunakan MAX(no_pendaftaran) untuk menghindari race condition dari COUNT(*)
     const maxRow = await env.DB.prepare(
-      "SELECT MAX(CAST(SUBSTR(no_pendaftaran, 5) AS INTEGER)) as max_urut FROM pendaftar WHERE no_pendaftaran LIKE '2627%'"
+      "SELECT MAX(CAST(SUBSTR(no_pendaftaran, 5) AS INTEGER)) as maxUrut FROM pendaftar WHERE no_pendaftaran LIKE '2627%'"
     ).first();
-    const urut = (maxRow.max_urut || 0) + 1;
+    const urut = (maxRow?.maxUrut || 0) + 1;
     const no_pendaftaran = `2627${String(urut).padStart(3, '0')}`;
 
     const id = crypto.randomUUID();

@@ -596,12 +596,13 @@ function clearDraftData() {
 }
 
 // --- SUBMIT FORM ---
-let _isSubmitting = false; // Guard flag untuk mencegah double submit
+// Flag untuk mencegah double-submit
+let _isSubmitting = false;
 
 window.submitForm = async function() {
-    // === GUARD: Cegah double submit ===
+    // GUARD: Cegah double-submit jika proses masih berjalan
     if (_isSubmitting) {
-        console.warn('submitForm: sudah dalam proses, diabaikan.');
+        console.warn('Proses pengiriman sedang berjalan, abaikan klik ganda.');
         return;
     }
 
@@ -649,10 +650,14 @@ window.submitForm = async function() {
 
     if (!confirm.isConfirmed) return;
 
-    // === KUNCI tombol & set flag agar tidak bisa diklik ulang ===
+    // KUNCI: Set flag & disable tombol submit sebelum mulai proses
     _isSubmitting = true;
     const btnSubmit = document.getElementById('btn-submit');
-    if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.style.opacity = '0.6'; btnSubmit.style.cursor = 'not-allowed'; }
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.style.opacity = '0.6';
+        btnSubmit.style.cursor = 'not-allowed';
+    }
 
     Swal.fire({
         title: 'Sedang Mengirim...',
@@ -840,9 +845,13 @@ window.submitForm = async function() {
 
     } catch (err) {
         console.error(err);
-        // === BUKA kembali tombol jika gagal ===
+        // RESET flag agar user bisa coba lagi jika terjadi error
         _isSubmitting = false;
-        if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.style.opacity = ''; btnSubmit.style.cursor = ''; }
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.style.opacity = '';
+            btnSubmit.style.cursor = '';
+        }
         let msg = err.message;
         if (msg.toLowerCase().includes('fetch')) {
             msg = 'Koneksi internet Anda terputus atau tidak stabil. Silakan periksa jaringan Anda dan coba lagi.';
