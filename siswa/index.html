@@ -1474,40 +1474,36 @@
     <!-- KARTU PESERTA (PRINT) — semua ID dipertahankan -->
     <div id="kartu-peserta"
         style="display:none; font-family:'Times New Roman',serif; background:white; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0;">
-        <div style="border:2px solid #000; padding:25px; position:relative;">
+        <div style="border:2px solid #000; padding:15px 18px; position:relative;">
+            <!-- HEADER KOP -->
             <div
-                style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:25px; display:flex; align-items:center; justify-content:center; gap:20px;">
-                <img src="../images/logo.png" style="width:100px; height:auto;">
-                <div style="text-align:center; line-height:1.15; color:#000;">
-                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA
-                        REPUBLIK INDONESIA</h5>
-                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN
-                        AGAMA KAB. TASIKMALAYA</h5>
-                    <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH
-                        ALIYAH NEGERI 1 TASIKMALAYA</h3>
-                    <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame
-                        Kab.Tasikmalaya</p>
-                    <p style="margin:0; font-size:12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
-                    <p style="margin:0; font-size:12px; font-weight:bold;"><i>website : www.manegeri1tasikmalaya.sch.id
-                            &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
+                style="border-bottom:3px double black; padding-bottom:8px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:12px;">
+                <img src="../images/logo.png" style="width:70px; height:auto;">
+                <div style="text-align:center; line-height:1.1; color:#000;">
+                    <h5 style="margin:0; font-size:12px; font-weight:normal; letter-spacing:0.5px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
+                    <h5 style="margin:0; font-size:12px; font-weight:normal; letter-spacing:0.5px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
+                    <h3 style="margin:3px 0; font-size:16px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                    <p style="margin:0; font-size:10px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                    <p style="margin:0; font-size:10px;">Kode Pos 46461 Telp/Fax. (0265) 545719 | website: www.manegeri1tasikmalaya.sch.id</p>
                 </div>
             </div>
+            <!-- JUDUL KARTU -->
             <div
-                style="text-align:center; margin-bottom:30px; background:#eee; border:1px solid #000; padding:8px 0; border-radius:4px;">
-                <h3 style="margin:0; font-size:18px; font-weight:bold; font-family:Arial,sans-serif;">KARTU PESERTA
-                    UJIAN SELEKSI (CBT)</h3>
-                <p style="margin:2px 0 0 0; font-size:14px;">PENERIMAAN MURID BARU (PMB) TAHUN AJARAN 2026/2027</p>
+                style="text-align:center; margin-bottom:12px; background:#eee; border:1px solid #000; padding:5px 0; border-radius:3px;">
+                <h3 style="margin:0; font-size:14px; font-weight:bold; font-family:Arial,sans-serif;">KARTU PESERTA UJIAN SELEKSI (CBT)</h3>
+                <p style="margin:1px 0 0 0; font-size:11px;">PENERIMAAN MURID BARU (PMB) TAHUN AJARAN 2026/2027</p>
             </div>
-            <div style="display:flex; gap:30px; align-items:flex-start;">
-                <div style="width:4cm; flex-shrink:0; text-align:center;">
+            <!-- DATA PESERTA + FOTO -->
+            <div style="display:flex; gap:15px; align-items:flex-start;">
+                <div style="width:3cm; flex-shrink:0; text-align:center;">
                     <img id="print-foto" src=""
-                        style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
+                        style="width:3cm; height:4cm; object-fit:cover; border:1px solid #000; padding:1px; display:block;">
                 </div>
                 <div style="flex:1;">
-                    <table style="width:100%; font-size:15px; border-collapse:separate; border-spacing:0 8px; margin-top:10px;">
+                    <table style="width:100%; font-size:12px; border-collapse:separate; border-spacing:0 4px; margin-top:5px;">
                         <tr>
-                            <td style="width:150px; font-weight:bold;">NOMOR PESERTA</td>
-                            <td>: <span id="print-no" style="font-weight:bold; font-size:18px;"></span></td>
+                            <td style="width:120px; font-weight:bold;">NOMOR PESERTA</td>
+                            <td>: <span id="print-no" style="font-weight:bold; font-size:14px;"></span></td>
                         </tr>
                         <tr>
                             <td>NAMA LENGKAP</td>
@@ -1524,15 +1520,16 @@
                         <tr>
                             <td>ASAL SEKOLAH</td>
                             <td>: <span id="print-sekolah"></span></td>
+                        </tr>
                     </table>
                 </div>
             </div>
-            
-            <div style="display:flex; gap:15px; margin-top:25px; align-items:stretch;">
-                <div style="border:2px solid #000; padding:12px 15px; flex:1; display:flex; flex-direction:column; justify-content:center;">
-                    <table style="width:100%; font-size:16px; font-weight:bold;">
+            <!-- RUANG UJIAN + QR -->
+            <div style="display:flex; gap:10px; margin-top:10px; align-items:stretch;">
+                <div style="border:1px solid #000; padding:8px 10px; flex:1; display:flex; flex-direction:column; justify-content:center;">
+                    <table style="width:100%; font-size:12px; font-weight:bold;">
                         <tr>
-                            <td style="width:160px; white-space:nowrap;">RUANG UJIAN</td>
+                            <td style="width:130px; white-space:nowrap;">RUANG UJIAN</td>
                             <td style="white-space:nowrap;">: <span id="print-ruang"></span></td>
                         </tr>
                         <tr>
@@ -1545,25 +1542,27 @@
                         </tr>
                     </table>
                 </div>
-                <div style="border:2px solid #000; padding:10px; text-align:center; width:90px; display:flex; flex-direction:column; justify-content:center; align-items:center; flex-shrink:0;">
+                <div style="border:1px solid #000; padding:5px; text-align:center; width:70px; display:flex; flex-direction:column; justify-content:center; align-items:center; flex-shrink:0;">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cbt.man1tasikmalaya.sch.id" style="width:100%; height:auto; display:block;" alt="QR Link">
-                    <div style="font-size:9.5px; font-weight:bold; margin-top:6px; letter-spacing:0.5px; line-height:1.2;">SCAN LOGIN<br>UJIAN CBT</div>
+                    <div style="font-size:7px; font-weight:bold; margin-top:3px; letter-spacing:0.3px; line-height:1.1;">SCAN LOGIN<br>UJIAN CBT</div>
                 </div>
             </div>
-            <div style="margin-top:20px; font-size:13px; border-top:2px dashed #000; padding-top:15px;">
+            <!-- TATA TERTIB -->
+            <div style="margin-top:10px; font-size:10px; border-top:1px dashed #000; padding-top:8px;">
                 <b style="text-decoration:underline;">TATA TERTIB PESERTA UJIAN CBT:</b>
-                <ol style="margin:5px 0 0 0; padding-left:20px; line-height:1.6;">
+                <ol style="margin:3px 0 0 0; padding-left:15px; line-height:1.4;">
                     <li>Ujian dilaksanakan berbasis komputer (Computer Based Test).</li>
+                    <li>Peserta <b>wajib membawa smartphone dan dilengkapi dengan kuota internet.</b></li>
                     <li>Sistem ujian (CBT) dapat diakses melalui link: <b>https://cbt.man1tasikmalaya.sch.id</b></li>
                     <li>Peserta wajib hadir di madrasah 30 menit sebelum sesi dimulai.</li>
                     <li>Wajib membawa <b>Kartu Peserta</b> ini (telah dicetak) sebagai bukti login ujian.</li>
                     <li>Berpakaian seragam sekolah asal, rapi, dan bersepatu.</li>
                     <li>Dilarang melakukan kecurangan selama melaksanakan tes CBT.</li>
-                    <li>Keterlambatan lebih dari 15 menit dianggap gugur.</li>
                 </ol>
             </div>
-            <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:flex-end;">
-                <div style="font-size:11px; font-style:italic;">
+            <!-- FOOTER -->
+            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:9px; font-style:italic;">
                     <i>Dicetak otomatis oleh sistem pada: <span id="print-date"></span></i>
                 </div>
             </div>
