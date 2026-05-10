@@ -1173,10 +1173,10 @@
 
                     <div class="filter-bar">
                         <span class="filter-bar-label">Filter:</span>
-                        <select id="filterPlotTgl" class="ctrl-input" onchange="renderPlottingTable()">
+                        <select id="filterPlotTgl" class="ctrl-input" onchange="updatePlottingFilters(); renderPlottingTable()">
                             <option value="">Semua Tanggal</option>
                         </select>
-                        <select id="filterPlotSesi" class="ctrl-input" onchange="renderPlottingTable()">
+                        <select id="filterPlotSesi" class="ctrl-input" onchange="updatePlottingFilters(); renderPlottingTable()">
                             <option value="">Semua Sesi</option>
                         </select>
                         <select id="filterPlotRuang" class="ctrl-input" onchange="renderPlottingTable()">

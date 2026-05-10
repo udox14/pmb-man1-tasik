@@ -952,18 +952,44 @@ window.updatePlottingFilters = function() {
     const curRuang = selRuang.value;
 
     let uniqueDates = scheduleConfig.map(h => h.tanggal);
+
+    // Sesi: filter berdasarkan tanggal yang dipilih di filter atas
     let uniqueSessions = new Set();
     let uniqueRooms = new Set();
-    scheduleConfig.forEach(h => {
-        (h.sesi || []).forEach(s => {
-            uniqueSessions.add(s.nama);
-            (s.ruangan || []).forEach(r => {
-                uniqueRooms.add(r.nama);
+    if (curTgl && curTgl !== 'UNASSIGNED') {
+        const hari = scheduleConfig.find(h => h.tanggal === curTgl);
+        if (hari) {
+            (hari.sesi || []).forEach(s => {
+                uniqueSessions.add(s.nama);
+                (s.ruangan || []).forEach(r => uniqueRooms.add(r.nama));
+            });
+        }
+    } else {
+        scheduleConfig.forEach(h => {
+            (h.sesi || []).forEach(s => {
+                uniqueSessions.add(s.nama);
+                (s.ruangan || []).forEach(r => uniqueRooms.add(r.nama));
             });
         });
-    });
+    }
     uniqueSessions = Array.from(uniqueSessions);
     let allRoomsList = Array.from(uniqueRooms);
+
+    // Jika sesi dipilih, filter ruangan berdasarkan sesi tersebut
+    if (curSesi && curSesi !== 'UNASSIGNED') {
+        let filteredRooms = new Set();
+        const targetHaris = (curTgl && curTgl !== 'UNASSIGNED') 
+            ? scheduleConfig.filter(h => h.tanggal === curTgl) 
+            : scheduleConfig;
+        targetHaris.forEach(h => {
+            (h.sesi || []).forEach(s => {
+                if (s.nama === curSesi) {
+                    (s.ruangan || []).forEach(r => filteredRooms.add(r.nama));
+                }
+            });
+        });
+        allRoomsList = Array.from(filteredRooms);
+    }
 
     selTgl.innerHTML = '<option value="">Semua Tanggal</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
     selSesi.innerHTML = '<option value="">Semua Sesi</option>' + uniqueSessions.map(s => `<option value="${s}">${s}</option>`).join('') + '<option value="UNASSIGNED">-- Belum Diatur --</option>';
@@ -976,8 +1002,18 @@ window.updatePlottingFilters = function() {
     selRuang.innerHTML = optRuang;
 
     selTgl.value = curTgl;
-    selSesi.value = curSesi;
-    selRuang.value = curRuang;
+    // Jika sesi yang dipilih sebelumnya tidak ada di list baru, reset
+    if (curSesi && !uniqueSessions.includes(curSesi) && curSesi !== 'UNASSIGNED') {
+        selSesi.value = '';
+    } else {
+        selSesi.value = curSesi;
+    }
+    // Jika ruangan yang dipilih sebelumnya tidak ada di list baru, reset
+    if (curRuang && !allRoomsList.includes(curRuang) && curRuang !== 'UNASSIGNED') {
+        selRuang.value = '';
+    } else {
+        selRuang.value = curRuang;
+    }
 }
 
 function renderPlottingTable() {
@@ -1018,28 +1054,50 @@ function renderPlottingTable() {
     }
 
     let uniqueDates = scheduleConfig.map(h => h.tanggal);
-    let uniqueSessions = new Set();
-    let uniqueRooms = new Set();
-    scheduleConfig.forEach(h => {
-        (h.sesi || []).forEach(s => {
-            uniqueSessions.add(s.nama);
-            (s.ruangan || []).forEach(r => {
-                uniqueRooms.add(r.nama);
-            });
-        });
-    });
-    uniqueSessions = Array.from(uniqueSessions);
-    let allRoomsList = Array.from(uniqueRooms);
 
     const optDates = '<option value="">- Belum Diatur -</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
-    const optSessions = '<option value="">- Belum Diatur -</option>' + uniqueSessions.map(s => `<option value="${s}">${s}</option>`).join('');
-    
-    let optRooms = '<option value="">- Belum Diatur -</option>';
-    allRoomsList.forEach(r => {
-        optRooms += `<option value="${r}">${r}</option>`;
-    });
+
+    // Helper: ambil sesi berdasarkan tanggal
+    function getSessionsForDate(tanggal) {
+        const hari = scheduleConfig.find(h => h.tanggal === tanggal);
+        if (!hari) return [];
+        return (hari.sesi || []).map(s => s.nama);
+    }
+
+    // Helper: ambil ruangan berdasarkan tanggal + sesi
+    function getRoomsForSession(tanggal, sesiNama) {
+        const hari = scheduleConfig.find(h => h.tanggal === tanggal);
+        if (!hari) return [];
+        const sesi = (hari.sesi || []).find(s => s.nama === sesiNama);
+        if (!sesi) return [];
+        return (sesi.ruangan || []).map(r => r.nama);
+    }
+
+    // Fallback: semua sesi & ruangan (jika tanggal belum dipilih)
+    function getAllSessions() {
+        let all = new Set();
+        scheduleConfig.forEach(h => (h.sesi || []).forEach(s => all.add(s.nama)));
+        return Array.from(all);
+    }
+    function getAllRooms() {
+        let all = new Set();
+        scheduleConfig.forEach(h => (h.sesi || []).forEach(s => (s.ruangan || []).forEach(r => all.add(r.nama))));
+        return Array.from(all);
+    }
 
     targetStudents.forEach(p => {
+        // Tentukan opsi sesi berdasarkan tanggal yang sudah di-set
+        const curTanggal = p.tanggal_tes || '';
+        const curSesi = p.sesi_tes || '';
+        
+        const sessionList = curTanggal ? getSessionsForDate(curTanggal) : getAllSessions();
+        const optSessions = '<option value="">- Belum Diatur -</option>' + sessionList.map(s => `<option value="${s}">${s}</option>`).join('');
+
+        // Tentukan opsi ruangan berdasarkan tanggal + sesi yang sudah di-set
+        const roomList = (curTanggal && curSesi) ? getRoomsForSession(curTanggal, curSesi) : getAllRooms();
+        let optRooms = '<option value="">- Belum Diatur -</option>';
+        roomList.forEach(r => { optRooms += `<option value="${r}">${r}</option>`; });
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td data-label="Peserta">
@@ -1047,17 +1105,17 @@ function renderPlottingTable() {
                 <div style="font-size:0.8rem; color:#64748b;">${p.nisn} / ${p.no_pendaftaran}</div>
             </td>
             <td data-label="Tanggal Tes">
-                <select class="input-modern-form" style="padding: 8px; font-size:0.85rem;" onchange="markPlottingChange('${p.id}', 'tanggal_tes', this.value)">
+                <select class="input-modern-form" style="padding: 8px; font-size:0.85rem;" onchange="onPlotTanggalChange('${p.id}', this)">
                     ${optDates}
                 </select>
             </td>
             <td data-label="Sesi CBT">
-                <select class="input-modern-form" style="padding: 8px; font-size:0.85rem;" onchange="markPlottingChange('${p.id}', 'sesi_tes', this.value)">
+                <select class="input-modern-form plot-sesi" data-id="${p.id}" style="padding: 8px; font-size:0.85rem;" onchange="onPlotSesiChange('${p.id}', this)">
                     ${optSessions}
                 </select>
             </td>
             <td data-label="Ruangan">
-                <select class="input-modern-form" style="padding: 8px; font-size:0.85rem;" onchange="markPlottingChange('${p.id}', 'ruang_tes', this.value)">
+                <select class="input-modern-form plot-ruang" data-id="${p.id}" style="padding: 8px; font-size:0.85rem;" onchange="markPlottingChange('${p.id}', 'ruang_tes', this.value)">
                     ${optRooms}
                 </select>
             </td>
@@ -1070,6 +1128,65 @@ function renderPlottingTable() {
         
         tbody.appendChild(tr);
     });
+}
+
+// Handler ketika tanggal diubah di baris plotting → update dropdown sesi & ruangan
+window.onPlotTanggalChange = function(id, selectEl) {
+    const tanggal = selectEl.value;
+    markPlottingChange(id, 'tanggal_tes', tanggal);
+
+    // Cari row yang sama
+    const row = selectEl.closest('tr');
+    const selSesi = row.querySelector('.plot-sesi');
+    const selRuang = row.querySelector('.plot-ruang');
+
+    // Rebuild opsi sesi berdasarkan tanggal yang dipilih
+    let sessionList = [];
+    if (tanggal) {
+        const hari = scheduleConfig.find(h => h.tanggal === tanggal);
+        if (hari) sessionList = (hari.sesi || []).map(s => s.nama);
+    } else {
+        scheduleConfig.forEach(h => (h.sesi || []).forEach(s => sessionList.push(s.nama)));
+        sessionList = [...new Set(sessionList)];
+    }
+    selSesi.innerHTML = '<option value="">- Belum Diatur -</option>' + sessionList.map(s => `<option value="${s}">${s}</option>`).join('');
+    selSesi.value = '';
+
+    // Reset ruangan juga
+    selRuang.innerHTML = '<option value="">- Belum Diatur -</option>';
+    selRuang.value = '';
+
+    // Reset sesi & ruang di plottingChanges
+    markPlottingChange(id, 'sesi_tes', '');
+    markPlottingChange(id, 'ruang_tes', '');
+}
+
+// Handler ketika sesi diubah di baris plotting → update dropdown ruangan
+window.onPlotSesiChange = function(id, selectEl) {
+    const sesiNama = selectEl.value;
+    markPlottingChange(id, 'sesi_tes', sesiNama);
+
+    const row = selectEl.closest('tr');
+    const selTanggal = row.querySelector('select'); // first select = tanggal
+    const selRuang = row.querySelector('.plot-ruang');
+    const tanggal = selTanggal.value;
+
+    // Rebuild opsi ruangan berdasarkan tanggal + sesi
+    let roomList = [];
+    if (tanggal && sesiNama) {
+        const hari = scheduleConfig.find(h => h.tanggal === tanggal);
+        if (hari) {
+            const sesi = (hari.sesi || []).find(s => s.nama === sesiNama);
+            if (sesi) roomList = (sesi.ruangan || []).map(r => r.nama);
+        }
+    } else {
+        // Fallback: semua ruangan
+        scheduleConfig.forEach(h => (h.sesi || []).forEach(s => (s.ruangan || []).forEach(r => roomList.push(r.nama))));
+        roomList = [...new Set(roomList)];
+    }
+    selRuang.innerHTML = '<option value="">- Belum Diatur -</option>' + roomList.map(r => `<option value="${r}">${r}</option>`).join('');
+    selRuang.value = '';
+    markPlottingChange(id, 'ruang_tes', '');
 }
 
 window.markPlottingChange = function(id, field, value) {
@@ -2484,4 +2601,4 @@ let _RESET_PIN_HASH = '';
     });
 })();
 
-loadPendaftar();
+loadPendaftar();
