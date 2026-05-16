@@ -82,15 +82,27 @@ export async function onRequestPost(context) {
       return Response.json({ success: true }, { headers: CORS });
     }
 
-    // Update plotting (jadwal per pendaftar: ruang_tes, tanggal_tes, sesi_tes)
+    // Update plotting (jadwal per pendaftar: ruang_tes, tanggal_tes, sesi_tes, asal_sekolah)
     if (action === 'plotting') {
-      const { changes } = body; // { id: { ruang_tes, tanggal_tes, sesi_tes }, ... }
-      const stmts = Object.entries(changes).map(([id, data]) =>
-        env.DB.prepare(
-          'UPDATE pendaftar SET ruang_tes = ?, tanggal_tes = ?, sesi_tes = ? WHERE id = ?'
-        ).bind(data.ruang_tes ?? null, data.tanggal_tes ?? null, data.sesi_tes ?? null, id)
-      );
-      await env.DB.batch(stmts);
+      const { changes } = body; // { id: { ruang_tes, tanggal_tes, sesi_tes, asal_sekolah? }, ... }
+
+      // Kolom yang diizinkan diupdate lewat plotting
+      const ALLOWED_FIELDS = ['ruang_tes', 'tanggal_tes', 'sesi_tes', 'asal_sekolah'];
+
+      const stmts = Object.entries(changes).map(([id, data]) => {
+        // Build SET clause hanya dari field yang ada & diizinkan
+        const fields = Object.keys(data).filter(k => ALLOWED_FIELDS.includes(k));
+        if (fields.length === 0) return null;
+
+        const setClauses = fields.map(k => `${k} = ?`).join(', ');
+        const values     = fields.map(k => data[k] ?? null);
+
+        return env.DB.prepare(
+          `UPDATE pendaftar SET ${setClauses} WHERE id = ?`
+        ).bind(...values, id);
+      }).filter(Boolean);
+
+      if (stmts.length > 0) await env.DB.batch(stmts);
       return Response.json({ success: true }, { headers: CORS });
     }
 

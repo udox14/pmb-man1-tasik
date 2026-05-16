@@ -1411,7 +1411,8 @@ window.exportPlottingExcel = function() {
 
 /**
  * Import hasil plotting dari file Excel.
- * Match berdasarkan No Pendaftaran, update tanggal_tes, sesi_tes, ruang_tes.
+ * Match berdasarkan No Pendaftaran.
+ * Update: tanggal_tes, sesi_tes, ruang_tes, DAN asal_sekolah (jika diubah).
  */
 window.importPlottingExcel = function() {
     const input = document.createElement('input');
@@ -1448,61 +1449,85 @@ window.importPlottingExcel = function() {
                 return;
             }
 
+            // Apakah kolom Asal Sekolah ada di file?
+            const hasSekolahCol = 'Asal Sekolah' in firstRow;
+
             // Match dengan data allPendaftar
-            const updates = [];
+            const updates  = [];
             const notFound = [];
-            const skipped = []; // baris tanpa jadwal
+            const skipped  = []; // baris tanpa perubahan apapun
 
             rows.forEach(row => {
                 const noPendaftaran = String(row['No Pendaftaran'] || '').trim();
-                const tanggal = String(row['Tanggal Tes'] || '').trim();
-                const sesi    = String(row['Sesi/Waktu Ujian'] || '').trim();
-                const ruang   = String(row['Ruangan'] || '').trim();
+                const tanggal       = String(row['Tanggal Tes']     || '').trim();
+                const sesi          = String(row['Sesi/Waktu Ujian']|| '').trim();
+                const ruang         = String(row['Ruangan']         || '').trim();
+                const sekolah       = hasSekolahCol ? String(row['Asal Sekolah'] || '').trim() : '';
 
                 if (!noPendaftaran) return;
 
-                // Skip baris yang kolom jadwalnya masih kosong semua
-                if (!tanggal && !sesi && !ruang) {
+                const peserta = allPendaftar.find(p => p.no_pendaftaran === noPendaftaran);
+                if (!peserta) {
+                    // Hanya catat not-found jika baris tidak kosong sama sekali
+                    if (tanggal || sesi || ruang || sekolah) notFound.push(noPendaftaran);
+                    return;
+                }
+
+                // Deteksi perubahan nama sekolah
+                const sekolahLama  = (peserta.asal_sekolah || '').trim();
+                const sekolahBerubah = hasSekolahCol && sekolah && sekolah !== sekolahLama;
+
+                // Skip baris yang tidak ada perubahan apapun
+                if (!tanggal && !sesi && !ruang && !sekolahBerubah) {
                     skipped.push(noPendaftaran);
                     return;
                 }
 
-                const peserta = allPendaftar.find(p => p.no_pendaftaran === noPendaftaran);
-                if (!peserta) {
-                    notFound.push(noPendaftaran);
-                    return;
-                }
-
                 updates.push({
-                    id:          peserta.id,
-                    no:          noPendaftaran,
-                    nama:        peserta.nama_lengkap,
-                    tanggal_tes: tanggal,
-                    sesi_tes:    sesi,
-                    ruang_tes:   ruang
+                    id:              peserta.id,
+                    no:              noPendaftaran,
+                    nama:            peserta.nama_lengkap,
+                    sekolah_lama:    sekolahLama,
+                    sekolah_baru:    sekolahBerubah ? sekolah : null,
+                    sekolah_berubah: sekolahBerubah,
+                    tanggal_tes:     tanggal,
+                    sesi_tes:        sesi,
+                    ruang_tes:       ruang
                 });
             });
 
             if (updates.length === 0) {
-                let msg = 'Tidak ada data yang bisa diimport.';
+                let msg = 'Tidak ada data yang berubah untuk diimport.';
                 if (notFound.length > 0) msg += `<br><br><b>Tidak ditemukan (${notFound.length}):</b> ${notFound.slice(0,5).join(', ')}${notFound.length > 5 ? '...' : ''}`;
-                if (skipped.length > 0)  msg += `<br><b>Dilewati (kosong): ${skipped.length} baris</b>`;
+                if (skipped.length > 0)  msg += `<br><b>Dilewati (tidak ada perubahan): ${skipped.length} baris</b>`;
                 Swal.fire('Tidak Ada Data', msg, 'warning');
                 return;
             }
 
-            // Tampilkan preview
-            const previewRows = updates.slice(0, 5).map(u =>
-                `<tr style="font-size:.78rem;">
+            // Hitung ringkasan
+            const sekolahUpdCount = updates.filter(u => u.sekolah_berubah).length;
+            const plotUpdCount    = updates.filter(u => u.tanggal_tes || u.sesi_tes || u.ruang_tes).length;
+
+            // Build preview rows — tampilkan juga perubahan sekolah jika ada
+            const previewRows = updates.slice(0, 6).map(u => {
+                const sekolahCell = u.sekolah_berubah
+                    ? `<td style="padding:4px 8px; border-bottom:1px solid #e2e8f0; font-size:.73rem;">
+                           <span style="color:#94a3b8; text-decoration:line-through;">${u.sekolah_lama || '-'}</span><br>
+                           <span style="color:#16a34a; font-weight:700;">${u.sekolah_baru}</span>
+                       </td>`
+                    : `<td style="padding:4px 8px; border-bottom:1px solid #e2e8f0; color:#94a3b8; font-size:.73rem;">(tidak berubah)</td>`;
+                return `<tr style="font-size:.78rem;">
                     <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.no}</td>
                     <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.nama}</td>
-                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.tanggal_tes}</td>
-                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.sesi_tes}</td>
-                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.ruang_tes}</td>
-                </tr>`
-            ).join('');
+                    ${sekolahCell}
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.ruang_tes || '<span style="color:#94a3b8">-</span>'}</td>
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.tanggal_tes || '<span style="color:#94a3b8">-</span>'}</td>
+                </tr>`;
+            }).join('');
 
-            const moreText = updates.length > 5 ? `<tr><td colspan="5" style="font-size:.75rem; color:#64748b; padding:6px 8px; text-align:center;">... dan ${updates.length - 5} peserta lainnya</td></tr>` : '';
+            const moreText = updates.length > 6
+                ? `<tr><td colspan="5" style="font-size:.75rem; color:#64748b; padding:6px 8px; text-align:center;">... dan ${updates.length - 6} peserta lainnya</td></tr>`
+                : '';
 
             let warningHtml = '';
             if (notFound.length > 0) {
@@ -1511,20 +1536,32 @@ window.importPlottingExcel = function() {
                 </div>`;
             }
 
+            // Ringkasan singkat di atas preview
+            const summaryPills = `
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    ${plotUpdCount > 0 ? `<span style="background:#e0f2f1; color:#00796b; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:99px;">
+                        📅 ${plotUpdCount} jadwal & ruangan
+                    </span>` : ''}
+                    ${sekolahUpdCount > 0 ? `<span style="background:#dcfce7; color:#16a34a; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:99px;">
+                        🏫 ${sekolahUpdCount} nama sekolah
+                    </span>` : ''}
+                </div>`;
+
             const { isConfirmed } = await Swal.fire({
-                title: `Import Plotting — ${updates.length} Peserta`,
+                title: `Import — ${updates.length} Peserta`,
                 html: `
                     <div style="text-align:left; font-size:.82rem;">
-                        <p style="color:#334155; margin:0 0 10px;">Data berikut akan diupdate ke database:</p>
-                        <div style="overflow-x:auto; max-height:200px; overflow-y:auto;">
-                        <table style="width:100%; border-collapse:collapse;">
+                        ${summaryPills}
+                        <p style="color:#334155; margin:0 0 10px; font-size:.8rem;">Preview perubahan yang akan disimpan:</p>
+                        <div style="overflow-x:auto; max-height:210px; overflow-y:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:.78rem;">
                             <thead>
-                                <tr style="background:#f1f5f9; font-size:.7rem; font-weight:700; color:#475569; text-transform:uppercase;">
-                                    <th style="padding:6px 8px; text-align:left;">No Daftar</th>
+                                <tr style="background:#f1f5f9; font-size:.68rem; font-weight:700; color:#475569; text-transform:uppercase;">
+                                    <th style="padding:6px 8px; text-align:left; white-space:nowrap;">No Daftar</th>
                                     <th style="padding:6px 8px; text-align:left;">Nama</th>
-                                    <th style="padding:6px 8px; text-align:left;">Tanggal</th>
-                                    <th style="padding:6px 8px; text-align:left;">Sesi</th>
-                                    <th style="padding:6px 8px; text-align:left;">Ruangan</th>
+                                    <th style="padding:6px 8px; text-align:left;">Asal Sekolah</th>
+                                    <th style="padding:6px 8px; text-align:left; white-space:nowrap;">Ruangan</th>
+                                    <th style="padding:6px 8px; text-align:left; white-space:nowrap;">Tanggal</th>
                                 </tr>
                             </thead>
                             <tbody>${previewRows}${moreText}</tbody>
@@ -1537,24 +1574,26 @@ window.importPlottingExcel = function() {
                 confirmButtonText: `Terapkan ${updates.length} Perubahan`,
                 cancelButtonText: 'Batal',
                 confirmButtonColor: '#00796b',
-                width: '700px'
+                width: '720px'
             });
 
             if (!isConfirmed) return;
 
-            Swal.fire({ title: 'Menyimpan...', html: `Mengupdate <span id="imp-prog">0</span> / ${updates.length} peserta`, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             // Kirim batch ke API plotting
             const changes = {};
             updates.forEach(u => {
-                changes[u.id] = {
-                    tanggal_tes: u.tanggal_tes,
-                    sesi_tes:    u.sesi_tes,
-                    ruang_tes:   u.ruang_tes
+                const payload = {
+                    tanggal_tes: u.tanggal_tes || null,
+                    sesi_tes:    u.sesi_tes    || null,
+                    ruang_tes:   u.ruang_tes   || null
                 };
+                // Sertakan asal_sekolah hanya jika berubah
+                if (u.sekolah_berubah) payload.asal_sekolah = u.sekolah_baru;
+                changes[u.id] = payload;
             });
 
-            // Kirim semua sekaligus (batch tunggal)
             const result = await apiPost('admin?action=plotting', { changes });
 
             if (!result.error) {
@@ -1562,17 +1601,23 @@ window.importPlottingExcel = function() {
                 updates.forEach(u => {
                     const idx = allPendaftar.findIndex(p => p.id === u.id);
                     if (idx !== -1) {
-                        allPendaftar[idx].tanggal_tes = u.tanggal_tes;
-                        allPendaftar[idx].sesi_tes    = u.sesi_tes;
-                        allPendaftar[idx].ruang_tes   = u.ruang_tes;
+                        if (u.tanggal_tes) allPendaftar[idx].tanggal_tes = u.tanggal_tes;
+                        if (u.sesi_tes)    allPendaftar[idx].sesi_tes    = u.sesi_tes;
+                        if (u.ruang_tes)   allPendaftar[idx].ruang_tes   = u.ruang_tes;
+                        if (u.sekolah_berubah) allPendaftar[idx].asal_sekolah = u.sekolah_baru;
                     }
                 });
 
                 renderPlottingTable();
+                renderTable(); // refresh tabel pendaftar juga (kolom asal sekolah)
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Import Berhasil!',
-                    html: `<p style="font-size:.88rem; color:#334155;"><b>${updates.length}</b> peserta berhasil diupdate jadwal & ruangannya.</p>`,
+                    html: `<p style="font-size:.88rem; color:#334155; line-height:1.7;">
+                        ${plotUpdCount > 0 ? `📅 <b>${plotUpdCount}</b> peserta diupdate jadwal & ruangannya.<br>` : ''}
+                        ${sekolahUpdCount > 0 ? `🏫 <b>${sekolahUpdCount}</b> nama sekolah berhasil dibenarkan.` : ''}
+                    </p>`,
                     confirmButtonColor: '#00796b'
                 });
             } else {
@@ -1587,6 +1632,7 @@ window.importPlottingExcel = function() {
 
     input.click();
 };
+
 
 // ==========================================
 // 10. DETAIL SISWA (SWEETALERT POPUP)
