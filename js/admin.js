@@ -1329,7 +1329,267 @@ window.autoPlotting = async function() {
 }
 
 // ==========================================
-// 9. DETAIL SISWA (SWEETALERT POPUP)
+// 9. PLOTTING MANUAL VIA EXCEL
+// ==========================================
+
+/**
+ * Export data peserta CBT ke Excel untuk plotting manual.
+ * Kolom: No Pendaftaran, Nama, NISN, Asal Sekolah, Tanggal Tes, Sesi/Waktu Ujian, Ruangan
+ */
+window.exportPlottingExcel = function() {
+    // Ambil hanya peserta yang wajib CBT (sama dengan kriteria renderPlottingTable)
+    const targetStudents = allPendaftar.filter(p => {
+        if (!p.status_verifikasi && p.status_verifikasi !== false) return false;
+        if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
+        if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
+        return false;
+    });
+
+    if (targetStudents.length === 0) {
+        Swal.fire('Info', 'Belum ada peserta yang memenuhi syarat untuk diplot (Reguler terverifikasi / Prestasi ditolak).', 'info');
+        return;
+    }
+
+    const excelData = targetStudents.map(p => ({
+        'No Pendaftaran': p.no_pendaftaran || '-',
+        'Nama Lengkap':   p.nama_lengkap || '-',
+        'NISN':           p.nisn || '-',
+        'Asal Sekolah':   p.asal_sekolah || '-',
+        'Tanggal Tes':    p.tanggal_tes || '',
+        'Sesi/Waktu Ujian': p.sesi_tes || '',
+        'Ruangan':        p.ruang_tes || ''
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    // Set lebar kolom
+    worksheet['!cols'] = [
+        { wch: 18 }, // No Pendaftaran
+        { wch: 32 }, // Nama Lengkap
+        { wch: 16 }, // NISN
+        { wch: 35 }, // Asal Sekolah
+        { wch: 24 }, // Tanggal Tes
+        { wch: 28 }, // Sesi/Waktu Ujian
+        { wch: 18 }, // Ruangan
+    ];
+
+    // Style header (warna background teal)
+    const headerRange = XLSX.utils.decode_range(worksheet['!ref']);
+    for (let C = headerRange.s.c; C <= headerRange.e.c; C++) {
+        const cellAddr = XLSX.utils.encode_cell({ r: 0, c: C });
+        if (!worksheet[cellAddr]) continue;
+        worksheet[cellAddr].s = {
+            fill: { fgColor: { rgb: '00796B' } },
+            font: { bold: true, color: { rgb: 'FFFFFF' } },
+            alignment: { horizontal: 'center' }
+        };
+    }
+
+    // Kunci kolom A-D (tidak perlu diubah), kolom E-G untuk diisi
+    const note = 'PETUNJUK: Isi kolom Tanggal Tes, Sesi/Waktu Ujian, dan Ruangan. Jangan ubah No Pendaftaran!';
+    worksheet['A1'].c = [{ a: 'Admin', t: note }];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Plotting Peserta CBT');
+
+    const tgl = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
+    XLSX.writeFile(workbook, `Template_Plotting_CBT_PMB_${tgl}.xlsx`);
+
+    Swal.fire({
+        icon: 'success',
+        title: 'File Berhasil Didownload',
+        html: `<p style="font-size:.88rem; line-height:1.6; color:#334155;">
+            File <b>Template_Plotting_CBT_PMB_${tgl}.xlsx</b> sudah didownload.<br><br>
+            Isi kolom <b>Tanggal Tes</b>, <b>Sesi/Waktu Ujian</b>, dan <b>Ruangan</b> di Excel,
+            lalu kembali ke web dan klik <b>Import Excel Plotting</b>.
+        </p>`,
+        confirmButtonText: 'Mengerti',
+        confirmButtonColor: '#00796b'
+    });
+};
+
+/**
+ * Import hasil plotting dari file Excel.
+ * Match berdasarkan No Pendaftaran, update tanggal_tes, sesi_tes, ruang_tes.
+ */
+window.importPlottingExcel = function() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,.xls';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    input.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        document.body.removeChild(input);
+
+        Swal.fire({ title: 'Membaca File...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'arraybuffer' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+            if (!rows || rows.length === 0) {
+                Swal.fire('Error', 'File Excel kosong atau format tidak dikenali.', 'error');
+                return;
+            }
+
+            // Validasi kolom wajib
+            const firstRow = rows[0];
+            const requiredCols = ['No Pendaftaran', 'Tanggal Tes', 'Sesi/Waktu Ujian', 'Ruangan'];
+            const missingCols = requiredCols.filter(col => !(col in firstRow));
+            if (missingCols.length > 0) {
+                Swal.fire('Format Salah', `Kolom tidak ditemukan: <b>${missingCols.join(', ')}</b><br><br>Gunakan file yang diexport dari sistem ini.`, 'error');
+                return;
+            }
+
+            // Match dengan data allPendaftar
+            const updates = [];
+            const notFound = [];
+            const skipped = []; // baris tanpa jadwal
+
+            rows.forEach(row => {
+                const noPendaftaran = String(row['No Pendaftaran'] || '').trim();
+                const tanggal = String(row['Tanggal Tes'] || '').trim();
+                const sesi    = String(row['Sesi/Waktu Ujian'] || '').trim();
+                const ruang   = String(row['Ruangan'] || '').trim();
+
+                if (!noPendaftaran) return;
+
+                // Skip baris yang kolom jadwalnya masih kosong semua
+                if (!tanggal && !sesi && !ruang) {
+                    skipped.push(noPendaftaran);
+                    return;
+                }
+
+                const peserta = allPendaftar.find(p => p.no_pendaftaran === noPendaftaran);
+                if (!peserta) {
+                    notFound.push(noPendaftaran);
+                    return;
+                }
+
+                updates.push({
+                    id:          peserta.id,
+                    no:          noPendaftaran,
+                    nama:        peserta.nama_lengkap,
+                    tanggal_tes: tanggal,
+                    sesi_tes:    sesi,
+                    ruang_tes:   ruang
+                });
+            });
+
+            if (updates.length === 0) {
+                let msg = 'Tidak ada data yang bisa diimport.';
+                if (notFound.length > 0) msg += `<br><br><b>Tidak ditemukan (${notFound.length}):</b> ${notFound.slice(0,5).join(', ')}${notFound.length > 5 ? '...' : ''}`;
+                if (skipped.length > 0)  msg += `<br><b>Dilewati (kosong): ${skipped.length} baris</b>`;
+                Swal.fire('Tidak Ada Data', msg, 'warning');
+                return;
+            }
+
+            // Tampilkan preview
+            const previewRows = updates.slice(0, 5).map(u =>
+                `<tr style="font-size:.78rem;">
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.no}</td>
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.nama}</td>
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.tanggal_tes}</td>
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.sesi_tes}</td>
+                    <td style="padding:4px 8px; border-bottom:1px solid #e2e8f0;">${u.ruang_tes}</td>
+                </tr>`
+            ).join('');
+
+            const moreText = updates.length > 5 ? `<tr><td colspan="5" style="font-size:.75rem; color:#64748b; padding:6px 8px; text-align:center;">... dan ${updates.length - 5} peserta lainnya</td></tr>` : '';
+
+            let warningHtml = '';
+            if (notFound.length > 0) {
+                warningHtml += `<div style="margin-top:10px; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; padding:8px 12px; font-size:.76rem; color:#b45309;">
+                    <b>⚠ ${notFound.length} No. Pendaftaran tidak ditemukan</b> di sistem: ${notFound.slice(0,3).join(', ')}${notFound.length > 3 ? '...' : ''}
+                </div>`;
+            }
+
+            const { isConfirmed } = await Swal.fire({
+                title: `Import Plotting — ${updates.length} Peserta`,
+                html: `
+                    <div style="text-align:left; font-size:.82rem;">
+                        <p style="color:#334155; margin:0 0 10px;">Data berikut akan diupdate ke database:</p>
+                        <div style="overflow-x:auto; max-height:200px; overflow-y:auto;">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr style="background:#f1f5f9; font-size:.7rem; font-weight:700; color:#475569; text-transform:uppercase;">
+                                    <th style="padding:6px 8px; text-align:left;">No Daftar</th>
+                                    <th style="padding:6px 8px; text-align:left;">Nama</th>
+                                    <th style="padding:6px 8px; text-align:left;">Tanggal</th>
+                                    <th style="padding:6px 8px; text-align:left;">Sesi</th>
+                                    <th style="padding:6px 8px; text-align:left;">Ruangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>${previewRows}${moreText}</tbody>
+                        </table>
+                        </div>
+                        ${warningHtml}
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: `Terapkan ${updates.length} Perubahan`,
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#00796b',
+                width: '700px'
+            });
+
+            if (!isConfirmed) return;
+
+            Swal.fire({ title: 'Menyimpan...', html: `Mengupdate <span id="imp-prog">0</span> / ${updates.length} peserta`, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            // Kirim batch ke API plotting
+            const changes = {};
+            updates.forEach(u => {
+                changes[u.id] = {
+                    tanggal_tes: u.tanggal_tes,
+                    sesi_tes:    u.sesi_tes,
+                    ruang_tes:   u.ruang_tes
+                };
+            });
+
+            // Kirim semua sekaligus (batch tunggal)
+            const result = await apiPost('admin?action=plotting', { changes });
+
+            if (!result.error) {
+                // Update local state
+                updates.forEach(u => {
+                    const idx = allPendaftar.findIndex(p => p.id === u.id);
+                    if (idx !== -1) {
+                        allPendaftar[idx].tanggal_tes = u.tanggal_tes;
+                        allPendaftar[idx].sesi_tes    = u.sesi_tes;
+                        allPendaftar[idx].ruang_tes   = u.ruang_tes;
+                    }
+                });
+
+                renderPlottingTable();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Import Berhasil!',
+                    html: `<p style="font-size:.88rem; color:#334155;"><b>${updates.length}</b> peserta berhasil diupdate jadwal & ruangannya.</p>`,
+                    confirmButtonColor: '#00796b'
+                });
+            } else {
+                Swal.fire('Gagal', 'Terjadi kesalahan: ' + result.error, 'error');
+            }
+
+        } catch (err) {
+            console.error('Import error:', err);
+            Swal.fire('Error', 'Gagal membaca file Excel. Pastikan format file benar.', 'error');
+        }
+    };
+
+    input.click();
+};
+
+// ==========================================
+// 10. DETAIL SISWA (SWEETALERT POPUP)
 // ==========================================
 window.triggerSaveAnim = function() {
     const saveBtn = document.getElementById('btn-save-changes');
@@ -2315,8 +2575,9 @@ window.aturJalur = async function() {
         }
 
         // Jalur aktif jika value === 'true' atau belum pernah diset (default aktif)
-        const regChecked = config['JALUR_REGULER'] !== 'false';
-        const presChecked = config['JALUR_PRESTASI'] !== 'false';
+        const regChecked    = config['JALUR_REGULER'] !== 'false';
+        const presChecked   = config['JALUR_PRESTASI'] !== 'false';
+        const cetakChecked  = config['CETAK_KARTU_AKTIF'] === 'true';
 
         const { value: formValues } = await Swal.fire({
             title: 'Pengaturan Sistem PMB',
@@ -2330,6 +2591,48 @@ window.aturJalur = async function() {
                     <div style="background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
                         <strong style="color:#991b1b; font-size:1.05rem;">Jalur Prestasi</strong>
                         <input type="checkbox" id="check-prestasi" ${presChecked ? 'checked' : ''} style="transform:scale(1.5);">
+                    </div>
+
+                    <div style="background:${cetakChecked ? '#f0fdf4' : '#fff8f0'}; padding:15px; border-radius:10px; border:1px solid ${cetakChecked ? '#bbf7d0' : '#fed7aa'}; display:flex; justify-content:space-between; align-items:flex-start; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <div>
+                                <strong style="color:${cetakChecked ? '#15803d' : '#c2410c'}; font-size:1.05rem; display:flex; align-items:center; gap:7px;">
+                                    <i class="ph ${cetakChecked ? 'ph-printer' : 'ph-printer-slash'}"></i>
+                                    Cetak Kartu Tes
+                                </strong>
+                                <p style="margin:4px 0 0; font-size:.78rem; color:#64748b; line-height:1.5;">
+                                    Aktifkan agar peserta bisa mencetak Kartu Ujian CBT.<br>
+                                    Nonaktifkan saat plotting masih berlangsung.
+                                </p>
+                            </div>
+                            <label id="toggle-cetak-label" style="position:relative; display:inline-block; width:52px; height:28px; flex-shrink:0; margin-left:12px;">
+                                <input type="checkbox" id="check-cetak-kartu" ${cetakChecked ? 'checked' : ''}
+                                       onchange="
+                                           const lbl = this.closest('div').parentElement;
+                                           lbl.style.background = this.checked ? '#f0fdf4' : '#fff8f0';
+                                           lbl.style.borderColor = this.checked ? '#bbf7d0' : '#fed7aa';
+                                           lbl.querySelector('strong').style.color = this.checked ? '#15803d' : '#c2410c';
+                                           lbl.querySelector('i').className = 'ph ' + (this.checked ? 'ph-printer' : 'ph-printer-slash');
+                                       "
+                                       style="opacity:0;width:0;height:0;">
+                                <span style="
+                                    position:absolute; cursor:pointer; inset:0;
+                                    background:${cetakChecked ? '#16a34a' : '#cbd5e1'};
+                                    border-radius:99px; transition:.3s;
+                                " id="toggle-cetak-slider"
+                                   onclick="this.style.background = document.getElementById('check-cetak-kartu').checked ? '#16a34a' : '#cbd5e1';"
+                                ></span>
+                                <span style="
+                                    position:absolute; top:3px; left:${cetakChecked ? '27px' : '3px'};
+                                    background:white; width:22px; height:22px;
+                                    border-radius:50%; transition:.3s;
+                                    pointer-events:none;
+                                " id="toggle-cetak-knob"></span>
+                            </label>
+                        </div>
+                        <div id="cetak-status-badge" style="font-size:.75rem; font-weight:700; padding:4px 12px; border-radius:99px; background:${cetakChecked ? '#dcfce7' : '#fee2e2'}; color:${cetakChecked ? '#166534' : '#991b1b'}; align-self:flex-start;">
+                            ${cetakChecked ? '✓ Aktif — Peserta bisa cetak kartu' : '✗ Nonaktif — Cetak kartu terkunci'}
+                        </div>
                     </div>
                     
                     <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:20px; font-size:0.85rem;">
@@ -2396,7 +2699,8 @@ window.aturJalur = async function() {
                     document.getElementById('t-peng-reg').value,
                     document.getElementById('t-lap-reg').value,
                     document.getElementById('t-rapat').value,
-                    document.getElementById('t-link-wa').value
+                    document.getElementById('t-link-wa').value,
+                    document.getElementById('check-cetak-kartu').checked  // index 14
                 ];
             }
         });
@@ -2416,9 +2720,17 @@ window.aturJalur = async function() {
                 { key: 'TEKS_PENGUMUMAN_REG', value: formValues[10] },
                 { key: 'TEKS_LAPOR_REG', value: formValues[11] },
                 { key: 'TEKS_RAPAT', value: formValues[12] },
-                { key: 'LINK_GRUP_WA', value: formValues[13] }
+                { key: 'LINK_GRUP_WA', value: formValues[13] },
+                { key: 'CETAK_KARTU_AKTIF', value: String(formValues[14]) }
             ]});
-            Swal.fire('Sukses', 'Pengaturan berhasil disimpan', 'success');
+            Swal.fire({
+                icon: 'success',
+                title: 'Pengaturan Disimpan',
+                html: formValues[14]
+                    ? `<p style="font-size:.88rem; color:#334155;">Pengaturan berhasil disimpan.<br><br><b style="color:#16a34a;">✓ Cetak Kartu Tes sekarang <u>AKTIF</u></b> — peserta dapat mencetak kartu ujian mereka.</p>`
+                    : `<p style="font-size:.88rem; color:#334155;">Pengaturan berhasil disimpan.<br><br><b style="color:#dc2626;">✗ Cetak Kartu Tes <u>NONAKTIF</u></b> — tombol cetak tersembunyi dari peserta.</p>`,
+                confirmButtonColor: '#00796b'
+            });
         }
     } catch (e) {
         console.error(e);

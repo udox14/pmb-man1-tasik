@@ -39,20 +39,19 @@ async function loadDashboardData() {
     renderProfile(pendaftarData);
     renderFullData(pendaftarData);
     renderPrestasiContent(prestasiData);
-    renderStatus(pendaftarData);
-    setupSmartCountdown(pendaftarData);
 
+    // Fetch semua pengaturan termasuk CETAK_KARTU_AKTIF
+    let globalCfg = {};
     try {
         const setDB = await apiGet('pengaturan');
         if (Array.isArray(setDB)) {
-            const cfg = {};
-            setDB.forEach(item => cfg[item.key] = item.value);
+            setDB.forEach(item => globalCfg[item.key] = item.value);
             document.querySelectorAll('.dyn-txt').forEach(el => {
                 const key = el.getAttribute('data-key');
-                if (cfg[key]) el.innerHTML = cfg[key];
+                if (globalCfg[key]) el.innerHTML = globalCfg[key];
             });
-            if (cfg['LINK_GRUP_WA']) {
-                const linkWA = cfg['LINK_GRUP_WA'];
+            if (globalCfg['LINK_GRUP_WA']) {
+                const linkWA = globalCfg['LINK_GRUP_WA'];
                 const aWa = document.getElementById('wa-dash-link');
                 const iWa = document.getElementById('wa-dash-qrcode');
                 if (aWa) aWa.href = linkWA;
@@ -60,6 +59,11 @@ async function loadDashboardData() {
             }
         }
     } catch(e) { console.error('Gagal meload teks dinamis', e); }
+
+    // Render status dengan info setting cetak kartu
+    const cetakAktif = globalCfg['CETAK_KARTU_AKTIF'] === 'true';
+    renderStatus(pendaftarData, cetakAktif);
+    setupSmartCountdown(pendaftarData);
 
   } catch (err) {
     console.error('Error Dashboard:', err);
@@ -72,6 +76,7 @@ async function loadDashboardData() {
     }).then(() => { logout(); });
   }
 }
+
 
 // ===========================================================
 // RENDER PROFILE
@@ -319,7 +324,7 @@ function renderPrestasiContent(list) {
 // ===========================================================
 // RENDER STATUS
 // ===========================================================
-function renderStatus(data) {
+function renderStatus(data, cetakAktif) {
   const cardVerif    = document.getElementById('card-verif');
   const valVerif     = document.getElementById('val-verif');
   const cardLulus    = document.getElementById('card-lulus');
@@ -390,7 +395,7 @@ function renderStatus(data) {
   const btnPrint    = document.getElementById('btn-sidebar-cetak');
   const btnPrintMob = document.getElementById('btn-sidebar-cetak-mob');
 
-  ['info-bebas-tes', 'info-tunggu-verif', 'info-tunggu-jadwal'].forEach(id => {
+  ['info-bebas-tes', 'info-tunggu-verif', 'info-tunggu-jadwal', 'info-cetak-terkunci'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.remove();
   });
@@ -413,8 +418,27 @@ function renderStatus(data) {
   if (mustFollowCBT) {
     if (data.status_verifikasi === true || data.status_verifikasi === false) {
       if (data.ruang_tes && data.tanggal_tes && data.sesi_tes) {
-        // Jadwal sudah ada — tampilkan tombol cetak
-        showPrint(true);
+        // Jadwal sudah ada — cek setting cetak kartu
+        if (cetakAktif) {
+          // Cetak diizinkan oleh admin
+          showPrint(true);
+        } else {
+          // Jadwal ada tapi admin belum mengaktifkan cetak kartu
+          showPrint(false);
+          const infoBox = document.createElement('div');
+          infoBox.id = 'info-cetak-terkunci';
+          infoBox.style.cssText =
+            'background:#f0f9ff; border:1px solid #7dd3fc; padding:16px 18px; border-radius:12px; margin-bottom:14px;';
+          infoBox.innerHTML = `
+            <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#0369a1;">
+              <i class="ph ph-lock-key"></i> Pencetakan Kartu Belum Dibuka
+            </h4>
+            <p style="margin:0; font-size:.82rem; color:#0369a1; line-height:1.5;">
+              Jadwal ujian Anda sudah tersedia: <strong>${data.ruang_tes}</strong> &bull; ${data.tanggal_tes} &bull; ${data.sesi_tes.split('(')[0].trim()}.<br>
+              Tombol <strong>Cetak Kartu Ujian</strong> akan dibuka oleh panitia pada waktunya. Silakan pantau terus halaman ini.
+            </p>`;
+          if (timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
+        }
       } else {
         // Verifikasi sudah ada tapi jadwal belum
         showPrint(false);
@@ -453,6 +477,7 @@ function renderStatus(data) {
     showPrint(false);
   }
 }
+
 
 // ===========================================================
 // DAFTAR ULANG
