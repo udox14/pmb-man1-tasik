@@ -720,6 +720,31 @@
             color: var(--teal);
             white-space: nowrap;
         }
+        .session-room-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 9px;
+            padding-top: 9px;
+            border-top: 1px dashed var(--rule);
+        }
+        .session-room-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            max-width: 100%;
+            padding: 4px 7px;
+            border-radius: 6px;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            color: var(--ink-soft);
+            font-size: .68rem;
+            font-weight: 700;
+        }
+        .session-room-chip b {
+            color: var(--ink);
+            font-size: .72rem;
+        }
 
         /* Jadwal card action row */
         .card-action-row {

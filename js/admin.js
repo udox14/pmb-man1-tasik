@@ -1036,21 +1036,25 @@ function renderPlottingSessionStats() {
 
     const eligibleStudents = getPlottingEligibleStudents();
     const sessionCounts = new Map();
-    let unassignedCount = 0;
+    const unassignedRooms = new Map();
 
     eligibleStudents.forEach(p => {
         const tanggal = getPlottingValue(p, 'tanggal_tes');
         const sesi = getPlottingValue(p, 'sesi_tes');
+        const ruang = getPlottingValue(p, 'ruang_tes') || 'Tanpa ruangan';
         if (!tanggal || !sesi) {
-            unassignedCount++;
+            const key = 'Tanpa sesi';
+            unassignedRooms.set(key, (unassignedRooms.get(key) || 0) + 1);
             return;
         }
 
         const key = `${tanggal}||${sesi}`;
         if (!sessionCounts.has(key)) {
-            sessionCounts.set(key, { tanggal, sesi, count: 0 });
+            sessionCounts.set(key, { tanggal, sesi, count: 0, rooms: new Map() });
         }
-        sessionCounts.get(key).count++;
+        const stat = sessionCounts.get(key);
+        stat.count++;
+        stat.rooms.set(ruang, (stat.rooms.get(ruang) || 0) + 1);
     });
 
     const configuredSessions = [];
@@ -1058,35 +1062,54 @@ function renderPlottingSessionStats() {
         (h.sesi || []).forEach(s => {
             const key = `${h.tanggal}||${s.nama}`;
             const counted = sessionCounts.get(key);
+            const rooms = new Map();
+            (s.ruangan || []).forEach(r => rooms.set(r.nama || '-', counted?.rooms.get(r.nama) || 0));
+            if (counted) {
+                counted.rooms.forEach((count, roomName) => {
+                    if (!rooms.has(roomName)) rooms.set(roomName, count);
+                });
+            }
             configuredSessions.push({
                 tanggal: h.tanggal || '-',
                 sesi: s.nama || '-',
-                count: counted ? counted.count : 0
+                count: counted ? counted.count : 0,
+                rooms
             });
             sessionCounts.delete(key);
         });
     });
 
-    const extraSessions = Array.from(sessionCounts.values());
+    const extraSessions = Array.from(sessionCounts.values()).map(item => ({
+        ...item,
+        rooms: item.rooms || new Map()
+    }));
     const stats = configuredSessions.concat(extraSessions);
+    const unassignedCount = Array.from(unassignedRooms.values()).reduce((total, count) => total + count, 0);
     if (unassignedCount > 0) {
-        stats.push({ tanggal: 'Belum diatur', sesi: 'Tanpa sesi', count: unassignedCount });
+        stats.push({ tanggal: 'Belum diatur', sesi: 'Tanpa sesi', count: unassignedCount, rooms: unassignedRooms });
     }
 
     if (stats.length === 0) {
-        container.innerHTML = '<div class="session-stat-item"><div class="session-stat-date">Belum ada data</div><div class="session-stat-main"><span class="session-stat-name">Sesi</span><span class="session-stat-count">0</span></div></div>';
+        container.innerHTML = '<div class="session-stat-item"><div class="session-stat-date">Belum ada data</div><div class="session-stat-main"><span class="session-stat-name">Sesi</span><span class="session-stat-count">0</span></div><div class="session-room-list"><span class="session-room-chip">Ruangan <b>0</b></span></div></div>';
         return;
     }
 
-    container.innerHTML = stats.map(item => `
+    container.innerHTML = stats.map(item => {
+        const rooms = Array.from((item.rooms || new Map()).entries());
+        const roomHtml = rooms.length
+            ? rooms.map(([roomName, count]) => `<span class="session-room-chip">${roomName} <b>${count}</b></span>`).join('')
+            : '<span class="session-room-chip">Ruangan <b>0</b></span>';
+        return `
         <div class="session-stat-item" title="${item.tanggal} - ${item.sesi}">
             <div class="session-stat-date">${item.tanggal}</div>
             <div class="session-stat-main">
                 <span class="session-stat-name">${item.sesi}</span>
                 <span class="session-stat-count">${item.count}</span>
             </div>
+            <div class="session-room-list">${roomHtml}</div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function renderPlottingTable() {
