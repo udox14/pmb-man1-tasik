@@ -681,6 +681,45 @@
             width: 100%;
             padding-left: 34px;
         }
+        .session-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            padding: 12px 18px 0;
+        }
+        .session-stat-item {
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            background: var(--surface);
+            padding: 10px 12px;
+            min-width: 0;
+        }
+        .session-stat-date {
+            font-size: .68rem;
+            color: var(--ink-soft);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .session-stat-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .session-stat-name {
+            font-size: .78rem;
+            font-weight: 800;
+            color: var(--ink);
+            overflow-wrap: anywhere;
+        }
+        .session-stat-count {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--teal);
+            white-space: nowrap;
+        }
 
         /* Jadwal card action row */
         .card-action-row {
@@ -1225,6 +1264,7 @@
                     <div class="info-note" style="margin:12px 18px 0;border-radius:6px;">
                         Menampilkan semua peserta <b>Reguler</b> yang sudah terverifikasi. Seluruh peserta reguler wajib mengikuti tes Akademik/CBT.
                     </div>
+                    <div id="plottingSessionStats" class="session-stats"></div>
 
                     <div class="table-responsive" style="margin-top:12px;">
                         <table class="admin-table">

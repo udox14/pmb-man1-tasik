@@ -1016,33 +1016,101 @@ window.updatePlottingFilters = function() {
     }
 }
 
-function renderPlottingTable() {
-    const tbody = document.getElementById('plottingTableBody');
-    
-    const fTgl = document.getElementById('filterPlotTgl')?.value || "";
-    const fSesi = document.getElementById('filterPlotSesi')?.value || "";
-    const fRuang = document.getElementById('filterPlotRuang')?.value || "";
-    const searchKeyword = (document.getElementById('searchPlotting')?.value || "").trim().toLowerCase();
-
-    let targetStudents = allPendaftar.filter(p => {
+function getPlottingEligibleStudents() {
+    return allPendaftar.filter(p => {
         if (!p.status_verifikasi && p.status_verifikasi !== false) return false;
         if (p.jalur === 'REGULER' && p.status_verifikasi === true) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === false) return true;
         if (p.jalur === 'PRESTASI' && p.status_verifikasi === true && p.status_kelulusan === 'TIDAK DITERIMA') return true;
         return false;
     });
+}
+
+function getPlottingValue(p, field) {
+    return plottingChanges[p.id]?.[field] ?? p[field] ?? '';
+}
+
+function renderPlottingSessionStats() {
+    const container = document.getElementById('plottingSessionStats');
+    if (!container) return;
+
+    const eligibleStudents = getPlottingEligibleStudents();
+    const sessionCounts = new Map();
+    let unassignedCount = 0;
+
+    eligibleStudents.forEach(p => {
+        const tanggal = getPlottingValue(p, 'tanggal_tes');
+        const sesi = getPlottingValue(p, 'sesi_tes');
+        if (!tanggal || !sesi) {
+            unassignedCount++;
+            return;
+        }
+
+        const key = `${tanggal}||${sesi}`;
+        if (!sessionCounts.has(key)) {
+            sessionCounts.set(key, { tanggal, sesi, count: 0 });
+        }
+        sessionCounts.get(key).count++;
+    });
+
+    const configuredSessions = [];
+    scheduleConfig.forEach(h => {
+        (h.sesi || []).forEach(s => {
+            const key = `${h.tanggal}||${s.nama}`;
+            const counted = sessionCounts.get(key);
+            configuredSessions.push({
+                tanggal: h.tanggal || '-',
+                sesi: s.nama || '-',
+                count: counted ? counted.count : 0
+            });
+            sessionCounts.delete(key);
+        });
+    });
+
+    const extraSessions = Array.from(sessionCounts.values());
+    const stats = configuredSessions.concat(extraSessions);
+    if (unassignedCount > 0) {
+        stats.push({ tanggal: 'Belum diatur', sesi: 'Tanpa sesi', count: unassignedCount });
+    }
+
+    if (stats.length === 0) {
+        container.innerHTML = '<div class="session-stat-item"><div class="session-stat-date">Belum ada data</div><div class="session-stat-main"><span class="session-stat-name">Sesi</span><span class="session-stat-count">0</span></div></div>';
+        return;
+    }
+
+    container.innerHTML = stats.map(item => `
+        <div class="session-stat-item" title="${item.tanggal} - ${item.sesi}">
+            <div class="session-stat-date">${item.tanggal}</div>
+            <div class="session-stat-main">
+                <span class="session-stat-name">${item.sesi}</span>
+                <span class="session-stat-count">${item.count}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderPlottingTable() {
+    const tbody = document.getElementById('plottingTableBody');
+    renderPlottingSessionStats();
+    
+    const fTgl = document.getElementById('filterPlotTgl')?.value || "";
+    const fSesi = document.getElementById('filterPlotSesi')?.value || "";
+    const fRuang = document.getElementById('filterPlotRuang')?.value || "";
+    const searchKeyword = (document.getElementById('searchPlotting')?.value || "").trim().toLowerCase();
+
+    let targetStudents = getPlottingEligibleStudents();
     
     if (fTgl) {
-        if (fTgl === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !(plottingChanges[p.id]?.tanggal_tes ?? p.tanggal_tes));
-        else targetStudents = targetStudents.filter(p => (plottingChanges[p.id]?.tanggal_tes ?? p.tanggal_tes) === fTgl);
+        if (fTgl === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !getPlottingValue(p, 'tanggal_tes'));
+        else targetStudents = targetStudents.filter(p => getPlottingValue(p, 'tanggal_tes') === fTgl);
     }
     if (fSesi) {
-        if (fSesi === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !(plottingChanges[p.id]?.sesi_tes ?? p.sesi_tes));
-        else targetStudents = targetStudents.filter(p => (plottingChanges[p.id]?.sesi_tes ?? p.sesi_tes) === fSesi);
+        if (fSesi === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !getPlottingValue(p, 'sesi_tes'));
+        else targetStudents = targetStudents.filter(p => getPlottingValue(p, 'sesi_tes') === fSesi);
     }
     if (fRuang) {
-        if (fRuang === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !(plottingChanges[p.id]?.ruang_tes ?? p.ruang_tes));
-        else targetStudents = targetStudents.filter(p => (plottingChanges[p.id]?.ruang_tes ?? p.ruang_tes) === fRuang);
+        if (fRuang === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !getPlottingValue(p, 'ruang_tes'));
+        else targetStudents = targetStudents.filter(p => getPlottingValue(p, 'ruang_tes') === fRuang);
     }
     if (searchKeyword) {
         targetStudents = targetStudents.filter(p => {
@@ -1099,10 +1167,9 @@ function renderPlottingTable() {
 
     targetStudents.forEach(p => {
         // Tentukan opsi sesi berdasarkan tanggal yang sudah di-set
-        const pendingChange = plottingChanges[p.id] || {};
-        const curTanggal = pendingChange.tanggal_tes ?? p.tanggal_tes ?? '';
-        const curSesi = pendingChange.sesi_tes ?? p.sesi_tes ?? '';
-        const curRuang = pendingChange.ruang_tes ?? p.ruang_tes ?? '';
+        const curTanggal = getPlottingValue(p, 'tanggal_tes');
+        const curSesi = getPlottingValue(p, 'sesi_tes');
+        const curRuang = getPlottingValue(p, 'ruang_tes');
         
         const sessionList = curTanggal ? getSessionsForDate(curTanggal) : getAllSessions();
         const optSessions = '<option value="">- Belum Diatur -</option>' + sessionList.map(s => `<option value="${s}">${s}</option>`).join('');
@@ -1116,7 +1183,7 @@ function renderPlottingTable() {
         tr.innerHTML = `
             <td data-label="Peserta">
                 <div style="font-weight:600; color:#1e293b;">${p.nama_lengkap}</div>
-                <div style="font-size:0.8rem; color:#64748b;">${p.nisn} / ${p.no_pendaftaran}</div>
+                <div style="font-size:0.8rem; color:#64748b;">${p.asal_sekolah || '-'}</div>
             </td>
             <td data-label="Tanggal Tes">
                 <select class="input-modern-form" style="padding: 8px; font-size:0.85rem;" onchange="onPlotTanggalChange('${p.id}', this)">
@@ -1207,6 +1274,7 @@ window.markPlottingChange = function(id, field, value) {
     if(!plottingChanges[id]) plottingChanges[id] = {};
     plottingChanges[id][field] = value;
     document.getElementById('btn-save-plotting').style.display = 'inline-flex';
+    renderPlottingSessionStats();
 }
 
 window.saveManualPlotting = async function() {
