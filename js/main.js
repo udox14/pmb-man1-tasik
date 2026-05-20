@@ -98,7 +98,7 @@ async function checkJalurStatus() {
             const inputNisn = document.querySelector('#input-nisn');
             if (btnDaftar) {
                 btnDaftar.disabled = true;
-                btnDaftar.innerText = "Pendaftaran Belum Dibuka";
+                btnDaftar.innerText = "Pendaftaran Ditutup";
                 btnDaftar.style.backgroundColor = '#9ca3af';
                 btnDaftar.style.borderColor = '#9ca3af';
                 btnDaftar.style.boxShadow = 'none';
