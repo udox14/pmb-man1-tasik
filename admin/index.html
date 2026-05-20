@@ -663,6 +663,24 @@
             color: var(--ink-soft);
         }
         .filter-bar-count b { color: var(--teal); font-size: .9rem; }
+        .filter-search {
+            position: relative;
+            flex: 1 1 220px;
+            max-width: 320px;
+        }
+        .filter-search i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-faint);
+            font-size: .9rem;
+            pointer-events: none;
+        }
+        .filter-search input {
+            width: 100%;
+            padding-left: 34px;
+        }
 
         /* Jadwal card action row */
         .card-action-row {
@@ -876,6 +894,7 @@
 
             .filter-bar { padding: 10px 14px; }
             .filter-bar select { font-size: .75rem; }
+            .filter-search { max-width: none; flex-basis: 100%; }
 
             .card-action-row { padding: 12px 14px; }
             .panel-section-body { padding: 14px; }
@@ -1192,6 +1211,12 @@
                         <select id="filterPlotRuang" class="ctrl-input" onchange="renderPlottingTable()">
                             <option value="">Semua Ruangan</option>
                         </select>
+                        <div class="filter-search">
+                            <i class="ph ph-magnifying-glass"></i>
+                            <input type="search" id="searchPlotting" class="ctrl-input"
+                                   placeholder="Cari nama, NISN, no. daftar..."
+                                   oninput="renderPlottingTable()">
+                        </div>
                         <span class="filter-bar-count">
                             Tampil: <b id="plotCount">0</b> siswa
                         </span>

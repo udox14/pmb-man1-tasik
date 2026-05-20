@@ -1022,6 +1022,7 @@ function renderPlottingTable() {
     const fTgl = document.getElementById('filterPlotTgl')?.value || "";
     const fSesi = document.getElementById('filterPlotSesi')?.value || "";
     const fRuang = document.getElementById('filterPlotRuang')?.value || "";
+    const searchKeyword = (document.getElementById('searchPlotting')?.value || "").trim().toLowerCase();
 
     let targetStudents = allPendaftar.filter(p => {
         if (!p.status_verifikasi && p.status_verifikasi !== false) return false;
@@ -1032,16 +1033,27 @@ function renderPlottingTable() {
     });
     
     if (fTgl) {
-        if (fTgl === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !p.tanggal_tes);
-        else targetStudents = targetStudents.filter(p => p.tanggal_tes === fTgl);
+        if (fTgl === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !(plottingChanges[p.id]?.tanggal_tes ?? p.tanggal_tes));
+        else targetStudents = targetStudents.filter(p => (plottingChanges[p.id]?.tanggal_tes ?? p.tanggal_tes) === fTgl);
     }
     if (fSesi) {
-        if (fSesi === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !p.sesi_tes);
-        else targetStudents = targetStudents.filter(p => p.sesi_tes === fSesi);
+        if (fSesi === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !(plottingChanges[p.id]?.sesi_tes ?? p.sesi_tes));
+        else targetStudents = targetStudents.filter(p => (plottingChanges[p.id]?.sesi_tes ?? p.sesi_tes) === fSesi);
     }
     if (fRuang) {
-        if (fRuang === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !p.ruang_tes);
-        else targetStudents = targetStudents.filter(p => p.ruang_tes === fRuang);
+        if (fRuang === 'UNASSIGNED') targetStudents = targetStudents.filter(p => !(plottingChanges[p.id]?.ruang_tes ?? p.ruang_tes));
+        else targetStudents = targetStudents.filter(p => (plottingChanges[p.id]?.ruang_tes ?? p.ruang_tes) === fRuang);
+    }
+    if (searchKeyword) {
+        targetStudents = targetStudents.filter(p => {
+            const searchable = [
+                p.nama_lengkap,
+                p.nisn,
+                p.no_pendaftaran,
+                p.asal_sekolah
+            ].filter(Boolean).join(' ').toLowerCase();
+            return searchable.includes(searchKeyword);
+        });
     }
 
     const countSpan = document.getElementById('plotCount');
@@ -1087,8 +1099,10 @@ function renderPlottingTable() {
 
     targetStudents.forEach(p => {
         // Tentukan opsi sesi berdasarkan tanggal yang sudah di-set
-        const curTanggal = p.tanggal_tes || '';
-        const curSesi = p.sesi_tes || '';
+        const pendingChange = plottingChanges[p.id] || {};
+        const curTanggal = pendingChange.tanggal_tes ?? p.tanggal_tes ?? '';
+        const curSesi = pendingChange.sesi_tes ?? p.sesi_tes ?? '';
+        const curRuang = pendingChange.ruang_tes ?? p.ruang_tes ?? '';
         
         const sessionList = curTanggal ? getSessionsForDate(curTanggal) : getAllSessions();
         const optSessions = '<option value="">- Belum Diatur -</option>' + sessionList.map(s => `<option value="${s}">${s}</option>`).join('');
@@ -1122,9 +1136,9 @@ function renderPlottingTable() {
         `;
         
         const selects = tr.querySelectorAll('select');
-        if(p.tanggal_tes && selects[0]) selects[0].value = p.tanggal_tes;
-        if(p.sesi_tes && selects[1]) selects[1].value = p.sesi_tes;
-        if(p.ruang_tes && selects[2]) selects[2].value = p.ruang_tes;
+        if(curTanggal && selects[0]) selects[0].value = curTanggal;
+        if(curSesi && selects[1]) selects[1].value = curSesi;
+        if(curRuang && selects[2]) selects[2].value = curRuang;
         
         tbody.appendChild(tr);
     });
