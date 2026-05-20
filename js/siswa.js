@@ -423,21 +423,7 @@ function renderStatus(data, cetakAktif) {
           // Cetak diizinkan oleh admin
           showPrint(true);
         } else {
-          // Jadwal ada tapi admin belum mengaktifkan cetak kartu
           showPrint(false);
-          const infoBox = document.createElement('div');
-          infoBox.id = 'info-cetak-terkunci';
-          infoBox.style.cssText =
-            'background:#f0f9ff; border:1px solid #7dd3fc; padding:16px 18px; border-radius:12px; margin-bottom:14px;';
-          infoBox.innerHTML = `
-            <h4 style="margin:0 0 6px; display:flex; align-items:center; gap:7px; font-size:.88rem; color:#0369a1;">
-              <i class="ph ph-lock-key"></i> Pencetakan Kartu Belum Dibuka
-            </h4>
-            <p style="margin:0; font-size:.82rem; color:#0369a1; line-height:1.5;">
-              Jadwal ujian Anda sudah tersedia: <strong>${data.ruang_tes}</strong> &bull; ${data.tanggal_tes} &bull; ${data.sesi_tes.split('(')[0].trim()}.<br>
-              Tombol <strong>Cetak Kartu Ujian</strong> akan dibuka oleh panitia pada waktunya. Silakan pantau terus halaman ini.
-            </p>`;
-          if (timerBanner) timerBanner.parentNode.insertBefore(infoBox, timerBanner.nextSibling);
         }
       } else {
         // Verifikasi sudah ada tapi jadwal belum
