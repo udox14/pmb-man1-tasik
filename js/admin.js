@@ -259,6 +259,9 @@ function renderTable() {
                 ${badgeDU}
             </td>
             <td data-label="Aksi" style="text-align: right;">
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="cetakKartuTes('${p.id}')">
+                    <i class="ph ph-printer"></i> Kartu
+                </button>
                 <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="viewDetail('${p.id}')">
                     <i class="ph ph-eye"></i> Detail
                 </button>
@@ -392,6 +395,18 @@ function updateBulkUI() {
     if (selectedIds.size > 0) { 
         bar.classList.add('show'); 
         countSpan.innerText = selectedIds.size; 
+
+        // Buat tombol cetak kartu tes massal
+        if (!document.getElementById('btn-bulk-cetak-kartu')) {
+            const btnKartu = document.createElement('button');
+            btnKartu.id = 'btn-bulk-cetak-kartu';
+            btnKartu.className = 'btn btn-primary';
+            btnKartu.style.background = '#dc2626';
+            btnKartu.style.borderColor = '#dc2626';
+            btnKartu.innerHTML = '<i class="ph ph-printer"></i> Cetak Kartu Tes';
+            btnKartu.onclick = () => window.bulkAction('CETAK_KARTU');
+            bar.appendChild(btnKartu);
+        }
         
         // Buat tombol cetak form verifikasi prestasi
         if (!document.getElementById('btn-bulk-cetak-prestasi')) {
@@ -451,6 +466,13 @@ function updateBulkUI() {
 window.bulkAction = async function(action) {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
+
+    // TANGANI CETAK KARTU TES PILIHAN
+    if (action === 'CETAK_KARTU') {
+        const selectedPendaftar = allPendaftar.filter(p => ids.includes(p.id));
+        cetakKartuTesPendaftar(selectedPendaftar);
+        return;
+    }
     
     // TANGANI DOWNLOAD ZIP PILIHAN
     if (action === 'DOWNLOAD_ZIP') {
@@ -756,6 +778,146 @@ window.bulkAction = async function(action) {
             Swal.fire('Gagal', result.error, 'error'); 
         }
     }
+}
+
+// ==========================================
+// 7B. CETAK KARTU TES PESERTA
+// ==========================================
+function escapeHTML(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function buildKartuTesHTML(p, tglCetak) {
+    const val = (value) => escapeHTML(value || '-');
+    const photoSrc = p.foto_url ? escapeHTML(p.foto_url) : 'https://via.placeholder.com/160x240?text=FOTO';
+    const pageBreakStyle = 'font-family:\'Times New Roman\',serif; width:100%; max-width:210mm; margin:0 auto; box-sizing:border-box; padding:0; background:white;';
+
+    return `
+    <div class="page-break" style="${pageBreakStyle}">
+        <div style="border:2px solid #000; padding:25px; position:relative;">
+            <div style="border-bottom:4px double black; padding-bottom:15px; margin-bottom:25px; display:flex; align-items:center; justify-content:center; gap:20px;">
+                <img src="../images/logo.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_Kementerian_Agama_Republik_Indonesia_baru_2.png'" style="width:100px; height:auto;">
+                <div style="text-align:center; line-height:1.15; color:#000;">
+                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h5>
+                    <h5 style="margin:0; font-size:16px; font-weight:normal; letter-spacing:1px;">KANTOR KEMENTERIAN AGAMA KAB. TASIKMALAYA</h5>
+                    <h3 style="margin:5px 0; font-size:22px; font-weight:bold; font-family:Arial,sans-serif;">MADRASAH ALIYAH NEGERI 1 TASIKMALAYA</h3>
+                    <p style="margin:0; font-size:12px;">Jln. Pahlawan KHZ. Musthafa Sukamanah Ds.Sukarapih Kec.Sukarame Kab.Tasikmalaya</p>
+                    <p style="margin:0; font-size:12px;">Kode Pos 46461 Telp/Fax. (0265) 545719</p>
+                    <p style="margin:0; font-size:12px; font-weight:bold;"><i>website : www.man1tasikmalaya.sch.id &nbsp;&nbsp; e-mail : manegeri1tasik@gmail.com</i></p>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-bottom:30px; background:#eee; border:1px solid #000; padding:8px 0; border-radius:4px;">
+                <h3 style="margin:0; font-size:18px; font-weight:bold; font-family:Arial,sans-serif;">KARTU PESERTA UJIAN SELEKSI (CBT)</h3>
+                <p style="margin:2px 0 0 0; font-size:14px;">PENERIMAAN MURID BARU (PMB) TAHUN AJARAN 2026/2027</p>
+            </div>
+
+            <div style="display:flex; gap:30px; align-items:flex-start;">
+                <div style="width:4cm; flex-shrink:0; text-align:center;">
+                    <img src="${photoSrc}" onerror="this.src='https://via.placeholder.com/160x240?text=FOTO'" style="width:4cm; height:6cm; object-fit:cover; border:2px solid #000; padding:2px; display:block;">
+                </div>
+                <div style="flex:1;">
+                    <table style="width:100%; font-size:15px; border-collapse:separate; border-spacing:0 8px; margin-top:10px;">
+                        <tr><td style="width:150px; font-weight:bold;">NOMOR PESERTA</td><td>: <span style="font-weight:bold; font-size:18px;">${val(p.no_pendaftaran)}</span></td></tr>
+                        <tr><td>NAMA LENGKAP</td><td>: <span style="text-transform:uppercase;">${val(p.nama_lengkap)}</span></td></tr>
+                        <tr><td>NISN</td><td>: ${val(p.nisn)}</td></tr>
+                        <tr><td>JENIS KELAMIN</td><td>: ${val(p.jenis_kelamin)}</td></tr>
+                        <tr><td>ASAL SEKOLAH</td><td>: ${val(p.asal_sekolah)}</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:15px; margin-top:25px; align-items:stretch;">
+                <div style="border:2px solid #000; padding:12px 15px; flex:1; display:flex; flex-direction:column; justify-content:center;">
+                    <table style="width:100%; font-size:16px; font-weight:bold;">
+                        <tr><td style="width:160px; white-space:nowrap;">RUANG UJIAN</td><td style="white-space:nowrap;">: ${val(p.ruang_tes)}</td></tr>
+                        <tr><td style="white-space:nowrap;">HARI / TANGGAL</td><td style="white-space:nowrap;">: ${val(p.tanggal_tes)}</td></tr>
+                        <tr><td style="white-space:nowrap;">SESI UJIAN</td><td style="white-space:nowrap;">: ${val(p.sesi_tes)}</td></tr>
+                    </table>
+                </div>
+                <div style="border:2px solid #000; padding:10px; text-align:center; width:90px; display:flex; flex-direction:column; justify-content:center; align-items:center; flex-shrink:0;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cbt.man1tasikmalaya.sch.id" style="width:100%; height:auto; display:block;" alt="QR Link">
+                    <div style="font-size:9.5px; font-weight:bold; margin-top:6px; letter-spacing:0.5px; line-height:1.2;">SCAN LOGIN<br>UJIAN CBT</div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; font-size:13px; border-top:2px dashed #000; padding-top:15px;">
+                <b style="text-decoration:underline;">TATA TERTIB PESERTA UJIAN CBT:</b>
+                <ol style="margin:5px 0 0 0; padding-left:20px; line-height:1.6;">
+                    <li>Ujian dilaksanakan berbasis komputer (Computer Based Test).</li>
+                    <li>Peserta <b>wajib membawa smartphone dan dilengkapi dengan kuota internet.</b></li>
+                    <li>Sistem ujian (CBT) dapat diakses melalui link: <b>https://cbt.man1tasikmalaya.sch.id</b></li>
+                    <li>Peserta <b>wajib hadir di madrasah</b> 30 menit sebelum sesi dimulai.</li>
+                    <li>Wajib membawa <b>Kartu Peserta</b> ini (telah dicetak) sebagai bukti login ujian.</li>
+                    <li>Berpakaian seragam sekolah asal, rapi, dan bersepatu.</li>
+                    <li>Dilarang melakukan kecurangan selama melaksanakan tes.</li>
+                    <li>Segala bentuk kecurangan terdeteksi sistem dan akan dikenakan sanksi sesuai ketentuan.</li>
+                </ol>
+            </div>
+
+            <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; font-style:italic;">
+                    <i>Dicetak otomatis oleh sistem pada: ${escapeHTML(tglCetak)}</i>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function cetakKartuTesPendaftar(pendaftarList) {
+    if (!Array.isArray(pendaftarList) || pendaftarList.length === 0) {
+        Swal.fire('Info', 'Tidak ada peserta yang bisa dicetak.', 'info');
+        return;
+    }
+
+    const belumTerjadwal = pendaftarList.filter(p => !p.ruang_tes || !p.tanggal_tes || !p.sesi_tes);
+    const lanjutCetak = () => {
+        const now = new Date();
+        const opts = { timeZone: 'Asia/Jakarta', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const tglCetak = now.toLocaleDateString('id-ID', opts) + ' WIB';
+        const area = document.getElementById('cetak-verifikasi-area');
+        if (!area) {
+            Swal.fire('Gagal', 'Area cetak tidak ditemukan.', 'error');
+            return;
+        }
+
+        area.innerHTML = pendaftarList.map(p => buildKartuTesHTML(p, tglCetak)).join('');
+        setTimeout(() => {
+            window.print();
+            setTimeout(() => { area.innerHTML = ''; }, 3000);
+        }, 300);
+    };
+
+    if (belumTerjadwal.length > 0) {
+        Swal.fire({
+            title: 'Sebagian Belum Terjadwal',
+            html: `<b>${belumTerjadwal.length}</b> dari ${pendaftarList.length} peserta belum memiliki ruang, tanggal, atau sesi tes. Kartu tetap bisa dicetak, tetapi jadwal akan tampil sebagai tanda minus.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Tetap Cetak',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#dc2626'
+        }).then(result => {
+            if (result.isConfirmed) lanjutCetak();
+        });
+        return;
+    }
+
+    lanjutCetak();
+}
+
+window.cetakKartuTes = function(id) {
+    const pendaftar = allPendaftar.find(p => p.id === id);
+    if (!pendaftar) {
+        Swal.fire('Info', 'Data peserta tidak ditemukan.', 'info');
+        return;
+    }
+    cetakKartuTesPendaftar([pendaftar]);
 }
 
 // ==========================================
