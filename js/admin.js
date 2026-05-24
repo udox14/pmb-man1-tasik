@@ -1958,13 +1958,39 @@ function findPendaftarFromKelulusanRow(row) {
     return null;
 }
 
-window.downloadTemplateKelulusan = function() {
+window.downloadTemplateKelulusan = async function() {
     if (!allPendaftar.length) {
         Swal.fire('Info', 'Belum ada data pendaftar untuk dibuat template.', 'info');
         return;
     }
 
-    const excelData = allPendaftar.map(p => ({
+    const { value: jalurFilter } = await Swal.fire({
+        title: 'Export Template Kelulusan',
+        input: 'select',
+        inputOptions: {
+            'SEMUA': 'Keduanya (Prestasi & Reguler)',
+            'PRESTASI': 'Hanya Jalur Prestasi',
+            'REGULER': 'Hanya Jalur Reguler'
+        },
+        inputValue: 'SEMUA',
+        showCancelButton: true,
+        confirmButtonText: 'Download Template',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#00796b'
+    });
+
+    if (!jalurFilter) return;
+
+    const targetPendaftar = jalurFilter === 'SEMUA'
+        ? allPendaftar
+        : allPendaftar.filter(p => p.jalur === jalurFilter);
+
+    if (targetPendaftar.length === 0) {
+        Swal.fire('Info', `Tidak ada pendaftar Jalur ${jalurFilter}.`, 'info');
+        return;
+    }
+
+    const excelData = targetPendaftar.map(p => ({
         'No Pendaftaran': p.no_pendaftaran || '',
         'NISN': p.nisn || '',
         'Nama Lengkap': p.nama_lengkap || '',
@@ -2006,7 +2032,8 @@ window.downloadTemplateKelulusan = function() {
     XLSX.utils.book_append_sheet(workbook, guideSheet, 'Petunjuk');
 
     const tgl = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
-    XLSX.writeFile(workbook, `Template_Kelulusan_PMB_MAN1Tasik_${tgl}.xlsx`);
+    const suffix = jalurFilter === 'SEMUA' ? 'Semua_Jalur' : jalurFilter;
+    XLSX.writeFile(workbook, `Template_Kelulusan_${suffix}_PMB_MAN1Tasik_${tgl}.xlsx`);
 };
 
 window.importKelulusanExcel = function() {
