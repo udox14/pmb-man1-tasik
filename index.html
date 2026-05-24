@@ -1161,6 +1161,32 @@
             font-size: 1.4rem;
         }
 
+        .landing-announcement {
+            display: none;
+            text-align: center;
+            padding: 4px 0 2px;
+        }
+
+        .landing-announcement-icon {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: var(--teal-dim);
+            color: var(--teal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .landing-announcement-text {
+            color: var(--ink-mid);
+            font-size: .95rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
         .nisn-alert {
             background: var(--teal-dim);
             border: 1px solid var(--teal);
@@ -1743,46 +1769,45 @@
 ══════════════════════════════════════════ -->
 <div class="instruction-overlay" id="instructionModalIndex">
     <div class="instruction-box-popup">
-        <h3><i class="ph ph-warning-circle"></i> Perhatian Sebelum Mendaftar!</h3>
+        <h3 id="landingPopupTitle"><i class="ph ph-warning-circle" id="landingPopupIcon"></i> <span id="landingPopupTitleText">Perhatian Sebelum Mendaftar!</span></h3>
         
-        <div class="nisn-alert">
-            <div class="nisn-alert-icon"><i class="ph ph-identification-card"></i></div>
-            <div class="nisn-alert-text">
-                <strong>Wajib Validasi NISN</strong>
-                Pastikan NISN Anda valid dan sesuai dengan data yang terdaftar di Pusat Data Kemendikdasmen agar proses pendaftaran tidak terkendala.<br>
-                <a href="https://nisn.data.kemendikdasmen.go.id/" target="_blank" class="nisn-alert-link">Cek Data NISN <i class="ph ph-arrow-up-right"></i></a>
+        <div id="landingInstructionContent">
+            <div class="nisn-alert">
+                <div class="nisn-alert-icon"><i class="ph ph-identification-card"></i></div>
+                <div class="nisn-alert-text">
+                    <strong>Wajib Validasi NISN</strong>
+                    Pastikan NISN Anda valid dan sesuai dengan data yang terdaftar di Pusat Data Kemendikdasmen agar proses pendaftaran tidak terkendala.<br>
+                    <a href="https://nisn.data.kemendikdasmen.go.id/" target="_blank" class="nisn-alert-link">Cek Data NISN <i class="ph ph-arrow-up-right"></i></a>
+                </div>
+            </div>
+
+            <div class="instruction-list">
+                <p><i class="ph ph-folder-lock"></i> Persiapkan Berkas Berikut:</p>
+                <ul class="instruction-file-list">
+                    <li><i class="ph ph-image"></i> <div><strong>Pas Foto Latar Biru</strong>Format JPG/PNG, maksimal ukuran 2MB</div></li>
+                    <li><i class="ph ph-users-three"></i> <div><strong>Scan Kartu Keluarga (KK) Asli</strong>Format PDF, maksimal ukuran 2MB</div></li>
+                    <li><i class="ph ph-scroll"></i> <div><strong>Scan Akta Kelahiran Asli</strong>Format PDF, maksimal ukuran 2MB</div></li>
+                    <li><i class="ph ph-certificate"></i> <div><strong>Scan Surat Kelakuan Baik (SKB)</strong>Format PDF, maksimal ukuran 2MB</div></li>
+                    <li><i class="ph ph-identification-badge"></i> <div><strong>Scan KTP Orang Tua (Ayah & Ibu)</strong>Format PDF, maksimal ukuran 2MB. KTP digabungkan dalam 1 file PDF.</div></li>
+                    <li><i class="ph ph-book-open-text"></i> <div><strong>Scan Rapor 5 Semester (Opsional untuk Jalur Reguler)</strong>Format PDF, maksimal ukuran 2MB. Halaman identitas dan nilai semester 1-5 digabung dalam 1 file.</div></li>
+                    <li><i class="ph ph-trophy"></i> <div><strong>Sertifikat Prestasi</strong>Khusus Pendaftar Jalur Prestasi (Opsional). Format PDF, maksimal 5MB.</div></li>
+                </ul>
             </div>
         </div>
 
-        <div class="instruction-list">
-            <p><i class="ph ph-folder-lock"></i> Persiapkan Berkas Berikut:</p>
-            <ul class="instruction-file-list">
-                <li><i class="ph ph-image"></i> <div><strong>Pas Foto Latar Biru</strong>Format JPG/PNG, maksimal ukuran 2MB</div></li>
-                <li><i class="ph ph-users-three"></i> <div><strong>Scan Kartu Keluarga (KK) Asli</strong>Format PDF, maksimal ukuran 2MB</div></li>
-                <li><i class="ph ph-scroll"></i> <div><strong>Scan Akta Kelahiran Asli</strong>Format PDF, maksimal ukuran 2MB</div></li>
-                <li><i class="ph ph-certificate"></i> <div><strong>Scan Surat Kelakuan Baik (SKB)</strong>Format PDF, maksimal ukuran 2MB</div></li>
-                <li><i class="ph ph-identification-badge"></i> <div><strong>Scan KTP Orang Tua (Ayah & Ibu)</strong>Format PDF, maksimal ukuran 2MB. KTP digabungkan dalam 1 file PDF.</div></li>
-                <li><i class="ph ph-book-open-text"></i> <div><strong>Scan Rapor 5 Semester (Opsional untuk Jalur Reguler)</strong>Format PDF, maksimal ukuran 2MB. Halaman identitas dan nilai semester 1-5 digabung dalam 1 file.</div></li>
-                <li><i class="ph ph-trophy"></i> <div><strong>Sertifikat Prestasi</strong>Khusus Pendaftar Jalur Prestasi (Opsional). Format PDF, maksimal 5MB.</div></li>
-            </ul>
+        <div class="landing-announcement" id="landingAnnouncementContent">
+            <div class="landing-announcement-icon"><i class="ph ph-megaphone"></i></div>
+            <p class="landing-announcement-text" id="landingAnnouncementText">Hasil seleksi sudah bisa dilihat di akun masing-masing.</p>
         </div>
         
-        <button class="btn btn-primary" onclick="closeInstructionIndex()"
+        <button class="btn btn-primary" id="landingPopupButton" onclick="closeInstructionIndex()"
             style="width:100%;margin-top:24px;justify-content:center;border-radius:var(--radius-sm);font-size:.92rem;font-weight:700;padding:14px;box-shadow:0 4px 14px rgba(0, 121, 107, .2);transition:all .2s;background:var(--teal);color:white;border:none;cursor:pointer;">
-            Saya Mengerti & Siap Mendaftar <i class="ph ph-check-circle" style="font-size:1.15rem;margin-left:6px;"></i>
+            <span id="landingPopupButtonText">Saya Mengerti & Siap Mendaftar</span> <i class="ph ph-check-circle" id="landingPopupButtonIcon" style="font-size:1.15rem;margin-left:6px;"></i>
         </button>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Tampilkan modal saat awal buka halaman index
-        const modal = document.getElementById('instructionModalIndex');
-        if (modal) {
-            modal.style.display = 'flex';
-        }
-    });
-
     function closeInstructionIndex() {
         const modal = document.getElementById('instructionModalIndex');
         if (modal) {

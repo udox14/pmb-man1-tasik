@@ -35,8 +35,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     el.innerHTML = cfg[key]; // pakai innerHTML agar mendukung elemen bold dsb
                 }
             });
+
+            renderLandingPopup(cfg);
+        } else {
+            renderLandingPopup({});
         }
-    } catch(e) { console.error('Gagal memuat teks dinamis'); }
+    } catch(e) {
+        console.error('Gagal memuat teks dinamis');
+        renderLandingPopup({});
+    }
 
     const styleFix = document.createElement('style');
     styleFix.innerHTML = `
@@ -46,6 +53,69 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
     document.head.appendChild(styleFix);
 });
+
+function normalizeLandingPopupSettings(cfg = {}) {
+    return {
+        aktif: cfg.LANDING_POPUP_AKTIF !== 'false',
+        mode: cfg.LANDING_POPUP_MODE === 'pengumuman' ? 'pengumuman' : 'instruksi',
+        judul: cfg.LANDING_POPUP_JUDUL || 'Pengumuman Hasil Seleksi',
+        isi: cfg.LANDING_POPUP_ISI || 'Hasil seleksi sudah bisa dilihat di akun masing-masing.',
+        tombolText: cfg.LANDING_POPUP_TOMBOL_TEXT || 'Login Sekarang',
+        tombolLink: cfg.LANDING_POPUP_TOMBOL_LINK || 'login.html',
+    };
+}
+
+function safePopupLink(url) {
+    const cleanUrl = String(url || '').trim();
+    if (!cleanUrl || cleanUrl.toLowerCase().startsWith('javascript:')) return 'login.html';
+    return cleanUrl;
+}
+
+function renderLandingPopup(cfg) {
+    const modal = document.getElementById('instructionModalIndex');
+    if (!modal) return;
+
+    const settings = normalizeLandingPopupSettings(cfg);
+    if (!settings.aktif) {
+        modal.style.display = 'none';
+        return;
+    }
+
+    const titleIcon = document.getElementById('landingPopupIcon');
+    const titleText = document.getElementById('landingPopupTitleText');
+    const instructionContent = document.getElementById('landingInstructionContent');
+    const announcementContent = document.getElementById('landingAnnouncementContent');
+    const announcementText = document.getElementById('landingAnnouncementText');
+    const button = document.getElementById('landingPopupButton');
+    const buttonText = document.getElementById('landingPopupButtonText');
+    const buttonIcon = document.getElementById('landingPopupButtonIcon');
+
+    if (settings.mode === 'pengumuman') {
+        if (titleIcon) titleIcon.className = 'ph ph-megaphone';
+        if (titleText) titleText.textContent = settings.judul;
+        if (instructionContent) instructionContent.style.display = 'none';
+        if (announcementContent) announcementContent.style.display = 'block';
+        if (announcementText) announcementText.textContent = settings.isi;
+        if (buttonText) buttonText.textContent = settings.tombolText;
+        if (buttonIcon) buttonIcon.className = 'ph ph-sign-in';
+        if (button) {
+            button.onclick = () => { window.location.href = safePopupLink(settings.tombolLink); };
+        }
+    } else {
+        if (titleIcon) titleIcon.className = 'ph ph-warning-circle';
+        if (titleText) titleText.textContent = 'Perhatian Sebelum Mendaftar!';
+        if (instructionContent) instructionContent.style.display = 'block';
+        if (announcementContent) announcementContent.style.display = 'none';
+        if (buttonText) buttonText.textContent = 'Saya Mengerti & Siap Mendaftar';
+        if (buttonIcon) buttonIcon.className = 'ph ph-check-circle';
+        if (button) {
+            button.onclick = closeInstructionIndex;
+        }
+    }
+
+    modal.style.opacity = '1';
+    modal.style.display = 'flex';
+}
 
 function moveSlide(n) {
     const slides = document.querySelectorAll('.slide');

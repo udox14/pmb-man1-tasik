@@ -105,6 +105,12 @@ INSERT OR IGNORE INTO pengaturan (key, value) VALUES
   ('TANGGAL_PENGUMUMAN_REGULER',  '2026-05-25T00:00:00'),
   ('TEKS_BATAS_DAFTAR_ULANG',     '20 Juni 2026'),
   ('KELULUSAN_AKTIF',             'false'),
+  ('LANDING_POPUP_AKTIF',         'true'),
+  ('LANDING_POPUP_MODE',          'instruksi'),
+  ('LANDING_POPUP_JUDUL',         'Pengumuman Hasil Seleksi'),
+  ('LANDING_POPUP_ISI',           'Hasil seleksi sudah bisa dilihat di akun masing-masing.'),
+  ('LANDING_POPUP_TOMBOL_TEXT',   'Login Sekarang'),
+  ('LANDING_POPUP_TOMBOL_LINK',   'login.html'),
   ('PMB_OPEN',                    'true');
 
 -- Admin default (password: admin123 — ganti setelah deploy!)

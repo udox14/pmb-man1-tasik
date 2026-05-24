@@ -9,6 +9,12 @@ const CORS = {
 const DEFAULT_SETTINGS = {
   TEKS_BATAS_DAFTAR_ULANG: '20 Juni 2026',
   KELULUSAN_AKTIF: 'false',
+  LANDING_POPUP_AKTIF: 'true',
+  LANDING_POPUP_MODE: 'instruksi',
+  LANDING_POPUP_JUDUL: 'Pengumuman Hasil Seleksi',
+  LANDING_POPUP_ISI: 'Hasil seleksi sudah bisa dilihat di akun masing-masing.',
+  LANDING_POPUP_TOMBOL_TEXT: 'Login Sekarang',
+  LANDING_POPUP_TOMBOL_LINK: 'login.html',
 };
 
 export async function onRequestGet(context) {

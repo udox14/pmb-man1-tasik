@@ -3234,6 +3234,18 @@ window.aturJalur = async function() {
         const presChecked   = config['JALUR_PRESTASI'] !== 'false';
         const cetakChecked  = config['CETAK_KARTU_AKTIF'] === 'true';
         const lulusChecked  = config['KELULUSAN_AKTIF'] === 'true';
+        const popupChecked  = config['LANDING_POPUP_AKTIF'] !== 'false';
+        const popupMode     = config['LANDING_POPUP_MODE'] === 'pengumuman' ? 'pengumuman' : 'instruksi';
+        const popupJudul    = config['LANDING_POPUP_JUDUL'] || 'Pengumuman Hasil Seleksi';
+        const popupIsi      = config['LANDING_POPUP_ISI'] || 'Hasil seleksi sudah bisa dilihat di akun masing-masing.';
+        const popupBtnText  = config['LANDING_POPUP_TOMBOL_TEXT'] || 'Login Sekarang';
+        const popupBtnLink  = config['LANDING_POPUP_TOMBOL_LINK'] || 'login.html';
+        const esc = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
 
         const { value: formValues } = await Swal.fire({
             title: 'Pengaturan Sistem PMB',
@@ -3338,6 +3350,81 @@ window.aturJalur = async function() {
                             ${lulusChecked ? 'Aktif - Hasil terlihat siswa' : 'Nonaktif - Hasil disembunyikan'}
                         </div>
                     </div>
+
+                    <div style="background:${popupChecked ? '#f0fdf4' : '#fff8f0'}; padding:15px; border-radius:10px; border:1px solid ${popupChecked ? '#bbf7d0' : '#fed7aa'}; display:flex; align-items:flex-start; flex-direction:column; gap:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <div>
+                                <strong style="color:${popupChecked ? '#15803d' : '#c2410c'}; font-size:1.05rem; display:flex; align-items:center; gap:7px;">
+                                    <i class="ph ${popupChecked ? 'ph-chats-circle' : 'ph-chat-circle-slash'}"></i>
+                                    Pop-up Landing Page
+                                </strong>
+                                <p style="margin:4px 0 0; font-size:.78rem; color:#64748b; line-height:1.5;">
+                                    Atur pop-up yang muncul saat halaman utama dibuka.
+                                </p>
+                            </div>
+                            <label style="position:relative; display:inline-block; width:52px; height:28px; flex-shrink:0; margin-left:12px;">
+                                <input type="checkbox" id="check-popup-landing" ${popupChecked ? 'checked' : ''}
+                                       onchange="
+                                           const box = this.closest('div').parentElement;
+                                           box.style.background = this.checked ? '#f0fdf4' : '#fff8f0';
+                                           box.style.borderColor = this.checked ? '#bbf7d0' : '#fed7aa';
+                                           box.querySelector('strong').style.color = this.checked ? '#15803d' : '#c2410c';
+                                           box.querySelector('i').className = 'ph ' + (this.checked ? 'ph-chats-circle' : 'ph-chat-circle-slash');
+                                           const slider = box.querySelector('.toggle-popup-slider');
+                                           const knob = box.querySelector('.toggle-popup-knob');
+                                           const badge = box.querySelector('.toggle-popup-badge');
+                                           slider.style.background = this.checked ? '#16a34a' : '#cbd5e1';
+                                           knob.style.left = this.checked ? '27px' : '3px';
+                                           badge.style.background = this.checked ? '#dcfce7' : '#fee2e2';
+                                           badge.style.color = this.checked ? '#166534' : '#991b1b';
+                                           badge.innerHTML = this.checked ? 'Aktif - Pop-up tampil' : 'Nonaktif - Pop-up disembunyikan';
+                                       "
+                                       style="opacity:0;width:0;height:0;">
+                                <span class="toggle-popup-slider" style="
+                                    position:absolute; cursor:pointer; inset:0;
+                                    background:${popupChecked ? '#16a34a' : '#cbd5e1'};
+                                    border-radius:99px; transition:.3s;
+                                "></span>
+                                <span class="toggle-popup-knob" style="
+                                    position:absolute; top:3px; left:${popupChecked ? '27px' : '3px'};
+                                    background:white; width:22px; height:22px;
+                                    border-radius:50%; transition:.3s;
+                                    pointer-events:none;
+                                "></span>
+                            </label>
+                        </div>
+                        <div class="toggle-popup-badge" style="font-size:.75rem; font-weight:700; padding:4px 12px; border-radius:99px; background:${popupChecked ? '#dcfce7' : '#fee2e2'}; color:${popupChecked ? '#166534' : '#991b1b'}; align-self:flex-start;">
+                            ${popupChecked ? 'Aktif - Pop-up tampil' : 'Nonaktif - Pop-up disembunyikan'}
+                        </div>
+
+                        <div style="width:100%; border-top:1px dashed #dbe3ea; padding-top:12px;">
+                            <label style="display:block; font-weight:700; color:#475569; font-size:.8rem; margin-bottom:8px;">Jenis Pop-up</label>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                                <label style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:.82rem; color:#334155;">
+                                    <input type="radio" name="landing-popup-mode" value="instruksi" ${popupMode === 'instruksi' ? 'checked' : ''} onchange="document.getElementById('landing-popup-fields').style.display = this.value === 'pengumuman' ? 'block' : 'none';">
+                                    Instruksi Pendaftaran
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:.82rem; color:#334155;">
+                                    <input type="radio" name="landing-popup-mode" value="pengumuman" ${popupMode === 'pengumuman' ? 'checked' : ''} onchange="document.getElementById('landing-popup-fields').style.display = this.value === 'pengumuman' ? 'block' : 'none';">
+                                    Pengumuman
+                                </label>
+                            </div>
+
+                            <div id="landing-popup-fields" style="display:${popupMode === 'pengumuman' ? 'block' : 'none'}; margin-top:12px;">
+                                <label style="display:block; margin:12px 0 5px; font-weight:600; color:#475569; font-size:.8rem;">Judul Pengumuman</label>
+                                <input type="text" id="landing-popup-judul" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" value="${esc(popupJudul)}">
+
+                                <label style="display:block; margin:12px 0 5px; font-weight:600; color:#475569; font-size:.8rem;">Isi Pengumuman</label>
+                                <textarea id="landing-popup-isi" rows="3" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box; resize:vertical;">${esc(popupIsi)}</textarea>
+
+                                <label style="display:block; margin:12px 0 5px; font-weight:600; color:#475569; font-size:.8rem;">Teks Tombol</label>
+                                <input type="text" id="landing-popup-tombol-text" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" value="${esc(popupBtnText)}">
+
+                                <label style="display:block; margin:12px 0 5px; font-weight:600; color:#475569; font-size:.8rem;">Link Tombol</label>
+                                <input type="text" id="landing-popup-tombol-link" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" value="${esc(popupBtnLink)}" placeholder="login.html">
+                            </div>
+                        </div>
+                    </div>
                     
                     <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:20px; font-size:0.85rem;">
                         <h4 style="margin:0 0 15px; color:#1e293b; font-size:1rem;">Teks Jadwal Prestasi</h4>
@@ -3409,7 +3496,13 @@ window.aturJalur = async function() {
                     document.getElementById('t-batas-du').value,
                     document.getElementById('t-link-wa').value,
                     document.getElementById('check-cetak-kartu').checked,  // index 15
-                    document.getElementById('check-kelulusan-aktif').checked // index 16
+                    document.getElementById('check-kelulusan-aktif').checked, // index 16
+                    document.getElementById('check-popup-landing').checked, // index 17
+                    document.querySelector('input[name="landing-popup-mode"]:checked')?.value || 'instruksi', // index 18
+                    document.getElementById('landing-popup-judul').value || 'Pengumuman Hasil Seleksi', // index 19
+                    document.getElementById('landing-popup-isi').value || 'Hasil seleksi sudah bisa dilihat di akun masing-masing.', // index 20
+                    document.getElementById('landing-popup-tombol-text').value || 'Login Sekarang', // index 21
+                    document.getElementById('landing-popup-tombol-link').value || 'login.html' // index 22
                 ];
             }
         });
@@ -3432,7 +3525,13 @@ window.aturJalur = async function() {
                 { key: 'TEKS_BATAS_DAFTAR_ULANG', value: formValues[13] },
                 { key: 'LINK_GRUP_WA', value: formValues[14] },
                 { key: 'CETAK_KARTU_AKTIF', value: String(formValues[15]) },
-                { key: 'KELULUSAN_AKTIF', value: String(formValues[16]) }
+                { key: 'KELULUSAN_AKTIF', value: String(formValues[16]) },
+                { key: 'LANDING_POPUP_AKTIF', value: String(formValues[17]) },
+                { key: 'LANDING_POPUP_MODE', value: formValues[18] },
+                { key: 'LANDING_POPUP_JUDUL', value: formValues[19] },
+                { key: 'LANDING_POPUP_ISI', value: formValues[20] },
+                { key: 'LANDING_POPUP_TOMBOL_TEXT', value: formValues[21] },
+                { key: 'LANDING_POPUP_TOMBOL_LINK', value: formValues[22] }
             ]});
             Swal.fire({
                 icon: 'success',
@@ -3440,7 +3539,8 @@ window.aturJalur = async function() {
                 html: `<p style="font-size:.88rem; color:#334155; line-height:1.7;">
                     Pengaturan berhasil disimpan.<br><br>
                     <b style="color:${formValues[15] ? '#16a34a' : '#dc2626'};">Cetak Kartu Tes: ${formValues[15] ? 'AKTIF' : 'NONAKTIF'}</b><br>
-                    <b style="color:${formValues[16] ? '#16a34a' : '#dc2626'};">Pengumuman Kelulusan: ${formValues[16] ? 'AKTIF' : 'NONAKTIF'}</b>
+                    <b style="color:${formValues[16] ? '#16a34a' : '#dc2626'};">Pengumuman Kelulusan: ${formValues[16] ? 'AKTIF' : 'NONAKTIF'}</b><br>
+                    <b style="color:${formValues[17] ? '#16a34a' : '#dc2626'};">Pop-up Landing: ${formValues[17] ? 'AKTIF' : 'NONAKTIF'} (${formValues[18]})</b>
                 </p>`,
                 confirmButtonColor: '#00796b'
             });
