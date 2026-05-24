@@ -648,44 +648,54 @@
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 180mm;
-                height: 267mm;
+                width: 210mm;
+                height: 297mm;
                 margin: 0;
-                padding: 0;
+                padding: 40mm 25mm 30mm 35mm; /* Top: 40mm, Right: 25mm, Bottom: 30mm, Left: 35mm */
                 display: block !important;
                 border: none;
                 background: white;
-                overflow: hidden;
                 box-sizing: border-box;
+                overflow: hidden;
                 break-inside: avoid;
                 page-break-inside: avoid;
                 page-break-after: avoid;
             }
 
             body.print-sumbangan .surat-sumbangan-page {
-                width: 180mm;
-                height: 267mm;
+                width: 100%;
+                height: 100%;
                 overflow: hidden;
                 box-sizing: border-box;
-                font-size: 11.5pt !important;
-                line-height: 1.32 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
 
             body.print-sumbangan .surat-sumbangan-page h2 {
-                font-size: 13.5pt !important;
-                margin-bottom: 18px !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 12pt !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                margin-top: 0 !important;
+                margin-bottom: 25px !important;
+                text-transform: uppercase !important;
+                text-decoration: none !important;
             }
 
             body.print-sumbangan .surat-sumbangan-page p,
             body.print-sumbangan .surat-sumbangan-page li,
             body.print-sumbangan .surat-sumbangan-page table {
-                font-size: 11.5pt !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
             }
 
             body.print-sumbangan .surat-sumbangan-page ol {
-                margin-bottom: 10px !important;
+                margin: 0 0 15px 0 !important;
+                padding-left: 24px !important;
             }
 
             /* Fallback: jika tidak ada class, cetak kartu (perilaku lama) */
@@ -1550,73 +1560,73 @@
 
     <!-- SURAT PERNYATAAN KESEDIAAN MEMBAYAR SUMBANGAN (PRINT) -->
     <div id="surat-sumbangan-cetak"
-        style="display:none; font-family:'Times New Roman',serif; background:white; width:180mm; height:267mm; margin:0 auto; box-sizing:border-box; padding:0; color:#000; overflow:hidden;">
-        <div class="surat-sumbangan-page" style="padding:0; font-size:11.5pt; line-height:1.32; width:180mm; height:267mm; overflow:hidden; box-sizing:border-box;">
-            <h2 style="text-align:center; font-size:14pt; margin:0 0 24px; text-decoration:underline; font-weight:bold;">
+        style="display:none; font-family:'Times New Roman',serif; background:white; width:210mm; height:297mm; margin:0 auto; box-sizing:border-box; padding:40mm 25mm 30mm 35mm; color:#000; overflow:hidden;">
+        <div class="surat-sumbangan-page" style="padding:0; font-size:12pt; line-height:1.5; width:100%; height:100%; overflow:hidden; box-sizing:border-box;">
+            <h2 style="text-align:center; font-size:12pt; margin:0 0 25px 0; text-transform:uppercase; font-weight:bold; text-decoration:none;">
                 SURAT PERNYATAAN KESEDIAAN
             </h2>
 
-            <p style="margin:0 0 10px;">Bismillahirrahmanirrahiim,</p>
-            <p style="margin:0 0 8px;">Saya yang bertandatangan dibawah ini :</p>
+            <p style="margin:0 0 15px 0; font-style:italic;">Bismillahirrahmannirrahiim,</p>
+            <p style="margin:0 0 10px 0;">Saya yang bertandatangan dibawah ini :</p>
 
-            <table style="width:100%; border-collapse:collapse; margin:0 0 10px; font-size:11.5pt;">
+            <table style="width:100%; border-collapse:collapse; margin:0 0 15px 0; font-size:12pt; line-height:1.5;">
                 <tr>
-                    <td style="width:145px; padding:2px 0; vertical-align:top;">Nama Orangtua/wali</td>
-                    <td style="width:14px; padding:2px 0; vertical-align:top;">:</td>
-                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-nama-ortu"></span></td>
+                    <td style="width:170px; padding:3px 0; vertical-align:top;">Nama Orangtua/wali</td>
+                    <td style="width:20px; padding:3px 0; vertical-align:top;">:</td>
+                    <td style="padding:3px 0; vertical-align:top;"><span id="smb-nama-ortu"></span></td>
                 </tr>
                 <tr>
-                    <td style="padding:2px 0; vertical-align:top;">Alamat</td>
-                    <td style="padding:2px 0; vertical-align:top;">:</td>
-                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-alamat"></span></td>
+                    <td style="padding:3px 0; vertical-align:top;">Alamat</td>
+                    <td style="padding:3px 0; vertical-align:top;">:</td>
+                    <td style="padding:3px 0; vertical-align:top;"><span id="smb-alamat"></span></td>
                 </tr>
                 <tr>
-                    <td style="padding:2px 0; vertical-align:top;">Pekerjaan</td>
-                    <td style="padding:2px 0; vertical-align:top;">:</td>
-                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-pekerjaan"></span></td>
+                    <td style="padding:3px 0; vertical-align:top;">Pekerjaan</td>
+                    <td style="padding:3px 0; vertical-align:top;">:</td>
+                    <td style="padding:3px 0; vertical-align:top;"><span id="smb-pekerjaan"></span></td>
                 </tr>
                 <tr>
-                    <td style="padding:2px 0; vertical-align:top;">No. Hp</td>
-                    <td style="padding:2px 0; vertical-align:top;">:</td>
-                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-hp"></span></td>
+                    <td style="padding:3px 0; vertical-align:top;">No. Hp</td>
+                    <td style="padding:3px 0; vertical-align:top;">:</td>
+                    <td style="padding:3px 0; vertical-align:top;"><span id="smb-hp"></span></td>
                 </tr>
                 <tr>
-                    <td style="padding:2px 0; vertical-align:top;">Nama siswa</td>
-                    <td style="padding:2px 0; vertical-align:top;">:</td>
-                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-nama-siswa"></span></td>
+                    <td style="padding:3px 0; vertical-align:top;">Nama siswa</td>
+                    <td style="padding:3px 0; vertical-align:top;">:</td>
+                    <td style="padding:3px 0; vertical-align:top;"><span id="smb-nama-siswa"></span></td>
                 </tr>
                 <tr>
-                    <td style="padding:2px 0; vertical-align:top;">Kelas</td>
-                    <td style="padding:2px 0; vertical-align:top;">:</td>
-                    <td style="padding:2px 0; vertical-align:top;">10</td>
+                    <td style="padding:3px 0; vertical-align:top;">Kelas</td>
+                    <td style="padding:3px 0; vertical-align:top;">:</td>
+                    <td style="padding:3px 0; vertical-align:top;">10</td>
                 </tr>
             </table>
 
-            <p style="margin:0 0 8px;">menyatakan :</p>
-            <ol style="margin:0 0 10px; padding-left:22px;">
-                <li style="margin-bottom:6px; text-align:justify;">
+            <p style="margin:0 0 10px 0;">menyatakan :</p>
+            <ol style="margin:0 0 15px 0; padding-left:24px;">
+                <li style="margin-bottom:8px; text-align:justify; padding-left:5px; line-height:1.5;">
                     berkomiten untuk mendukung program/kegiatan dalam rangka peningkatan mutu pendidikan di MAN 1 Tasikmalaya;
                 </li>
-                <li style="margin-bottom:6px; text-align:justify;">
+                <li style="margin-bottom:8px; text-align:justify; padding-left:5px; line-height:1.5;">
                     dengan sungguh-sungguh, sukarela, ikhlas dan tanpa paksaan dari pihak manapun, bahwa kami bersedia
                     memberikan sumbangan pendidikan kepada madrasah sesuai dengan hasil musyawarah dan kesepakatan Komite
-                    Madrasah sebesar
+                    Madrasah sebesar (disesuaikan)
                 </li>
             </ol>
 
-            <p style="margin:18px 0 18px; text-align:center; font-size:13pt;">Rp ________________________</p>
+            <p style="margin:15px 0 20px 35px; text-align:left; font-size:12pt; line-height:1.5;">Rp ________________________</p>
 
-            <p style="margin:0 0 24px; text-align:justify;">
+            <p style="margin:0 0 35px 0; text-align:justify; line-height:1.5;">
                 Demikian pernyataan ini kami buat dengan sebenarnya dan dapat digunakan sebagaimana mestinya.
             </p>
 
-            <div style="width:260px; margin-left:auto; text-align:left;">
-                <p style="margin:0 0 10px;">Tasikmalaya, <span id="smb-tanggal-rapat"></span></p>
-                <p style="margin:0 0 24px;">Yang menyatakan,</p>
-                <div style="width:120px; height:50px; border:1px solid #000; display:flex; align-items:center; justify-content:center; font-size:11pt; margin-bottom:36px;">
+            <div style="width:280px; margin-left:auto; text-align:left; line-height:1.5;">
+                <p style="margin:0 0 5px 0;">Tasikmalaya, <span id="smb-tanggal-rapat"></span></p>
+                <p style="margin:0 0 15px 0;">Yang menyatakan,</p>
+                <div style="width:120px; height:60px; border:1px solid #000; display:flex; align-items:center; justify-content:center; font-size:10pt; margin:15px 0 20px 0; font-family:'Times New Roman',serif;">
                     Materai 10.000
                 </div>
-                <p style="margin:0; font-weight:bold; text-decoration:underline;">(<span id="smb-ttd-nama"></span>)</p>
+                <p style="margin:0; font-weight:bold; text-transform:uppercase;"><span id="smb-ttd-nama"></span></p>
             </div>
         </div>
     </div>
