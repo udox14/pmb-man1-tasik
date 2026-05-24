@@ -14,12 +14,30 @@ function isAdmin(request) {
   return true;
 }
 
+async function ensureDaftarUlangColumns(env) {
+  const columns = [
+    "ALTER TABLE pendaftar ADD COLUMN daftar_ulang_hardcopy_status TEXT DEFAULT NULL",
+    "ALTER TABLE pendaftar ADD COLUMN daftar_ulang_hardcopy_at TEXT DEFAULT NULL",
+  ];
+
+  for (const sql of columns) {
+    try {
+      await env.DB.prepare(sql).run();
+    } catch (err) {
+      const msg = String(err?.message || '').toLowerCase();
+      if (!msg.includes('duplicate column')) throw err;
+    }
+  }
+}
+
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 
   try {
+    await ensureDaftarUlangColumns(env);
+
     if (action === 'pengaturan') {
       const { results } = await env.DB.prepare('SELECT * FROM pengaturan').all();
       return Response.json(results, { headers: CORS });
@@ -49,6 +67,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
+    await ensureDaftarUlangColumns(env);
 
     // Update verifikasi + status_kelulusan untuk banyak pendaftar sekaligus
     if (action === 'verifikasi') {

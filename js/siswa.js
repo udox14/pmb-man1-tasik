@@ -17,6 +17,7 @@ try {
 
 // Cache data pendaftar untuk dipakai di editData
 let _cachedData = null;
+let _dashboardConfig = {};
 
 // ===========================================================
 // LOAD DASHBOARD
@@ -59,6 +60,7 @@ async function loadDashboardData() {
             }
         }
     } catch(e) { console.error('Gagal meload teks dinamis', e); }
+    _dashboardConfig = globalCfg;
 
     // Render status dengan info setting cetak kartu
     const cetakAktif = globalCfg['CETAK_KARTU_AKTIF'] === 'true';
@@ -474,85 +476,99 @@ function renderDaftarUlang(data) {
 
   section.style.display = 'block';
 
-  // Update status badge masing-masing dokumen
-  const updateBadge = (elId, url) => {
-    const el = document.getElementById(elId);
-    if (!el) return;
-    if (url) {
-      el.innerHTML = `<span class="du-status-badge du-status-uploaded">
-        <i class="ph ph-check-circle"></i> Sudah Upload
-        <a href="${url}" target="_blank" style="color:#065f46; margin-left:4px; font-size:.62rem;">Lihat</a>
-      </span>`;
-    } else {
-      el.innerHTML = `<span class="du-status-badge du-status-pending">
-        <i class="ph ph-clock"></i> Belum Upload
-      </span>`;
-    }
-  };
-
-  updateBadge('du-status-pesantren', data.daftar_ulang_pesantren_url);
-
-  // Update teks tombol upload jika sudah terupload
-  if (data.daftar_ulang_pesantren_url) {
-    const btn = document.getElementById('btn-upload-pesantren');
-    if (btn) btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang';
-  }
+  const rapat = _dashboardConfig['TEKS_RAPAT'];
+  const batas = _dashboardConfig['TEKS_BATAS_DAFTAR_ULANG'];
+  document.querySelectorAll('[data-key="TEKS_RAPAT"]').forEach(el => { if (rapat) el.innerHTML = rapat; });
+  document.querySelectorAll('[data-key="TEKS_BATAS_DAFTAR_ULANG"]').forEach(el => { if (batas) el.innerHTML = batas; });
 }
 
-window.uploadDU = async function(input, jenis) {
-  const file = input.files[0];
-  if (!file) return;
+function buildAlamatLengkap(p) {
+  const rtrw = [p.rt ? `RT ${p.rt}` : '', p.rw ? `RW ${p.rw}` : ''].filter(Boolean).join(' / ');
+  return [
+    p.alamat_lengkap,
+    rtrw,
+    p.desa_kelurahan,
+    p.kecamatan,
+    p.kabupaten_kota,
+    p.provinsi,
+    p.kode_pos ? `Kode Pos ${p.kode_pos}` : '',
+  ].filter(Boolean).join(', ') || '-';
+}
 
-  const fieldMap = {
-    pesantren: { field: 'daftar_ulang_pesantren_url', btnId: 'btn-upload-pesantren', statusId: 'du-status-pesantren' },
-  };
-  const cfg = fieldMap[jenis];
-  if (!cfg || !userSession?.id) return;
-
-  const btn = document.getElementById(cfg.btnId);
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph ph-spinner"></i> Mengupload...'; }
-
-  try {
-    // Upload file ke R2
-    const form = new FormData();
-    form.append('file', file);
-    form.append('folder', `daftar-ulang/${userSession.id}`);
-    form.append('docName', jenis.toUpperCase());
-
-    const upRes = await fetch('/api/upload', { method: 'POST', body: form });
-    const upJson = await upRes.json();
-
-    if (upJson.error) throw new Error(upJson.error);
-
-    // Simpan URL ke database
-    const saveRes = await fetch('/api/pendaftar-edit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: userSession.id, [cfg.field]: upJson.url }),
+function getParentOptions(p) {
+  const options = [];
+  if (p.nama_ayah) {
+    options.push({
+      value: 'ayah',
+      label: `Ayah - ${p.nama_ayah}`,
+      data: { nama: p.nama_ayah, pekerjaan: p.pekerjaan_ayah, hp: p.no_telepon_ortu }
     });
-    const saveJson = await saveRes.json();
-    if (saveJson.error) throw new Error(saveJson.error);
+  }
+  if (p.nama_ibu) {
+    options.push({
+      value: 'ibu',
+      label: `Ibu - ${p.nama_ibu}`,
+      data: { nama: p.nama_ibu, pekerjaan: p.pekerjaan_ibu, hp: p.no_telepon_ortu }
+    });
+  }
+  if (p.nama_wali) {
+    options.push({
+      value: 'wali',
+      label: `Wali - ${p.nama_wali}`,
+      data: { nama: p.nama_wali, pekerjaan: p.pekerjaan_wali, hp: p.no_telepon_wali || p.no_telepon_ortu }
+    });
+  }
+  return options;
+}
 
-    // Update cache & UI
-    if (_cachedData) _cachedData[cfg.field] = upJson.url;
-    const statusEl = document.getElementById(cfg.statusId);
-    if (statusEl) {
-      statusEl.innerHTML = `<span class="du-status-badge du-status-uploaded">
-        <i class="ph ph-check-circle"></i> Sudah Upload
-        <a href="${upJson.url}" target="_blank" style="color:#065f46; margin-left:4px; font-size:.62rem;">Lihat</a>
-      </span>`;
-    }
-  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i> Upload Ulang'; }
-
-    Swal.fire({ icon: 'success', title: 'Upload Berhasil!', text: 'Dokumen daftar ulang Anda telah tersimpan.', timer: 2000, showConfirmButton: false });
-
-  } catch (err) {
-    console.error('Upload DU error:', err);
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-upload-simple"></i> Upload Scan'; }
-    Swal.fire('Gagal Upload', err.message, 'error');
+window.cetakSuratSumbangan = async function() {
+  if (!_cachedData) {
+    Swal.fire('Tunggu sebentar', 'Data sedang dimuat.', 'info');
+    return;
   }
 
-  input.value = ''; // reset input
+  const p = _cachedData;
+  const options = getParentOptions(p);
+  if (options.length === 0) {
+    Swal.fire('Data Orang Tua/Wali Kosong', 'Lengkapi data ayah, ibu, atau wali sebelum mencetak surat.', 'warning');
+    return;
+  }
+
+  const inputOptions = {};
+  options.forEach(opt => { inputOptions[opt.value] = opt.label; });
+
+  const { value: selected } = await Swal.fire({
+    title: 'Pilih Penandatangan',
+    input: 'radio',
+    inputOptions,
+    inputValue: options[0].value,
+    confirmButtonText: 'Cetak Surat',
+    showCancelButton: true,
+    cancelButtonText: 'Batal',
+    inputValidator: value => !value ? 'Pilih salah satu penandatangan.' : undefined,
+  });
+  if (!selected) return;
+
+  const parent = options.find(opt => opt.value === selected)?.data;
+  if (!parent) return;
+
+  const setEl = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text || '-';
+  };
+
+  setEl('smb-nama-ortu', parent.nama);
+  setEl('smb-alamat', buildAlamatLengkap(p));
+  setEl('smb-pekerjaan', parent.pekerjaan);
+  setEl('smb-hp', parent.hp);
+  setEl('smb-nama-siswa', p.nama_lengkap);
+  setEl('smb-tanggal-rapat', _dashboardConfig['TEKS_RAPAT'] || '........................');
+  setEl('smb-ttd-nama', parent.nama);
+
+  document.body.classList.remove('print-kartu', 'print-undangan');
+  document.body.classList.add('print-sumbangan');
+  window.print();
+  setTimeout(() => document.body.classList.remove('print-sumbangan'), 1000);
 };
 
 // ===========================================================

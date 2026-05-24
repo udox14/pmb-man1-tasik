@@ -77,7 +77,9 @@ CREATE TABLE IF NOT EXISTS pendaftar (
   tanggal_tes                 TEXT,
   sesi_tes                    TEXT,
   daftar_ulang_pesantren_url  TEXT,   -- Surat bersedia tinggal di pesantren (upload siswa)
-  daftar_ulang_tertib_url     TEXT    -- Surat siap menaati tata tertib (upload siswa)
+  daftar_ulang_tertib_url     TEXT,   -- Surat siap menaati tata tertib (upload siswa)
+  daftar_ulang_hardcopy_status TEXT,  -- NULL/BELUM/SUDAH: status penyerahan hardcopy daftar ulang
+  daftar_ulang_hardcopy_at    TEXT    -- timestamp saat hardcopy ditandai sudah diserahkan
 );
 
 CREATE TABLE IF NOT EXISTS prestasi (
@@ -101,6 +103,7 @@ CREATE TABLE IF NOT EXISTS pengaturan (
 INSERT OR IGNORE INTO pengaturan (key, value) VALUES
   ('TANGGAL_PENGUMUMAN_PRESTASI', '2026-04-18T00:00:00'),
   ('TANGGAL_PENGUMUMAN_REGULER',  '2026-05-25T00:00:00'),
+  ('TEKS_BATAS_DAFTAR_ULANG',     '20 Juni 2026'),
   ('PMB_OPEN',                    'true');
 
 -- Admin default (password: admin123 — ganti setelah deploy!)

@@ -218,10 +218,10 @@ function renderTable() {
         // Badge Daftar Ulang (hanya untuk yang DITERIMA)
         let badgeDU = '';
         if (p.status_kelulusan === 'DITERIMA') {
-            if (p.daftar_ulang_pesantren_url) {
-                badgeDU = '<span class="badge-modern badge-green" style="font-size:.65rem;"><i class="ph ph-check-circle"></i> Sudah Upload</span>';
+            if (p.daftar_ulang_hardcopy_status === 'SUDAH') {
+                badgeDU = `<button onclick="toggleDaftarUlangHardcopy('${p.id}', 'BELUM')" class="badge-modern badge-green" style="font-size:.65rem; border:none; cursor:pointer;"><i class="ph ph-check-circle"></i> Sudah Serah</button>`;
             } else {
-                badgeDU = '<span class="badge-modern badge-red" style="font-size:.65rem;"><i class="ph ph-clock"></i> Belum Upload</span>';
+                badgeDU = `<button onclick="toggleDaftarUlangHardcopy('${p.id}', 'SUDAH')" class="badge-modern badge-red" style="font-size:.65rem; border:none; cursor:pointer;"><i class="ph ph-clock"></i> Belum Serah</button>`;
             }
         } else {
             badgeDU = '<span style="color:#94a3b8; font-size:.7rem;">—</span>';
@@ -273,6 +273,29 @@ function renderTable() {
     renderPagination(totalPages);
     updateBulkUI();
 }
+
+window.toggleDaftarUlangHardcopy = async function(id, nextStatus) {
+    const p = allPendaftar.find(x => x.id === id);
+    if (!p) return;
+
+    const isDone = nextStatus === 'SUDAH';
+    const result = await apiPost('admin?action=update-satu', {
+        id,
+        payload: {
+            daftar_ulang_hardcopy_status: nextStatus,
+            daftar_ulang_hardcopy_at: isDone ? new Date().toISOString() : null,
+        }
+    });
+
+    if (result.error) {
+        Swal.fire('Gagal', result.error, 'error');
+        return;
+    }
+
+    p.daftar_ulang_hardcopy_status = nextStatus;
+    p.daftar_ulang_hardcopy_at = isDone ? new Date().toISOString() : null;
+    renderTable();
+};
 
 // ==========================================
 // 6. PAGINATION & TABLE HANDLERS
@@ -1931,6 +1954,8 @@ window.viewDetail = async function(id) {
             id: p.id, 
             status_verifikasi: p.status_verifikasi, 
             status_kelulusan: p.status_kelulusan || 'PENDING',
+            daftar_ulang_hardcopy_status: p.daftar_ulang_hardcopy_status || 'BELUM',
+            daftar_ulang_hardcopy_at: p.daftar_ulang_hardcopy_at || null,
             berkas_ditolak: berkasArr,
         };
 
@@ -1998,6 +2023,8 @@ window.viewDetail = async function(id) {
         const isLulusTrue = p.status_kelulusan === 'DITERIMA' ? 'active' : '';
         const isLulusFalse = p.status_kelulusan === 'TIDAK DITERIMA' ? 'active' : '';
         const isLulusPending = (!p.status_kelulusan || p.status_kelulusan === 'PENDING') ? 'active' : '';
+        const isDuDone = p.daftar_ulang_hardcopy_status === 'SUDAH' ? 'active' : '';
+        const isDuPending = p.daftar_ulang_hardcopy_status !== 'SUDAH' ? 'active' : '';
 
         // Bebas CBT hanya jika: jalur PRESTASI DAN status_verifikasi diterima DAN belum dinyatakan TIDAK DITERIMA
         // Siswa PRESTASI yang berkasnya ditolak (false) ATAU yang gagal tes pembuktian (TIDAK DITERIMA) WAJIB ikut CBT
@@ -2263,6 +2290,11 @@ window.viewDetail = async function(id) {
                                     <button onclick="setEditState('lulus', 'PENDING', this)" class="btn-act act-blue ${isLulusPending}">Wait</button>
                                     <button onclick="setEditState('lulus', 'DITERIMA', this)" class="btn-act act-green ${isLulusTrue}">Diterima</button>
                                     <button onclick="setEditState('lulus', 'TIDAK DITERIMA', this)" class="btn-act act-red ${isLulusFalse}">Gagal</button>
+                                </div>
+                                <div class="status-box">
+                                    <span class="status-label">Daftar Ulang</span>
+                                    <button onclick="setEditState('du', 'BELUM', this)" class="btn-act act-red ${isDuPending}">Belum Serah</button>
+                                    <button onclick="setEditState('du', 'SUDAH', this)" class="btn-act act-green ${isDuDone}">Sudah Serah</button>
                                 </div>
                                 <button id="btn-save-changes" onclick="saveDetailChanges()" class="btn-act">
                                     <i class="ph ph-floppy-disk"></i> Simpan
@@ -2574,6 +2606,10 @@ window.setEditState = function(type, value, btn) {
     if (type === 'lulus') {
         editState.status_kelulusan = value;
     }
+    if (type === 'du') {
+        editState.daftar_ulang_hardcopy_status = value;
+        editState.daftar_ulang_hardcopy_at = value === 'SUDAH' ? new Date().toISOString() : null;
+    }
     
     const parent = btn.parentElement;
     const siblings = parent.querySelectorAll('.btn-act');
@@ -2599,6 +2635,10 @@ window.saveDetailChanges = async function() {
     let payload = { 
         status_verifikasi: editState.status_verifikasi, 
         status_kelulusan: editState.status_kelulusan,
+        daftar_ulang_hardcopy_status: editState.daftar_ulang_hardcopy_status || 'BELUM',
+        daftar_ulang_hardcopy_at: editState.daftar_ulang_hardcopy_status === 'SUDAH'
+            ? (editState.daftar_ulang_hardcopy_at || new Date().toISOString())
+            : null,
         berkas_ditolak: editState.berkas_ditolak && editState.berkas_ditolak.length > 0
             ? JSON.stringify(editState.berkas_ditolak)
             : null,
@@ -2626,6 +2666,8 @@ window.saveDetailChanges = async function() {
         if (index !== -1) { 
             allPendaftar[index].status_verifikasi = payload.status_verifikasi; 
             allPendaftar[index].status_kelulusan = payload.status_kelulusan;
+            allPendaftar[index].daftar_ulang_hardcopy_status = payload.daftar_ulang_hardcopy_status;
+            allPendaftar[index].daftar_ulang_hardcopy_at = payload.daftar_ulang_hardcopy_at;
             allPendaftar[index].berkas_ditolak = payload.berkas_ditolak; 
             
             if(elTgl) { 
@@ -2979,6 +3021,9 @@ window.aturJalur = async function() {
                         
                         <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Tanggal Rapat Orang Tua</label>
                         <input type="text" id="t-rapat" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 6 Juni 2026" value="${config['TEKS_RAPAT'] || '6 Juni 2026'}">
+
+                        <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Batas Akhir Pengumpulan Berkas Daftar Ulang</label>
+                        <input type="text" id="t-batas-du" style="width:100%; padding:10px 14px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;" placeholder="contoh: 20 Juni 2026" value="${config['TEKS_BATAS_DAFTAR_ULANG'] || '20 Juni 2026'}">
                         
                         <h4 style="margin:25px 0 15px; color:#1e293b; font-size:1rem; border-top:1px dashed #ddd; padding-top:20px;">Link WhatsApp</h4>
                         <label style="display:block; margin: 15px 0 5px; font-weight:600; color:#475569;">Link Grup WhatsApp Calon Murid</label>
@@ -3012,8 +3057,9 @@ window.aturJalur = async function() {
                     document.getElementById('t-peng-reg').value,
                     document.getElementById('t-lap-reg').value,
                     document.getElementById('t-rapat').value,
+                    document.getElementById('t-batas-du').value,
                     document.getElementById('t-link-wa').value,
-                    document.getElementById('check-cetak-kartu').checked  // index 14
+                    document.getElementById('check-cetak-kartu').checked  // index 15
                 ];
             }
         });
@@ -3033,13 +3079,14 @@ window.aturJalur = async function() {
                 { key: 'TEKS_PENGUMUMAN_REG', value: formValues[10] },
                 { key: 'TEKS_LAPOR_REG', value: formValues[11] },
                 { key: 'TEKS_RAPAT', value: formValues[12] },
-                { key: 'LINK_GRUP_WA', value: formValues[13] },
-                { key: 'CETAK_KARTU_AKTIF', value: String(formValues[14]) }
+                { key: 'TEKS_BATAS_DAFTAR_ULANG', value: formValues[13] },
+                { key: 'LINK_GRUP_WA', value: formValues[14] },
+                { key: 'CETAK_KARTU_AKTIF', value: String(formValues[15]) }
             ]});
             Swal.fire({
                 icon: 'success',
                 title: 'Pengaturan Disimpan',
-                html: formValues[14]
+                html: formValues[15]
                     ? `<p style="font-size:.88rem; color:#334155;">Pengaturan berhasil disimpan.<br><br><b style="color:#16a34a;">✓ Cetak Kartu Tes sekarang <u>AKTIF</u></b> — peserta dapat mencetak kartu ujian mereka.</p>`
                     : `<p style="font-size:.88rem; color:#334155;">Pengaturan berhasil disimpan.<br><br><b style="color:#dc2626;">✗ Cetak Kartu Tes <u>NONAKTIF</u></b> — tombol cetak tersembunyi dari peserta.</p>`,
                 confirmButtonColor: '#00796b'

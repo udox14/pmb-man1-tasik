@@ -6,6 +6,10 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
+const DEFAULT_SETTINGS = {
+  TEKS_BATAS_DAFTAR_ULANG: '20 Juni 2026',
+};
+
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
@@ -26,6 +30,13 @@ export async function onRequestGet(context) {
         'SELECT key, value FROM pengaturan'
       ).all();
       results = rows;
+    }
+
+    const existingKeys = new Set(results.map(row => row.key));
+    for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+      if ((!keysParam || keysParam.split(',').map(k => k.trim()).includes(key)) && !existingKeys.has(key)) {
+        results.push({ key, value, is_active: 1 });
+      }
     }
 
     return Response.json(results, { headers: CORS });

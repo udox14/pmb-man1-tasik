@@ -638,13 +638,63 @@
                 background: white;
             }
 
-            /* Fallback: jika tidak ada class, cetak kartu (perilaku lama) */
-            body:not(.print-undangan):not(.print-kartu) #kartu-peserta,
-            body:not(.print-undangan):not(.print-kartu) #kartu-peserta * {
+            /* Mode: Cetak Surat Kesediaan Sumbangan */
+            body.print-sumbangan #surat-sumbangan-cetak,
+            body.print-sumbangan #surat-sumbangan-cetak * {
                 visibility: visible;
             }
 
-            body:not(.print-undangan):not(.print-kartu) #kartu-peserta {
+            body.print-sumbangan #surat-sumbangan-cetak {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 180mm;
+                height: 267mm;
+                margin: 0;
+                padding: 0;
+                display: block !important;
+                border: none;
+                background: white;
+                overflow: hidden;
+                box-sizing: border-box;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+
+            body.print-sumbangan .surat-sumbangan-page {
+                width: 180mm;
+                height: 267mm;
+                overflow: hidden;
+                box-sizing: border-box;
+                font-size: 11.5pt !important;
+                line-height: 1.32 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            body.print-sumbangan .surat-sumbangan-page h2 {
+                font-size: 13.5pt !important;
+                margin-bottom: 18px !important;
+            }
+
+            body.print-sumbangan .surat-sumbangan-page p,
+            body.print-sumbangan .surat-sumbangan-page li,
+            body.print-sumbangan .surat-sumbangan-page table {
+                font-size: 11.5pt !important;
+            }
+
+            body.print-sumbangan .surat-sumbangan-page ol {
+                margin-bottom: 10px !important;
+            }
+
+            /* Fallback: jika tidak ada class, cetak kartu (perilaku lama) */
+            body:not(.print-undangan):not(.print-kartu):not(.print-sumbangan) #kartu-peserta,
+            body:not(.print-undangan):not(.print-kartu):not(.print-sumbangan) #kartu-peserta * {
+                visibility: visible;
+            }
+
+            body:not(.print-undangan):not(.print-kartu):not(.print-sumbangan) #kartu-peserta {
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -880,7 +930,8 @@
         }
         .du-status-uploaded { background: #dcfce7; color: #15803d; }
         .du-status-pending  { background: #fef9c3; color: #854d0e; }
-        .du-btn-dl {
+        .du-btn-dl,
+        .du-btn-print {
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -894,8 +945,16 @@
             text-decoration: none;
             transition: background .15s, border-color .15s;
             white-space: nowrap;
+            font-family: inherit;
         }
         .du-btn-dl:hover { background: var(--bg); border-color: var(--teal); color: var(--teal); }
+        .du-btn-print {
+            border-color: var(--teal);
+            background: var(--teal);
+            color: white;
+            cursor: pointer;
+        }
+        .du-btn-print:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
         .du-btn-up {
             display: inline-flex;
             align-items: center;
@@ -942,7 +1001,7 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 8px;
             }
-            .du-btn-dl, .du-btn-up {
+            .du-btn-dl, .du-btn-up, .du-btn-print {
                 justify-content: center;
                 white-space: normal;
                 text-align: center;
@@ -1062,17 +1121,17 @@
                     <div>
                         <h3>Daftar Ulang &mdash; Selesaikan Sekarang</h3>
                         <p>Selamat, Anda dinyatakan <strong style="color:var(--teal);">DITERIMA</strong>.
-                           Unduh, isi, dan kembalikan dokumen berikut sebagai syarat resmi daftar ulang.</p>
+                           Unduh/cetak dokumen berikut sebagai syarat resmi daftar ulang.</p>
                     </div>
                 </div>
 
                 <!-- Instruksi singkat -->
                 <div class="du-instructions">
                     <ol>
-                        <li>Download surat di bawah.</li>
-                        <li>Print, isi, dan tandatangani secara manual.</li>
-                        <li>Scan atau foto dokumen yang sudah ditandatangani, lalu upload di sini.</li>
-                        <li><strong>Bawa hardcopy (fisik) dokumen dan serahkan ke panitia saat Rapat Orang Tua.</strong></li>
+                        <li>Download/cetak kedua dokumen di bawah.</li>
+                        <li>Isi bagian yang diperlukan dan tandatangani secara manual.</li>
+                        <li>Nominal sumbangan pada surat kesediaan diisi nanti setelah rapat selesai.</li>
+                        <li><strong>Serahkan hardcopy ke Panitia PMB saat Rapat Orang Tua Murid atau paling lambat <span class="dyn-txt" data-key="TEKS_BATAS_DAFTAR_ULANG">sesuai jadwal daftar ulang</span>.</strong></li>
                     </ol>
                 </div>
 
@@ -1083,21 +1142,29 @@
                     <div class="du-doc-row">
                         <div class="du-doc-info">
                             <div class="du-doc-title">Surat Pernyataan Murid Baru dan Orang Tua</div>
-                            <div id="du-status-pesantren">
-                                <span class="du-status-badge du-status-pending"><i class="ph ph-clock"></i> Belum Upload</span>
+                            <div>
+                                <span class="du-status-badge du-status-uploaded"><i class="ph ph-file-pdf"></i> Wajib Dicetak</span>
                             </div>
                         </div>
                         <div class="du-doc-actions">
                             <a href="/files/Berkas Daftar Ulang PMB MAN 1 2026-2027.pdf" target="_blank" download class="du-btn-dl">
                                 <i class="ph ph-download-simple"></i> Download
                             </a>
-                            <button class="du-btn-up" id="btn-upload-pesantren"
-                                onclick="document.getElementById('file-du-pesantren').click()">
-                                <i class="ph ph-upload-simple"></i> Upload Scan
+                        </div>
+                    </div>
+
+                    <!-- Dokumen: Surat Kesediaan Membayar Sumbangan -->
+                    <div class="du-doc-row">
+                        <div class="du-doc-info">
+                            <div class="du-doc-title">Surat Pernyataan Kesediaan Membayar Sumbangan</div>
+                            <div>
+                                <span class="du-status-badge du-status-uploaded"><i class="ph ph-printer"></i> Isi Otomatis</span>
+                            </div>
+                        </div>
+                        <div class="du-doc-actions">
+                            <button class="du-btn-print" onclick="cetakSuratSumbangan()">
+                                <i class="ph ph-printer"></i> Cetak Surat
                             </button>
-                            <input type="file" id="file-du-pesantren" class="du-input-file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onchange="uploadDU(this, 'pesantren')">
                         </div>
                     </div>
 
@@ -1111,6 +1178,14 @@
                         </p>
                     </div>
 
+                    <div style="padding:10px 0 4px; display:flex; align-items:flex-start; gap:8px;">
+                        <i class="ph ph-info" style="color:var(--teal); font-size:.9rem; margin-top:2px; flex-shrink:0;"></i>
+                        <p style="font-size:.76rem; color:var(--ink-soft); margin:0; line-height:1.6;">
+                            Nominal pada <strong style="color:var(--ink);">Surat Pernyataan Kesediaan Membayar Sumbangan</strong>
+                            tidak perlu diisi sekarang. Nominal akan diisi setelah rapat selesai sesuai hasil musyawarah.
+                        </p>
+                    </div>
+
                 </div><!-- /du-docs -->
 
                 <!-- Catatan penting: bawa hardcopy -->
@@ -1118,7 +1193,9 @@
                     <i class="ph ph-warning" style="color:#d97706; font-size:1rem; margin-top:2px; flex-shrink:0;"></i>
                     <span style="font-size:.78rem; color:#92400e; line-height:1.65;">
                         <strong>Penting:</strong> Hardcopy (fisik) dokumen ini <strong>wajib dibawa dan diserahkan langsung ke panitia</strong>
-                        pada saat <strong>Rapat Orang Tua</strong>. Pastikan dokumen sudah ditandatangani oleh siswa dan orang tua sebelum diserahkan.
+                        pada saat <strong>Rapat Orang Tua Murid</strong> (<span class="dyn-txt" data-key="TEKS_RAPAT">sesuai jadwal</span>)
+                        atau paling lambat <strong><span class="dyn-txt" data-key="TEKS_BATAS_DAFTAR_ULANG">sesuai jadwal daftar ulang</span></strong>.
+                        Pastikan dokumen sudah ditandatangani sebelum diserahkan.
                     </span>
                 </div>
 
@@ -1467,6 +1544,79 @@
                         S.Pd.I.</p>
                     <p style="margin:0; font-size:14px;">NIP. 197809132009011011</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SURAT PERNYATAAN KESEDIAAN MEMBAYAR SUMBANGAN (PRINT) -->
+    <div id="surat-sumbangan-cetak"
+        style="display:none; font-family:'Times New Roman',serif; background:white; width:180mm; height:267mm; margin:0 auto; box-sizing:border-box; padding:0; color:#000; overflow:hidden;">
+        <div class="surat-sumbangan-page" style="padding:0; font-size:11.5pt; line-height:1.32; width:180mm; height:267mm; overflow:hidden; box-sizing:border-box;">
+            <h2 style="text-align:center; font-size:14pt; margin:0 0 24px; text-decoration:underline; font-weight:bold;">
+                SURAT PERNYATAAN KESEDIAAN
+            </h2>
+
+            <p style="margin:0 0 10px;">Bismillahirrahmanirrahiim,</p>
+            <p style="margin:0 0 8px;">Saya yang bertandatangan dibawah ini :</p>
+
+            <table style="width:100%; border-collapse:collapse; margin:0 0 10px; font-size:11.5pt;">
+                <tr>
+                    <td style="width:145px; padding:2px 0; vertical-align:top;">Nama Orangtua/wali</td>
+                    <td style="width:14px; padding:2px 0; vertical-align:top;">:</td>
+                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-nama-ortu"></span></td>
+                </tr>
+                <tr>
+                    <td style="padding:2px 0; vertical-align:top;">Alamat</td>
+                    <td style="padding:2px 0; vertical-align:top;">:</td>
+                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-alamat"></span></td>
+                </tr>
+                <tr>
+                    <td style="padding:2px 0; vertical-align:top;">Pekerjaan</td>
+                    <td style="padding:2px 0; vertical-align:top;">:</td>
+                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-pekerjaan"></span></td>
+                </tr>
+                <tr>
+                    <td style="padding:2px 0; vertical-align:top;">No. Hp</td>
+                    <td style="padding:2px 0; vertical-align:top;">:</td>
+                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-hp"></span></td>
+                </tr>
+                <tr>
+                    <td style="padding:2px 0; vertical-align:top;">Nama siswa</td>
+                    <td style="padding:2px 0; vertical-align:top;">:</td>
+                    <td style="padding:2px 0; vertical-align:top;"><span id="smb-nama-siswa"></span></td>
+                </tr>
+                <tr>
+                    <td style="padding:2px 0; vertical-align:top;">Kelas</td>
+                    <td style="padding:2px 0; vertical-align:top;">:</td>
+                    <td style="padding:2px 0; vertical-align:top;">10</td>
+                </tr>
+            </table>
+
+            <p style="margin:0 0 8px;">menyatakan :</p>
+            <ol style="margin:0 0 10px; padding-left:22px;">
+                <li style="margin-bottom:6px; text-align:justify;">
+                    berkomiten untuk mendukung program/kegiatan dalam rangka peningkatan mutu pendidikan di MAN 1 Tasikmalaya;
+                </li>
+                <li style="margin-bottom:6px; text-align:justify;">
+                    dengan sungguh-sungguh, sukarela, ikhlas dan tanpa paksaan dari pihak manapun, bahwa kami bersedia
+                    memberikan sumbangan pendidikan kepada madrasah sesuai dengan hasil musyawarah dan kesepakatan Komite
+                    Madrasah sebesar
+                </li>
+            </ol>
+
+            <p style="margin:18px 0 18px; text-align:center; font-size:13pt;">Rp ________________________</p>
+
+            <p style="margin:0 0 24px; text-align:justify;">
+                Demikian pernyataan ini kami buat dengan sebenarnya dan dapat digunakan sebagaimana mestinya.
+            </p>
+
+            <div style="width:260px; margin-left:auto; text-align:left;">
+                <p style="margin:0 0 10px;">Tasikmalaya, <span id="smb-tanggal-rapat"></span></p>
+                <p style="margin:0 0 24px;">Yang menyatakan,</p>
+                <div style="width:120px; height:50px; border:1px solid #000; display:flex; align-items:center; justify-content:center; font-size:11pt; margin-bottom:36px;">
+                    Materai 10.000
+                </div>
+                <p style="margin:0; font-weight:bold; text-decoration:underline;">(<span id="smb-ttd-nama"></span>)</p>
             </div>
         </div>
     </div>
