@@ -104,6 +104,7 @@ INSERT OR IGNORE INTO pengaturan (key, value) VALUES
   ('TANGGAL_PENGUMUMAN_PRESTASI', '2026-04-18T00:00:00'),
   ('TANGGAL_PENGUMUMAN_REGULER',  '2026-05-25T00:00:00'),
   ('TEKS_BATAS_DAFTAR_ULANG',     '20 Juni 2026'),
+  ('KELULUSAN_AKTIF',             'false'),
   ('PMB_OPEN',                    'true');
 
 -- Admin default (password: admin123 — ganti setelah deploy!)

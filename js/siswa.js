@@ -41,7 +41,7 @@ async function loadDashboardData() {
     renderFullData(pendaftarData);
     renderPrestasiContent(prestasiData);
 
-    // Fetch semua pengaturan termasuk CETAK_KARTU_AKTIF
+    // Fetch semua pengaturan termasuk CETAK_KARTU_AKTIF dan KELULUSAN_AKTIF
     let globalCfg = {};
     try {
         const setDB = await apiGet('pengaturan');
@@ -62,9 +62,10 @@ async function loadDashboardData() {
     } catch(e) { console.error('Gagal meload teks dinamis', e); }
     _dashboardConfig = globalCfg;
 
-    // Render status dengan info setting cetak kartu
+    // Render status dengan info setting cetak kartu dan pengumuman kelulusan
     const cetakAktif = globalCfg['CETAK_KARTU_AKTIF'] === 'true';
-    renderStatus(pendaftarData, cetakAktif);
+    const kelulusanAktif = globalCfg['KELULUSAN_AKTIF'] === 'true';
+    renderStatus(pendaftarData, cetakAktif, kelulusanAktif);
     setupSmartCountdown(pendaftarData);
 
   } catch (err) {
@@ -326,21 +327,26 @@ function renderPrestasiContent(list) {
 // ===========================================================
 // RENDER STATUS
 // ===========================================================
-function renderStatus(data, cetakAktif) {
+function renderStatus(data, cetakAktif, kelulusanAktif) {
   const cardVerif    = document.getElementById('card-verif');
   const valVerif     = document.getElementById('val-verif');
   const cardLulus    = document.getElementById('card-lulus');
   const valLulus     = document.getElementById('val-lulus');
   const alertUndangan = document.getElementById('alert-undangan-prestasi');
   const alertGagal    = document.getElementById('alert-gagal-prestasi');
+  const daftarUlangSection = document.getElementById('daftar-ulang-section');
+  const alertAlihJalur = document.getElementById('alert-alih-jalur');
+  const visibleKelulusan = kelulusanAktif ? (data.status_kelulusan || 'PENDING') : 'PENDING';
 
   if (alertUndangan) alertUndangan.style.display = 'none';
   if (alertGagal)    alertGagal.style.display    = 'none';
+  if (daftarUlangSection) daftarUlangSection.style.display = 'none';
+  if (alertAlihJalur) alertAlihJalur.remove();
 
   if (data.status_verifikasi === true) {
     cardVerif.className = 'status-card-lg st-green';
     valVerif.innerHTML  = '<i class="ph ph-check-circle"></i> Berkas Diterima';
-    if (data.jalur === 'PRESTASI' && data.status_kelulusan === 'PENDING') {
+    if (data.jalur === 'PRESTASI' && visibleKelulusan === 'PENDING') {
       if (alertUndangan) alertUndangan.style.display = 'block';
     }
   } else if (data.status_verifikasi === false) {
@@ -354,7 +360,7 @@ function renderStatus(data, cetakAktif) {
     valVerif.innerHTML  = '<i class="ph ph-hourglass"></i> Menunggu Verifikasi';
   }
 
-  if (data.jalur === 'PRESTASI' && data.status_kelulusan === 'TIDAK DITERIMA') {
+  if (data.jalur === 'PRESTASI' && visibleKelulusan === 'TIDAK DITERIMA') {
     cardLulus.className = 'status-card-lg st-yellow';
     valLulus.innerHTML  = `<div style="font-size:.82rem; line-height:1.3;">
       <span style="color:#d97706;">Belum Lolos Prestasi</span><br>
@@ -381,12 +387,12 @@ function renderStatus(data, cetakAktif) {
       const timer = document.querySelector('.timer-banner');
       timer.parentNode.insertBefore(alertDiv, timer.nextSibling);
     }
-  } else if (data.status_kelulusan === 'DITERIMA') {
+  } else if (visibleKelulusan === 'DITERIMA') {
     cardLulus.className = 'status-card-lg st-green';
     valLulus.innerHTML  = '<i class="ph ph-confetti"></i> Lulus Seleksi';
     // Tampilkan section Daftar Ulang
     renderDaftarUlang(data);
-  } else if (data.status_kelulusan === 'TIDAK DITERIMA') {
+  } else if (visibleKelulusan === 'TIDAK DITERIMA') {
     cardLulus.className = 'status-card-lg st-red';
     valLulus.innerHTML  = '<i class="ph ph-x-circle"></i> Tidak Lulus';
   } else {
@@ -415,7 +421,7 @@ function renderStatus(data, cetakAktif) {
   const mustFollowCBT =
     (data.jalur === 'REGULER' && data.status_verifikasi === true) ||
     (data.jalur === 'PRESTASI' && data.status_verifikasi === false) ||
-    (data.jalur === 'PRESTASI' && data.status_verifikasi === true && data.status_kelulusan === 'TIDAK DITERIMA');
+    (data.jalur === 'PRESTASI' && data.status_verifikasi === true && visibleKelulusan === 'TIDAK DITERIMA');
 
   if (mustFollowCBT) {
     if (data.status_verifikasi === true || data.status_verifikasi === false) {

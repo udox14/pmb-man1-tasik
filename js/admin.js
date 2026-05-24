@@ -1923,6 +1923,279 @@ window.importPlottingExcel = function() {
     input.click();
 };
 
+// ==========================================
+// 9B. IMPORT/EXPORT KELULUSAN VIA EXCEL
+// ==========================================
+function normalizeKelulusanStatus(value) {
+    const raw = String(value || '').trim().toUpperCase().replace(/\s+/g, ' ');
+    if (!raw) return '';
+    const alias = {
+        'PENDING': 'PENDING',
+        'MENUNGGU': 'PENDING',
+        'BELUM DIUMUMKAN': 'PENDING',
+        'DITERIMA': 'DITERIMA',
+        'LULUS': 'DITERIMA',
+        'LULUS SELEKSI': 'DITERIMA',
+        'TIDAK DITERIMA': 'TIDAK DITERIMA',
+        'TIDAK_DITERIMA': 'TIDAK DITERIMA',
+        'TIDAKDITERIMA': 'TIDAK DITERIMA',
+        'TIDAK LULUS': 'TIDAK DITERIMA',
+        'GAGAL': 'TIDAK DITERIMA'
+    };
+    return alias[raw] || '';
+}
+
+function findPendaftarFromKelulusanRow(row) {
+    const noPendaftaran = String(row['No Pendaftaran'] || '').trim();
+    const nisn = String(row['NISN'] || '').trim();
+    if (noPendaftaran) {
+        const byNo = allPendaftar.find(p => String(p.no_pendaftaran || '').trim() === noPendaftaran);
+        if (byNo) return byNo;
+    }
+    if (nisn) {
+        return allPendaftar.find(p => String(p.nisn || '').trim() === nisn);
+    }
+    return null;
+}
+
+window.downloadTemplateKelulusan = function() {
+    if (!allPendaftar.length) {
+        Swal.fire('Info', 'Belum ada data pendaftar untuk dibuat template.', 'info');
+        return;
+    }
+
+    const excelData = allPendaftar.map(p => ({
+        'No Pendaftaran': p.no_pendaftaran || '',
+        'NISN': p.nisn || '',
+        'Nama Lengkap': p.nama_lengkap || '',
+        'Jalur': p.jalur || '',
+        'Asal Sekolah': p.asal_sekolah || '',
+        'Status Kelulusan': p.status_kelulusan || 'PENDING',
+        'Catatan': ''
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    worksheet['!cols'] = [
+        { wch: 18 },
+        { wch: 16 },
+        { wch: 34 },
+        { wch: 12 },
+        { wch: 34 },
+        { wch: 20 },
+        { wch: 28 }
+    ];
+    if (worksheet['F1']) {
+        worksheet['F1'].c = [{
+            a: 'Admin',
+            t: 'Isi hanya: PENDING, DITERIMA, atau TIDAK DITERIMA. Kolom No Pendaftaran/NISN dipakai untuk mencocokkan peserta.'
+        }];
+    }
+
+    const guideRows = [
+        ['PETUNJUK IMPORT KELULUSAN'],
+        ['1. Jangan ubah No Pendaftaran atau NISN.'],
+        ['2. Isi kolom Status Kelulusan dengan PENDING, DITERIMA, atau TIDAK DITERIMA.'],
+        ['3. Nilai LULUS akan dibaca sebagai DITERIMA, dan TIDAK LULUS sebagai TIDAK DITERIMA.'],
+        ['4. Hasil tidak tampil ke siswa selama Pengumuman Kelulusan masih nonaktif di Pengaturan Sistem.']
+    ];
+    const guideSheet = XLSX.utils.aoa_to_sheet(guideRows);
+    guideSheet['!cols'] = [{ wch: 110 }];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Import Kelulusan');
+    XLSX.utils.book_append_sheet(workbook, guideSheet, 'Petunjuk');
+
+    const tgl = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
+    XLSX.writeFile(workbook, `Template_Kelulusan_PMB_MAN1Tasik_${tgl}.xlsx`);
+};
+
+window.importKelulusanExcel = function() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,.xls';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    input.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        document.body.removeChild(input);
+
+        Swal.fire({ title: 'Membaca File...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'arraybuffer' });
+            const sheetName = workbook.SheetNames.includes('Import Kelulusan') ? 'Import Kelulusan' : workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+            if (!rows || rows.length === 0) {
+                Swal.fire('Error', 'File Excel kosong atau format tidak dikenali.', 'error');
+                return;
+            }
+
+            const firstRow = rows[0];
+            const requiredCols = ['Status Kelulusan'];
+            const hasIdentity = ('No Pendaftaran' in firstRow) || ('NISN' in firstRow);
+            const missingCols = requiredCols.filter(col => !(col in firstRow));
+            if (missingCols.length > 0 || !hasIdentity) {
+                Swal.fire('Format Salah', 'Kolom wajib: <b>No Pendaftaran</b> atau <b>NISN</b>, dan <b>Status Kelulusan</b>.<br><br>Gunakan template dari sistem ini.', 'error');
+                return;
+            }
+
+            const updates = [];
+            const notFound = [];
+            const invalidStatus = [];
+            const unchanged = [];
+
+            rows.forEach((row, index) => {
+                const noPendaftaran = String(row['No Pendaftaran'] || '').trim();
+                const nisn = String(row['NISN'] || '').trim();
+                const rawStatus = String(row['Status Kelulusan'] || '').trim();
+                if (!noPendaftaran && !nisn && !rawStatus) return;
+
+                const status = normalizeKelulusanStatus(rawStatus);
+                if (!status) {
+                    invalidStatus.push({ row: index + 2, no: noPendaftaran || nisn || '-', status: rawStatus || '(kosong)' });
+                    return;
+                }
+
+                const peserta = findPendaftarFromKelulusanRow(row);
+                if (!peserta) {
+                    notFound.push(noPendaftaran || nisn || `Baris ${index + 2}`);
+                    return;
+                }
+
+                const oldStatus = peserta.status_kelulusan || 'PENDING';
+                if (oldStatus === status) {
+                    unchanged.push(peserta.no_pendaftaran || peserta.nisn || peserta.nama_lengkap);
+                    return;
+                }
+
+                updates.push({
+                    id: peserta.id,
+                    no: peserta.no_pendaftaran || '-',
+                    nama: peserta.nama_lengkap || '-',
+                    jalur: peserta.jalur || '-',
+                    oldStatus,
+                    status
+                });
+            });
+
+            if (invalidStatus.length > 0) {
+                const sample = invalidStatus.slice(0, 6).map(item => `Baris ${item.row}: ${escapeHTML(item.no)} = ${escapeHTML(item.status)}`).join('<br>');
+                Swal.fire('Status Tidak Valid', `<div style="text-align:left; font-size:.82rem;">Gunakan hanya <b>PENDING</b>, <b>DITERIMA</b>, atau <b>TIDAK DITERIMA</b>.<br><br>${sample}${invalidStatus.length > 6 ? '<br>...' : ''}</div>`, 'error');
+                return;
+            }
+
+            if (updates.length === 0) {
+                let msg = 'Tidak ada status kelulusan yang berubah.';
+                if (notFound.length > 0) msg += `<br><br><b>Tidak ditemukan (${notFound.length}):</b> ${notFound.slice(0, 6).map(escapeHTML).join(', ')}${notFound.length > 6 ? '...' : ''}`;
+                if (unchanged.length > 0) msg += `<br><b>Sudah sama:</b> ${unchanged.length} baris`;
+                Swal.fire('Tidak Ada Perubahan', msg, 'warning');
+                return;
+            }
+
+            const diterimaCount = updates.filter(u => u.status === 'DITERIMA').length;
+            const tidakCount = updates.filter(u => u.status === 'TIDAK DITERIMA').length;
+            const pendingCount = updates.filter(u => u.status === 'PENDING').length;
+
+            const previewRows = updates.slice(0, 8).map(u => `
+                <tr style="font-size:.78rem;">
+                    <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">${escapeHTML(u.no)}</td>
+                    <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">${escapeHTML(u.nama)}</td>
+                    <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">${escapeHTML(u.jalur)}</td>
+                    <td style="padding:5px 8px; border-bottom:1px solid #e2e8f0;">
+                        <span style="color:#94a3b8; text-decoration:line-through;">${escapeHTML(u.oldStatus)}</span><br>
+                        <span style="color:${u.status === 'DITERIMA' ? '#16a34a' : u.status === 'TIDAK DITERIMA' ? '#dc2626' : '#2563eb'}; font-weight:800;">${escapeHTML(u.status)}</span>
+                    </td>
+                </tr>
+            `).join('');
+            const moreText = updates.length > 8
+                ? `<tr><td colspan="4" style="font-size:.75rem; color:#64748b; padding:6px 8px; text-align:center;">... dan ${updates.length - 8} peserta lainnya</td></tr>`
+                : '';
+            const warningHtml = notFound.length > 0
+                ? `<div style="margin-top:10px; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; padding:8px 12px; font-size:.76rem; color:#b45309;">
+                    <b>${notFound.length} peserta tidak ditemukan</b>: ${notFound.slice(0, 5).map(escapeHTML).join(', ')}${notFound.length > 5 ? '...' : ''}
+                   </div>`
+                : '';
+
+            const { isConfirmed } = await Swal.fire({
+                title: `Import Kelulusan - ${updates.length} Peserta`,
+                html: `
+                    <div style="text-align:left; font-size:.82rem;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span style="background:#dcfce7; color:#166534; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:99px;">DITERIMA: ${diterimaCount}</span>
+                            <span style="background:#fee2e2; color:#991b1b; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:99px;">TIDAK DITERIMA: ${tidakCount}</span>
+                            <span style="background:#dbeafe; color:#1e40af; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:99px;">PENDING: ${pendingCount}</span>
+                        </div>
+                        <p style="color:#334155; margin:0 0 10px; font-size:.8rem;">Preview perubahan yang akan disimpan:</p>
+                        <div style="overflow-x:auto; max-height:240px; overflow-y:auto;">
+                            <table style="width:100%; border-collapse:collapse; font-size:.78rem;">
+                                <thead>
+                                    <tr style="background:#f1f5f9; font-size:.68rem; font-weight:700; color:#475569; text-transform:uppercase;">
+                                        <th style="padding:6px 8px; text-align:left;">No Daftar</th>
+                                        <th style="padding:6px 8px; text-align:left;">Nama</th>
+                                        <th style="padding:6px 8px; text-align:left;">Jalur</th>
+                                        <th style="padding:6px 8px; text-align:left;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${previewRows}${moreText}</tbody>
+                            </table>
+                        </div>
+                        ${warningHtml}
+                        <div style="margin-top:10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:8px 12px; font-size:.76rem; color:#1e40af;">
+                            Hasil ini tetap tersembunyi dari siswa selama <b>Pengumuman Kelulusan</b> masih nonaktif.
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: `Terapkan ${updates.length} Status`,
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#00796b',
+                width: '760px'
+            });
+
+            if (!isConfirmed) return;
+
+            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const result = await apiPost('admin?action=kelulusan', {
+                updates: updates.map(u => ({ id: u.id, status_kelulusan: u.status }))
+            });
+
+            if (result.error) {
+                Swal.fire('Gagal', 'Terjadi kesalahan: ' + result.error, 'error');
+                return;
+            }
+
+            updates.forEach(u => {
+                const idx = allPendaftar.findIndex(p => p.id === u.id);
+                if (idx !== -1) allPendaftar[idx].status_kelulusan = u.status;
+            });
+            updateStats(allPendaftar);
+            renderTable();
+            renderPlottingTable();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Import Kelulusan Berhasil',
+                html: `<p style="font-size:.88rem; color:#334155; line-height:1.7;">
+                    <b>${updates.length}</b> status kelulusan diperbarui.<br>
+                    Pengumuman ke siswa mengikuti toggle <b>Pengumuman Kelulusan</b> di Pengaturan Sistem.
+                </p>`,
+                confirmButtonColor: '#00796b'
+            });
+        } catch (err) {
+            console.error('Import kelulusan error:', err);
+            Swal.fire('Error', 'Gagal membaca file Excel. Pastikan format file benar.', 'error');
+        }
+    };
+
+    input.click();
+};
+
 
 // ==========================================
 // 10. DETAIL SISWA (SWEETALERT POPUP)
@@ -2933,6 +3206,7 @@ window.aturJalur = async function() {
         const regChecked    = config['JALUR_REGULER'] !== 'false';
         const presChecked   = config['JALUR_PRESTASI'] !== 'false';
         const cetakChecked  = config['CETAK_KARTU_AKTIF'] === 'true';
+        const lulusChecked  = config['KELULUSAN_AKTIF'] === 'true';
 
         const { value: formValues } = await Swal.fire({
             title: 'Pengaturan Sistem PMB',
@@ -2987,6 +3261,54 @@ window.aturJalur = async function() {
                         </div>
                         <div id="cetak-status-badge" style="font-size:.75rem; font-weight:700; padding:4px 12px; border-radius:99px; background:${cetakChecked ? '#dcfce7' : '#fee2e2'}; color:${cetakChecked ? '#166534' : '#991b1b'}; align-self:flex-start;">
                             ${cetakChecked ? '✓ Aktif — Peserta bisa cetak kartu' : '✗ Nonaktif — Cetak kartu terkunci'}
+                        </div>
+                    </div>
+
+                    <div style="background:${lulusChecked ? '#f0fdf4' : '#fff8f0'}; padding:15px; border-radius:10px; border:1px solid ${lulusChecked ? '#bbf7d0' : '#fed7aa'}; display:flex; justify-content:space-between; align-items:flex-start; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <div>
+                                <strong style="color:${lulusChecked ? '#15803d' : '#c2410c'}; font-size:1.05rem; display:flex; align-items:center; gap:7px;">
+                                    <i class="ph ${lulusChecked ? 'ph-megaphone' : 'ph-megaphone-simple'}"></i>
+                                    Pengumuman Kelulusan
+                                </strong>
+                                <p style="margin:4px 0 0; font-size:.78rem; color:#64748b; line-height:1.5;">
+                                    Aktifkan hanya saat hasil akhir siap diumumkan ke dashboard siswa.<br>
+                                    Nonaktifkan agar admin bisa import/ralat kelulusan tanpa terlihat siswa.
+                                </p>
+                            </div>
+                            <label style="position:relative; display:inline-block; width:52px; height:28px; flex-shrink:0; margin-left:12px;">
+                                <input type="checkbox" id="check-kelulusan-aktif" ${lulusChecked ? 'checked' : ''}
+                                       onchange="
+                                           const box = this.closest('div').parentElement;
+                                           box.style.background = this.checked ? '#f0fdf4' : '#fff8f0';
+                                           box.style.borderColor = this.checked ? '#bbf7d0' : '#fed7aa';
+                                           box.querySelector('strong').style.color = this.checked ? '#15803d' : '#c2410c';
+                                           box.querySelector('i').className = 'ph ' + (this.checked ? 'ph-megaphone' : 'ph-megaphone-simple');
+                                           const slider = box.querySelector('.toggle-lulus-slider');
+                                           const knob = box.querySelector('.toggle-lulus-knob');
+                                           const badge = box.querySelector('.toggle-lulus-badge');
+                                           slider.style.background = this.checked ? '#16a34a' : '#cbd5e1';
+                                           knob.style.left = this.checked ? '27px' : '3px';
+                                           badge.style.background = this.checked ? '#dcfce7' : '#fee2e2';
+                                           badge.style.color = this.checked ? '#166534' : '#991b1b';
+                                           badge.innerHTML = this.checked ? 'Aktif - Hasil terlihat siswa' : 'Nonaktif - Hasil disembunyikan';
+                                       "
+                                       style="opacity:0;width:0;height:0;">
+                                <span class="toggle-lulus-slider" style="
+                                    position:absolute; cursor:pointer; inset:0;
+                                    background:${lulusChecked ? '#16a34a' : '#cbd5e1'};
+                                    border-radius:99px; transition:.3s;
+                                "></span>
+                                <span class="toggle-lulus-knob" style="
+                                    position:absolute; top:3px; left:${lulusChecked ? '27px' : '3px'};
+                                    background:white; width:22px; height:22px;
+                                    border-radius:50%; transition:.3s;
+                                    pointer-events:none;
+                                "></span>
+                            </label>
+                        </div>
+                        <div class="toggle-lulus-badge" style="font-size:.75rem; font-weight:700; padding:4px 12px; border-radius:99px; background:${lulusChecked ? '#dcfce7' : '#fee2e2'}; color:${lulusChecked ? '#166534' : '#991b1b'}; align-self:flex-start;">
+                            ${lulusChecked ? 'Aktif - Hasil terlihat siswa' : 'Nonaktif - Hasil disembunyikan'}
                         </div>
                     </div>
                     
@@ -3059,7 +3381,8 @@ window.aturJalur = async function() {
                     document.getElementById('t-rapat').value,
                     document.getElementById('t-batas-du').value,
                     document.getElementById('t-link-wa').value,
-                    document.getElementById('check-cetak-kartu').checked  // index 15
+                    document.getElementById('check-cetak-kartu').checked,  // index 15
+                    document.getElementById('check-kelulusan-aktif').checked // index 16
                 ];
             }
         });
@@ -3081,14 +3404,17 @@ window.aturJalur = async function() {
                 { key: 'TEKS_RAPAT', value: formValues[12] },
                 { key: 'TEKS_BATAS_DAFTAR_ULANG', value: formValues[13] },
                 { key: 'LINK_GRUP_WA', value: formValues[14] },
-                { key: 'CETAK_KARTU_AKTIF', value: String(formValues[15]) }
+                { key: 'CETAK_KARTU_AKTIF', value: String(formValues[15]) },
+                { key: 'KELULUSAN_AKTIF', value: String(formValues[16]) }
             ]});
             Swal.fire({
                 icon: 'success',
                 title: 'Pengaturan Disimpan',
-                html: formValues[15]
-                    ? `<p style="font-size:.88rem; color:#334155;">Pengaturan berhasil disimpan.<br><br><b style="color:#16a34a;">✓ Cetak Kartu Tes sekarang <u>AKTIF</u></b> — peserta dapat mencetak kartu ujian mereka.</p>`
-                    : `<p style="font-size:.88rem; color:#334155;">Pengaturan berhasil disimpan.<br><br><b style="color:#dc2626;">✗ Cetak Kartu Tes <u>NONAKTIF</u></b> — tombol cetak tersembunyi dari peserta.</p>`,
+                html: `<p style="font-size:.88rem; color:#334155; line-height:1.7;">
+                    Pengaturan berhasil disimpan.<br><br>
+                    <b style="color:${formValues[15] ? '#16a34a' : '#dc2626'};">Cetak Kartu Tes: ${formValues[15] ? 'AKTIF' : 'NONAKTIF'}</b><br>
+                    <b style="color:${formValues[16] ? '#16a34a' : '#dc2626'};">Pengumuman Kelulusan: ${formValues[16] ? 'AKTIF' : 'NONAKTIF'}</b>
+                </p>`,
                 confirmButtonColor: '#00796b'
             });
         }

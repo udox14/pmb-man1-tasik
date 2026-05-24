@@ -8,6 +8,7 @@ const CORS = {
 
 const DEFAULT_SETTINGS = {
   TEKS_BATAS_DAFTAR_ULANG: '20 Juni 2026',
+  KELULUSAN_AKTIF: 'false',
 };
 
 export async function onRequestGet(context) {
