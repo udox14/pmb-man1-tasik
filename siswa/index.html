@@ -351,68 +351,96 @@
         .status-main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .status-card-lg {
             background: var(--surface);
-            padding: 18px 20px;
-            border-radius: 12px;
+            padding: 20px 24px;
+            border-radius: 14px;
             border: 1px solid var(--rule);
-            border-left: 4px solid var(--rule-dark);
+            border-left: 5px solid var(--rule-dark);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .status-card-lg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
         }
 
         .status-card-lg label {
-            font-size: .62rem;
+            font-size: .7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--ink-faint);
-            font-weight: 700;
+            letter-spacing: 1.2px;
+            color: var(--ink-soft);
+            font-weight: 800;
         }
 
         .status-value-lg {
-            font-size: .88rem;
+            font-size: 1.15rem;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: var(--ink);
         }
 
+        /* Rich Modern Status Accents */
         .st-yellow {
-            border-left-color: #eab308;
+            background: #fffbeb !important;
+            border-color: #fef08a !important;
+            border-left-color: #eab308 !important;
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.06);
         }
-
+        .st-yellow label {
+            color: #b45309 !important;
+        }
         .st-yellow .status-value-lg {
-            color: #a16207;
+            color: #78350f !important;
         }
 
         .st-green {
-            border-left-color: var(--ok);
+            background: #f0fdf4 !important;
+            border-color: #bbf7d0 !important;
+            border-left-color: #16a34a !important;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.06);
         }
-
+        .st-green label {
+            color: #15803d !important;
+        }
         .st-green .status-value-lg {
-            color: #15803d;
+            color: #14532d !important;
         }
 
         .st-red {
-            border-left-color: var(--err);
+            background: #fef2f2 !important;
+            border-color: #fecaca !important;
+            border-left-color: #dc2626 !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.06);
         }
-
+        .st-red label {
+            color: #b91c1c !important;
+        }
         .st-red .status-value-lg {
-            color: #b91c1c;
+            color: #7f1d1d !important;
         }
 
         .st-blue {
-            border-left-color: #2563eb;
+            background: #eff6ff !important;
+            border-color: #bfdbfe !important;
+            border-left-color: #3b82f6 !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.06);
         }
-
+        .st-blue label {
+            color: #1d4ed8 !important;
+        }
         .st-blue .status-value-lg {
-            color: #1e40af;
+            color: #1e3a8a !important;
         }
 
         /* Biodata card */
@@ -1123,6 +1151,22 @@
                 <div class="timer-grid" id="timer"></div>
             </div>
 
+            <!-- Status cards -->
+            <div class="status-main-grid">
+                <div class="status-card-lg" id="card-verif">
+                    <label>Status Verifikasi Berkas</label>
+                    <div class="status-value-lg" id="val-verif">
+                        <i class="ph ph-hourglass"></i> Menunggu
+                    </div>
+                </div>
+                <div class="status-card-lg" id="card-lulus">
+                    <label>Status Kelulusan Akhir</label>
+                    <div class="status-value-lg" id="val-lulus">
+                        <i class="ph ph-info"></i> Belum Ada
+                    </div>
+                </div>
+            </div>
+
             <!-- DAFTAR ULANG (muncul hanya jika DITERIMA) -->
             <div class="du-wrapper" id="daftar-ulang-section">
 
@@ -1211,22 +1255,6 @@
                 </div>
 
             </div><!-- /du-wrapper -->
-
-            <!-- Status cards -->
-            <div class="status-main-grid">
-                <div class="status-card-lg" id="card-verif">
-                    <label>Status Verifikasi Berkas</label>
-                    <div class="status-value-lg" id="val-verif">
-                        <i class="ph ph-hourglass"></i> Menunggu
-                    </div>
-                </div>
-                <div class="status-card-lg" id="card-lulus">
-                    <label>Status Kelulusan Akhir</label>
-                    <div class="status-value-lg" id="val-lulus">
-                        <i class="ph ph-info"></i> Belum Ada
-                    </div>
-                </div>
-            </div>
 
             <!-- Notif Prestasi: Undangan -->
             <div id="alert-undangan-prestasi" class="notif-box notif-success">
