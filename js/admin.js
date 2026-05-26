@@ -1996,6 +1996,8 @@ window.downloadTemplateKelulusan = async function() {
         'Nama Lengkap': p.nama_lengkap || '',
         'Jalur': p.jalur || '',
         'Asal Sekolah': p.asal_sekolah || '',
+        'Pilihan Pesantren': p.pilihan_pesantren || '',
+        'No Telepon Orang Tua': p.no_telepon_ortu || '',
         'Status Kelulusan': p.status_kelulusan || 'PENDING',
         'Catatan': ''
     }));
@@ -2007,11 +2009,13 @@ window.downloadTemplateKelulusan = async function() {
         { wch: 34 },
         { wch: 12 },
         { wch: 34 },
+        { wch: 22 },
+        { wch: 22 },
         { wch: 20 },
         { wch: 28 }
     ];
-    if (worksheet['F1']) {
-        worksheet['F1'].c = [{
+    if (worksheet['H1']) {
+        worksheet['H1'].c = [{
             a: 'Admin',
             t: 'Isi hanya: PENDING, DITERIMA, atau TIDAK DITERIMA. Kolom No Pendaftaran/NISN dipakai untuk mencocokkan peserta.'
         }];
