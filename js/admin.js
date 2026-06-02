@@ -129,11 +129,17 @@ async function loadPendaftar() {
 // 4. UPDATE STATISTIK DASHBOARD
 // ==========================================
 function updateStats(data) {
+    const diterima = data.filter(p => p.status_kelulusan === 'DITERIMA');
+
     document.getElementById('count-total').innerText = data.length;
     document.getElementById('count-reguler').innerText = data.filter(p => p.jalur === 'REGULER').length;
     document.getElementById('count-prestasi').innerText = data.filter(p => p.jalur === 'PRESTASI').length;
     document.getElementById('count-pending').innerText = data.filter(p => p.status_verifikasi === null).length;
-    document.getElementById('count-lulus').innerText = data.filter(p => p.status_kelulusan === 'DITERIMA').length;
+    document.getElementById('count-lulus').innerText = diterima.length;
+    document.getElementById('count-tidak-lulus').innerText = data.filter(p => p.status_kelulusan === 'TIDAK DITERIMA').length;
+    document.getElementById('count-kelulusan-pending').innerText = data.filter(p => (p.status_kelulusan || 'PENDING') === 'PENDING').length;
+    document.getElementById('count-daftar-ulang-sudah').innerText = diterima.filter(p => p.daftar_ulang_hardcopy_status === 'SUDAH').length;
+    document.getElementById('count-daftar-ulang-belum').innerText = diterima.filter(p => p.daftar_ulang_hardcopy_status !== 'SUDAH').length;
 }
 
 // ==========================================
@@ -294,6 +300,7 @@ window.toggleDaftarUlangHardcopy = async function(id, nextStatus) {
 
     p.daftar_ulang_hardcopy_status = nextStatus;
     p.daftar_ulang_hardcopy_at = isDone ? new Date().toISOString() : null;
+    updateStats(allPendaftar);
     renderTable();
 };
 

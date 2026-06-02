@@ -267,7 +267,7 @@
         ================================================================ */
         .stats-grid-modern {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 14px;
             margin-bottom: 20px;
         }
@@ -295,6 +295,8 @@
         .stat-card-modern.c-indigo::before { background: #6366f1; }
         .stat-card-modern.c-amber::before  { background: #f59e0b; }
         .stat-card-modern.c-green::before  { background: #22c55e; }
+        .stat-card-modern.c-red::before    { background: #ef4444; }
+        .stat-card-modern.c-gray::before   { background: #64748b; }
 
         .stat-icon-box {
             width: 42px;
@@ -311,6 +313,8 @@
         .ic-indigo { background: #eef2ff; color: #6366f1; }
         .ic-amber  { background: #fffbeb; color: #f59e0b; }
         .ic-green  { background: #f0fdf4; color: #22c55e; }
+        .ic-red    { background: #fef2f2; color: #ef4444; }
+        .ic-gray   { background: #f8fafc; color: #64748b; }
 
         .stat-card-modern h2 {
             font-size: 1.65rem;
@@ -1115,6 +1119,42 @@
                         <div>
                             <h2 id="count-lulus">0</h2>
                             <small>Siswa Diterima</small>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern c-red">
+                        <div class="stat-icon-box ic-red">
+                            <i class="ph ph-x-circle"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-tidak-lulus">0</h2>
+                            <small>Siswa Tidak Lulus</small>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern c-gray">
+                        <div class="stat-icon-box ic-gray">
+                            <i class="ph ph-clock-countdown"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-kelulusan-pending">0</h2>
+                            <small>Siswa Pending</small>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern c-green">
+                        <div class="stat-icon-box ic-green">
+                            <i class="ph ph-file-check"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-daftar-ulang-sudah">0</h2>
+                            <small>DU Sudah</small>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern c-red">
+                        <div class="stat-icon-box ic-red">
+                            <i class="ph ph-file-x"></i>
+                        </div>
+                        <div>
+                            <h2 id="count-daftar-ulang-belum">0</h2>
+                            <small>DU Belum</small>
                         </div>
                     </div>
                 </div>
