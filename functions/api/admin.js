@@ -6,6 +6,67 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
+const ADMIN_EDITABLE_FIELDS = new Set([
+  'status_verifikasi',
+  'status_kelulusan',
+  'daftar_ulang_hardcopy_status',
+  'daftar_ulang_hardcopy_at',
+  'berkas_ditolak',
+  'tanggal_tes',
+  'sesi_tes',
+  'ruang_tes',
+  'nisn',
+  'nik',
+  'nama_lengkap',
+  'jenis_kelamin',
+  'tempat_lahir',
+  'tanggal_lahir',
+  'ukuran_baju',
+  'agama',
+  'jumlah_saudara',
+  'anak_ke',
+  'status_anak',
+  'provinsi',
+  'kabupaten_kota',
+  'kecamatan',
+  'desa_kelurahan',
+  'rt',
+  'rw',
+  'alamat_lengkap',
+  'kode_pos',
+  'no_kk',
+  'nama_ayah',
+  'nik_ayah',
+  'tempat_lahir_ayah',
+  'tanggal_lahir_ayah',
+  'status_ayah',
+  'pendidikan_ayah',
+  'pekerjaan_ayah',
+  'penghasilan_ayah',
+  'nama_ibu',
+  'nik_ibu',
+  'tempat_lahir_ibu',
+  'tanggal_lahir_ibu',
+  'status_ibu',
+  'pendidikan_ibu',
+  'pekerjaan_ibu',
+  'penghasilan_ibu',
+  'no_telepon_ortu',
+  'nama_wali',
+  'nik_wali',
+  'tempat_lahir_wali',
+  'tanggal_lahir_wali',
+  'pendidikan_wali',
+  'pekerjaan_wali',
+  'penghasilan_wali',
+  'no_telepon_wali',
+  'asal_sekolah',
+  'npsn_sekolah',
+  'status_sekolah',
+  'alamat_sekolah',
+  'pilihan_pesantren',
+]);
+
 // Middleware: cek session admin (simpel via header X-Admin-Session)
 function isAdmin(request) {
   // Cek localStorage tidak bisa di server — admin.js di client sudah handle auth
@@ -141,7 +202,14 @@ export async function onRequestPost(context) {
       const { id, payload } = body;
       if (!id) return Response.json({ error: 'id required' }, { status: 400, headers: CORS });
 
-      const dbPayload = { ...payload };
+      const dbPayload = {};
+      Object.entries(payload || {}).forEach(([key, value]) => {
+        if (ADMIN_EDITABLE_FIELDS.has(key)) dbPayload[key] = value;
+      });
+      if (Object.keys(dbPayload).length === 0) {
+        return Response.json({ error: 'Tidak ada field valid untuk disimpan.' }, { status: 400, headers: CORS });
+      }
+
       if ('status_verifikasi' in dbPayload) {
         dbPayload.status_verifikasi = dbPayload.status_verifikasi === true ? 1 : dbPayload.status_verifikasi === false ? 0 : null;
       }

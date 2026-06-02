@@ -2326,6 +2326,20 @@ window.viewDetail = async function(id) {
         const val = (v) => v ? v : '-';
         const tglVal = (v) => { if(!v) return '-'; const p = v.split('-'); return p.length===3 ? `${p[2]}-${p[1]}-${p[0]}` : v; };
         const money = (v) => v ? 'Rp ' + parseInt(v).toLocaleString('id-ID') : '-';
+        const escAttr = (v) => String(v ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        const editInput = (field, value, type = 'text') =>
+            `<input type="${type}" id="edit-${field}" data-edit-field="${field}" class="sch-input" value="${escAttr(value)}" oninput="triggerSaveAnim()">`;
+        const editSelect = (field, value, options) => {
+            const opts = value && !options.includes(value) ? [value, ...options] : options;
+            return `
+            <select id="edit-${field}" data-edit-field="${field}" class="sch-input" onchange="triggerSaveAnim()">
+                ${opts.map(opt => `<option value="${escAttr(opt)}" ${String(value || '') === opt ? 'selected' : ''}>${escAttr(opt)}</option>`).join('')}
+            </select>`;
+        };
         
         const isVerifTrue = p.status_verifikasi === true ? 'active' : '';
         const isVerifFalse = p.status_verifikasi === false ? 'active' : '';
@@ -2645,67 +2659,94 @@ window.viewDetail = async function(id) {
                             <!-- DATA PRIBADI -->
                             <div class="detail-title" ${isBebasTes ? 'style="margin-top:0;"' : ''}>Data Pribadi</div>
                             <div class="detail-grid">
-                                <div class="detail-item"><label>NIK</label><b>${val(p.nik)}</b></div>
-                                <div class="detail-item"><label>Tempat, Tanggal Lahir</label><b>${val(p.tempat_lahir)}, ${tglVal(p.tanggal_lahir)}</b></div>
-                                <div class="detail-item"><label>Jenis Kelamin</label><b>${val(p.jenis_kelamin)}</b></div>
-                                <div class="detail-item"><label>Agama</label><b>${val(p.agama)}</b></div>
-                                <div class="detail-item"><label>Anak Ke</label><b>${val(p.anak_ke)} dari ${val(p.jumlah_saudara)}</b></div>
-                                <div class="detail-item"><label>Status Anak</label><b>${val(p.status_anak)}</b></div>
-                                <div class="detail-item"><label>Ukuran Baju</label><b>${val(p.ukuran_baju)}</b></div>
+                                <div class="detail-item"><label>Nama Lengkap</label>${editInput('nama_lengkap', p.nama_lengkap)}</div>
+                                <div class="detail-item"><label>NISN</label>${editInput('nisn', p.nisn)}</div>
+                                <div class="detail-item"><label>NIK</label>${editInput('nik', p.nik)}</div>
+                                <div class="detail-item"><label>Tempat Lahir</label>${editInput('tempat_lahir', p.tempat_lahir)}</div>
+                                <div class="detail-item"><label>Tanggal Lahir</label>${editInput('tanggal_lahir', p.tanggal_lahir)}</div>
+                                <div class="detail-item"><label>Jenis Kelamin</label>${editSelect('jenis_kelamin', p.jenis_kelamin, ['', 'Laki-laki', 'Perempuan'])}</div>
+                                <div class="detail-item"><label>Agama</label>${editInput('agama', p.agama)}</div>
+                                <div class="detail-item"><label>Anak Ke</label>${editInput('anak_ke', p.anak_ke, 'number')}</div>
+                                <div class="detail-item"><label>Jumlah Saudara</label>${editInput('jumlah_saudara', p.jumlah_saudara, 'number')}</div>
+                                <div class="detail-item"><label>Status Anak</label>${editInput('status_anak', p.status_anak)}</div>
+                                <div class="detail-item"><label>Ukuran Baju</label>${editInput('ukuran_baju', p.ukuran_baju)}</div>
                             </div>
 
                             <!-- ALAMAT -->
                             <div class="detail-title">Alamat Domisili</div>
                             <div class="detail-grid">
-                                <div class="detail-item" style="grid-column:span 2;"><label>Alamat Lengkap</label><b>${val(p.alamat_lengkap)}</b></div>
-                                <div class="detail-item"><label>RT / RW</label><b>${val(p.rt)} / ${val(p.rw)}</b></div>
-                                <div class="detail-item"><label>Desa / Kelurahan</label><b>${val(p.desa_kelurahan)}</b></div>
-                                <div class="detail-item"><label>Kecamatan</label><b>${val(p.kecamatan)}</b></div>
-                                <div class="detail-item"><label>Kab / Kota</label><b>${val(p.kabupaten_kota)}</b></div>
-                                <div class="detail-item"><label>Provinsi</label><b>${val(p.provinsi)}</b></div>
-                                <div class="detail-item"><label>Kode Pos</label><b>${val(p.kode_pos)}</b></div>
+                                <div class="detail-item" style="grid-column:span 2;"><label>Alamat Lengkap</label>${editInput('alamat_lengkap', p.alamat_lengkap)}</div>
+                                <div class="detail-item"><label>RT</label>${editInput('rt', p.rt)}</div>
+                                <div class="detail-item"><label>RW</label>${editInput('rw', p.rw)}</div>
+                                <div class="detail-item"><label>Desa / Kelurahan</label>${editInput('desa_kelurahan', p.desa_kelurahan)}</div>
+                                <div class="detail-item"><label>Kecamatan</label>${editInput('kecamatan', p.kecamatan)}</div>
+                                <div class="detail-item"><label>Kab / Kota</label>${editInput('kabupaten_kota', p.kabupaten_kota)}</div>
+                                <div class="detail-item"><label>Provinsi</label>${editInput('provinsi', p.provinsi)}</div>
+                                <div class="detail-item"><label>Kode Pos</label>${editInput('kode_pos', p.kode_pos)}</div>
                             </div>
 
                             <!-- DATA KELUARGA -->
                             <div class="detail-title">Data Keluarga</div>
+                            <div class="detail-grid" style="margin-bottom:10px;">
+                                <div class="detail-item"><label>No. KK</label>${editInput('no_kk', p.no_kk)}</div>
+                            </div>
                             <div class="d-sub-box" style="margin-bottom:8px;">
                                 <span class="d-sub-label">Ayah</span>
                                 <div class="detail-grid">
-                                    <div class="detail-item"><label>Nama</label><b>${val(p.nama_ayah)}</b></div>
-                                    <div class="detail-item"><label>NIK</label><b>${val(p.nik_ayah)}</b></div>
-                                    <div class="detail-item"><label>Pekerjaan</label><b>${val(p.pekerjaan_ayah)}</b></div>
-                                    <div class="detail-item"><label>Pendidikan</label><b>${val(p.pendidikan_ayah)}</b></div>
-                                    <div class="detail-item"><label>Penghasilan</label><b>${money(p.penghasilan_ayah)}</b></div>
+                                    <div class="detail-item"><label>Nama</label>${editInput('nama_ayah', p.nama_ayah)}</div>
+                                    <div class="detail-item"><label>NIK</label>${editInput('nik_ayah', p.nik_ayah)}</div>
+                                    <div class="detail-item"><label>Tempat Lahir</label>${editInput('tempat_lahir_ayah', p.tempat_lahir_ayah)}</div>
+                                    <div class="detail-item"><label>Tanggal Lahir</label>${editInput('tanggal_lahir_ayah', p.tanggal_lahir_ayah)}</div>
+                                    <div class="detail-item"><label>Status</label>${editInput('status_ayah', p.status_ayah)}</div>
+                                    <div class="detail-item"><label>Pekerjaan</label>${editInput('pekerjaan_ayah', p.pekerjaan_ayah)}</div>
+                                    <div class="detail-item"><label>Pendidikan</label>${editInput('pendidikan_ayah', p.pendidikan_ayah)}</div>
+                                    <div class="detail-item"><label>Penghasilan</label>${editInput('penghasilan_ayah', p.penghasilan_ayah, 'number')}</div>
                                 </div>
                             </div>
                             <div class="d-sub-box">
                                 <span class="d-sub-label">Ibu</span>
                                 <div class="detail-grid">
-                                    <div class="detail-item"><label>Nama</label><b>${val(p.nama_ibu)}</b></div>
-                                    <div class="detail-item"><label>NIK</label><b>${val(p.nik_ibu)}</b></div>
-                                    <div class="detail-item"><label>Pekerjaan</label><b>${val(p.pekerjaan_ibu)}</b></div>
-                                    <div class="detail-item"><label>Pendidikan</label><b>${val(p.pendidikan_ibu)}</b></div>
-                                    <div class="detail-item"><label>Penghasilan</label><b>${money(p.penghasilan_ibu)}</b></div>
+                                    <div class="detail-item"><label>Nama</label>${editInput('nama_ibu', p.nama_ibu)}</div>
+                                    <div class="detail-item"><label>NIK</label>${editInput('nik_ibu', p.nik_ibu)}</div>
+                                    <div class="detail-item"><label>Tempat Lahir</label>${editInput('tempat_lahir_ibu', p.tempat_lahir_ibu)}</div>
+                                    <div class="detail-item"><label>Tanggal Lahir</label>${editInput('tanggal_lahir_ibu', p.tanggal_lahir_ibu)}</div>
+                                    <div class="detail-item"><label>Status</label>${editInput('status_ibu', p.status_ibu)}</div>
+                                    <div class="detail-item"><label>Pekerjaan</label>${editInput('pekerjaan_ibu', p.pekerjaan_ibu)}</div>
+                                    <div class="detail-item"><label>Pendidikan</label>${editInput('pendidikan_ibu', p.pendidikan_ibu)}</div>
+                                    <div class="detail-item"><label>Penghasilan</label>${editInput('penghasilan_ibu', p.penghasilan_ibu, 'number')}</div>
+                                </div>
+                            </div>
+                            <div class="d-sub-box">
+                                <span class="d-sub-label">Wali</span>
+                                <div class="detail-grid">
+                                    <div class="detail-item"><label>Nama</label>${editInput('nama_wali', p.nama_wali)}</div>
+                                    <div class="detail-item"><label>NIK</label>${editInput('nik_wali', p.nik_wali)}</div>
+                                    <div class="detail-item"><label>Tempat Lahir</label>${editInput('tempat_lahir_wali', p.tempat_lahir_wali)}</div>
+                                    <div class="detail-item"><label>Tanggal Lahir</label>${editInput('tanggal_lahir_wali', p.tanggal_lahir_wali)}</div>
+                                    <div class="detail-item"><label>Pekerjaan</label>${editInput('pekerjaan_wali', p.pekerjaan_wali)}</div>
+                                    <div class="detail-item"><label>Pendidikan</label>${editInput('pendidikan_wali', p.pendidikan_wali)}</div>
+                                    <div class="detail-item"><label>Penghasilan</label>${editInput('penghasilan_wali', p.penghasilan_wali, 'number')}</div>
+                                    <div class="detail-item"><label>No. HP Wali</label>${editInput('no_telepon_wali', p.no_telepon_wali)}</div>
                                 </div>
                             </div>
                             <div class="d-phone-row">
                                 <label>No. HP Orang Tua</label>
-                                <b>${val(p.no_telepon_ortu)}</b>
+                                ${editInput('no_telepon_ortu', p.no_telepon_ortu)}
                             </div>
 
                             <!-- DATA SEKOLAH -->
                             <div class="detail-title">Sekolah Asal</div>
                             <div class="detail-grid">
-                                <div class="detail-item"><label>Nama Sekolah</label><b>${val(p.asal_sekolah)}</b></div>
-                                <div class="detail-item"><label>NPSN</label><b>${val(p.npsn_sekolah)}</b></div>
-                                <div class="detail-item"><label>Status</label><b>${val(p.status_sekolah)}</b></div>
-                                <div class="detail-item" style="grid-column:span 2;"><label>Alamat Sekolah</label><b>${val(p.alamat_sekolah)}</b></div>
+                                <div class="detail-item"><label>Nama Sekolah</label>${editInput('asal_sekolah', p.asal_sekolah)}</div>
+                                <div class="detail-item"><label>NPSN</label>${editInput('npsn_sekolah', p.npsn_sekolah)}</div>
+                                <div class="detail-item"><label>Status</label>${editInput('status_sekolah', p.status_sekolah)}</div>
+                                <div class="detail-item" style="grid-column:span 2;"><label>Alamat Sekolah</label>${editInput('alamat_sekolah', p.alamat_sekolah)}</div>
                             </div>
 
                             <!-- PESANTREN -->
                             <div class="d-pesantren-box">
                                 <label style="font-size:0.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;display:block;margin-bottom:4px;">Pilihan Tempat Tinggal</label>
-                                <b style="font-size:0.88rem;color:#0d1b2a;">${val(p.pilihan_pesantren)}</b>
+                                ${editInput('pilihan_pesantren', p.pilihan_pesantren)}
                             </div>
 
                             ${raporHtml}
@@ -2965,6 +3006,11 @@ window.saveDetailChanges = async function() {
         payload.ruang_tes = elRuang.value; 
     }
 
+    document.querySelectorAll('[data-edit-field]').forEach(el => {
+        const field = el.dataset.editField;
+        payload[field] = el.value.trim();
+    });
+
     const result = await apiPost('admin?action=update-satu', { id: editState.id, payload });
     
     if (saveBtn) {
@@ -2986,6 +3032,11 @@ window.saveDetailChanges = async function() {
                 allPendaftar[index].sesi_tes = payload.sesi_tes; 
                 allPendaftar[index].ruang_tes = payload.ruang_tes; 
             }
+
+            document.querySelectorAll('[data-edit-field]').forEach(el => {
+                const field = el.dataset.editField;
+                allPendaftar[index][field] = payload[field];
+            });
         }
         
         updateStats(allPendaftar); 
