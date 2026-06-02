@@ -225,9 +225,9 @@ function renderTable() {
         let badgeDU = '';
         if (p.status_kelulusan === 'DITERIMA') {
             if (p.daftar_ulang_hardcopy_status === 'SUDAH') {
-                badgeDU = `<button onclick="toggleDaftarUlangHardcopy('${p.id}', 'BELUM')" class="badge-modern badge-green" style="font-size:.65rem; border:none; cursor:pointer;"><i class="ph ph-check-circle"></i> Sudah Serah</button>`;
+                badgeDU = `<button onclick="toggleDaftarUlangHardcopy('${p.id}', 'BELUM')" class="badge-modern badge-green" style="font-size:.65rem; border:none; cursor:pointer;"><i class="ph ph-check"></i> Sudah Daftar Ulang</button>`;
             } else {
-                badgeDU = `<button onclick="toggleDaftarUlangHardcopy('${p.id}', 'SUDAH')" class="badge-modern badge-red" style="font-size:.65rem; border:none; cursor:pointer;"><i class="ph ph-clock"></i> Belum Serah</button>`;
+                badgeDU = `<button onclick="toggleDaftarUlangHardcopy('${p.id}', 'SUDAH')" class="badge-modern badge-red" style="font-size:.65rem; border:none; cursor:pointer;"><i class="ph ph-clock"></i> Belum Daftar Ulang</button>`;
             }
         } else {
             badgeDU = '<span style="color:#94a3b8; font-size:.7rem;">—</span>';
