@@ -3100,89 +3100,299 @@ window.alihkanSatuKeReguler = async function(id, name) {
 // ==========================================
 // 10. FITUR EXPORT EXCEL & ZIP BERKAS
 // ==========================================
-window.exportToExcel = function() {
-    if (allPendaftar.length === 0) { 
-        Swal.fire('Kosong', 'Belum ada data pendaftar untuk diexport.', 'info'); 
-        return; 
-    }
-    
-    const excelData = allPendaftar.map(p => {
-        let statVerif = "PENDING"; 
-        if (p.status_verifikasi === true) statVerif = "TERVERIFIKASI"; 
-        else if (p.status_verifikasi === false) statVerif = "DITOLAK";
-        
-        let ketUjian = "-";
-        if (p.jalur === 'PRESTASI') { 
-            ketUjian = "Tes Pembuktian (Offline)"; 
-        } else if (p.jalur === 'REGULER') { 
-            ketUjian = "WAJIB TES CBT"; 
+function getExportStatusVerifikasi(p) {
+    if (p.status_verifikasi === true) return "TERVERIFIKASI";
+    if (p.status_verifikasi === false) return "DITOLAK";
+    return "PENDING";
+}
+
+function getExportDaftarUlang(p) {
+    return p.daftar_ulang_hardcopy_status === 'SUDAH' ? "SUDAH" : "BELUM";
+}
+
+function getExportKeteranganUjian(p) {
+    if (p.jalur === 'PRESTASI') return "Tes Pembuktian (Offline)";
+    if (p.jalur === 'REGULER') return "WAJIB TES CBT";
+    return "-";
+}
+
+function getExportWaktuDaftar(p) {
+    return p.created_at
+        ? new Date(p.created_at + 'Z').toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+        : "-";
+}
+
+const EXPORT_COLUMN_GROUPS = [
+    {
+        group: 'Status & Seleksi',
+        columns: [
+            { key: 'created_at', label: 'Waktu Daftar', value: getExportWaktuDaftar },
+            { key: 'no_pendaftaran', label: 'No Pendaftaran', value: p => p.no_pendaftaran || "-" },
+            { key: 'jalur', label: 'Jalur', value: p => p.jalur || "-" },
+            { key: 'status_verifikasi', label: 'Status Verifikasi', value: getExportStatusVerifikasi },
+            { key: 'status_kelulusan', label: 'Status Kelulusan', value: p => p.status_kelulusan || "PENDING" },
+            { key: 'daftar_ulang_hardcopy_status', label: 'Daftar Ulang', value: getExportDaftarUlang },
+        ]
+    },
+    {
+        group: 'Biodata Siswa',
+        columns: [
+            { key: 'nisn', label: 'NISN', value: p => p.nisn || "-" },
+            { key: 'nik', label: 'NIK Siswa', value: p => p.nik || "-" },
+            { key: 'nama_lengkap', label: 'Nama Lengkap', value: p => p.nama_lengkap || "-" },
+            { key: 'jenis_kelamin', label: 'Jenis Kelamin', value: p => p.jenis_kelamin || "-" },
+            { key: 'tempat_lahir', label: 'Tempat Lahir', value: p => p.tempat_lahir || "-" },
+            { key: 'tanggal_lahir', label: 'Tanggal Lahir', value: p => p.tanggal_lahir || "-" },
+            { key: 'ukuran_baju', label: 'Ukuran Baju', value: p => p.ukuran_baju || "-" },
+            { key: 'agama', label: 'Agama', value: p => p.agama || "-" },
+            { key: 'anak_ke', label: 'Anak Ke', value: p => p.anak_ke || "-" },
+            { key: 'jumlah_saudara', label: 'Jumlah Saudara', value: p => p.jumlah_saudara || "-" },
+            { key: 'status_anak', label: 'Status Anak', value: p => p.status_anak || "-" },
+        ]
+    },
+    {
+        group: 'Alamat',
+        columns: [
+            { key: 'alamat_lengkap', label: 'Alamat Lengkap', value: p => p.alamat_lengkap || "-" },
+            { key: 'rt', label: 'RT', value: p => p.rt || "-" },
+            { key: 'rw', label: 'RW', value: p => p.rw || "-" },
+            { key: 'desa_kelurahan', label: 'Desa/Kelurahan', value: p => p.desa_kelurahan || "-" },
+            { key: 'kecamatan', label: 'Kecamatan', value: p => p.kecamatan || "-" },
+            { key: 'kabupaten_kota', label: 'Kab/Kota', value: p => p.kabupaten_kota || "-" },
+            { key: 'provinsi', label: 'Provinsi', value: p => p.provinsi || "-" },
+            { key: 'kode_pos', label: 'Kode Pos', value: p => p.kode_pos || "-" },
+        ]
+    },
+    {
+        group: 'Keluarga',
+        columns: [
+            { key: 'no_kk', label: 'No Kartu Keluarga', value: p => p.no_kk || "-" },
+            { key: 'nama_ayah', label: 'Nama Ayah', value: p => p.nama_ayah || "-" },
+            { key: 'nik_ayah', label: 'NIK Ayah', value: p => p.nik_ayah || "-" },
+            { key: 'pendidikan_ayah', label: 'Pendidikan Ayah', value: p => p.pendidikan_ayah || "-" },
+            { key: 'pekerjaan_ayah', label: 'Pekerjaan Ayah', value: p => p.pekerjaan_ayah || "-" },
+            { key: 'penghasilan_ayah', label: 'Penghasilan Ayah (Rp)', value: p => p.penghasilan_ayah || "-" },
+            { key: 'nama_ibu', label: 'Nama Ibu', value: p => p.nama_ibu || "-" },
+            { key: 'nik_ibu', label: 'NIK Ibu', value: p => p.nik_ibu || "-" },
+            { key: 'pendidikan_ibu', label: 'Pendidikan Ibu', value: p => p.pendidikan_ibu || "-" },
+            { key: 'pekerjaan_ibu', label: 'Pekerjaan Ibu', value: p => p.pekerjaan_ibu || "-" },
+            { key: 'penghasilan_ibu', label: 'Penghasilan Ibu (Rp)', value: p => p.penghasilan_ibu || "-" },
+            { key: 'no_telepon_ortu', label: 'No Telepon/WA Ortu', value: p => p.no_telepon_ortu || "-" },
+        ]
+    },
+    {
+        group: 'Sekolah & Tes',
+        columns: [
+            { key: 'asal_sekolah', label: 'Asal Sekolah', value: p => p.asal_sekolah || "-" },
+            { key: 'npsn_sekolah', label: 'NPSN Sekolah', value: p => p.npsn_sekolah || "-" },
+            { key: 'status_sekolah', label: 'Status Sekolah', value: p => p.status_sekolah || "-" },
+            { key: 'pilihan_pesantren', label: 'Pilihan Pesantren', value: p => p.pilihan_pesantren || "-" },
+            { key: 'keterangan_ujian', label: 'Keterangan Ujian', value: getExportKeteranganUjian },
+            { key: 'tanggal_tes', label: 'Tanggal Tes', value: p => p.tanggal_tes || "-" },
+            { key: 'sesi_tes', label: 'Sesi Ujian', value: p => p.sesi_tes || "-" },
+            { key: 'ruang_tes', label: 'Ruang Ujian', value: p => p.ruang_tes || "-" },
+        ]
+    },
+];
+
+const EXPORT_COLUMNS = EXPORT_COLUMN_GROUPS.flatMap(group => group.columns);
+
+function applyExportFilters(data, filters) {
+    return data.filter(p => {
+        if (filters.gender && p.jenis_kelamin !== filters.gender) return false;
+        if (filters.jalur && p.jalur !== filters.jalur) return false;
+        if (filters.kelulusan && (p.status_kelulusan || 'PENDING') !== filters.kelulusan) return false;
+
+        if (filters.verifikasi === 'PENDING' && p.status_verifikasi !== null && p.status_verifikasi !== undefined) return false;
+        if (filters.verifikasi === 'TERVERIFIKASI' && p.status_verifikasi !== true) return false;
+        if (filters.verifikasi === 'DITOLAK' && p.status_verifikasi !== false) return false;
+
+        if (filters.daftarUlang === 'SUDAH') {
+            return p.status_kelulusan === 'DITERIMA' && p.daftar_ulang_hardcopy_status === 'SUDAH';
+        }
+        if (filters.daftarUlang === 'BELUM') {
+            return p.status_kelulusan === 'DITERIMA' && p.daftar_ulang_hardcopy_status !== 'SUDAH';
         }
 
-        // SEMUA DATA FORMULIR MASUK DI SINI
-        return {
-            "Waktu Daftar": p.created_at ? new Date(p.created_at + 'Z').toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : "-",
-            "No Pendaftaran": p.no_pendaftaran || "-", 
-            "Jalur": p.jalur || "-", 
-            "Status Verifikasi": statVerif, 
-            "Status Kelulusan": p.status_kelulusan || "PENDING",
-            "NISN": p.nisn || "-", 
-            "NIK Siswa": p.nik || "-", 
-            "Nama Lengkap": p.nama_lengkap || "-", 
-            "Jenis Kelamin": p.jenis_kelamin || "-", 
-            "Tempat Lahir": p.tempat_lahir || "-", 
-            "Tanggal Lahir": p.tanggal_lahir || "-", 
-            "Ukuran Baju": p.ukuran_baju || "-", 
-            "Agama": p.agama || "-", 
-            "Anak Ke": p.anak_ke || "-", 
-            "Jumlah Saudara": p.jumlah_saudara || "-", 
-            "Status Anak": p.status_anak || "-", 
-            "Alamat Lengkap": p.alamat_lengkap || "-", 
-            "RT": p.rt || "-", 
-            "RW": p.rw || "-", 
-            "Desa/Kelurahan": p.desa_kelurahan || "-", 
-            "Kecamatan": p.kecamatan || "-", 
-            "Kab/Kota": p.kabupaten_kota || "-", 
-            "Provinsi": p.provinsi || "-", 
-            "Kode Pos": p.kode_pos || "-", 
-            "No Kartu Keluarga": p.no_kk || "-", 
-            "Nama Ayah": p.nama_ayah || "-", 
-            "NIK Ayah": p.nik_ayah || "-", 
-            "Pendidikan Ayah": p.pendidikan_ayah || "-", 
-            "Pekerjaan Ayah": p.pekerjaan_ayah || "-", 
-            "Penghasilan Ayah (Rp)": p.penghasilan_ayah || "-", 
-            "Nama Ibu": p.nama_ibu || "-", 
-            "NIK Ibu": p.nik_ibu || "-", 
-            "Pendidikan Ibu": p.pendidikan_ibu || "-", 
-            "Pekerjaan Ibu": p.pekerjaan_ibu || "-", 
-            "Penghasilan Ibu (Rp)": p.penghasilan_ibu || "-", 
-            "No Telepon/WA Ortu": p.no_telepon_ortu || "-", 
-            "Asal Sekolah": p.asal_sekolah || "-", 
-            "NPSN Sekolah": p.npsn_sekolah || "-", 
-            "Status Sekolah": p.status_sekolah || "-", 
-            "Pilihan Pesantren": p.pilihan_pesantren || "-", 
-            "Keterangan Ujian": ketUjian, 
-            "Tanggal Tes": p.tanggal_tes || "-", 
-            "Sesi Ujian": p.sesi_tes || "-", 
-            "Ruang Ujian": p.ruang_tes || "-"
-        };
+        return true;
+    });
+}
+
+function buildExportExcel(pendaftarList, selectedColumnKeys, filenamePrefix = 'Rekap_Lengkap') {
+    const selectedColumns = EXPORT_COLUMNS.filter(col => selectedColumnKeys.includes(col.key));
+    const excelData = pendaftarList.map(p => {
+        return selectedColumns.reduce((row, col) => {
+            row[col.label] = col.value(p);
+            return row;
+        }, {});
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    
-    // Rapikan lebar kolom secara dinamis
-    const wscols = Object.keys(excelData[0]).map(key => {
-        if (key === 'Nama Lengkap' || key === 'Alamat Lengkap' || key === 'Asal Sekolah') return { wch: 30 };
-        if (key === 'Keterangan Ujian' || key === 'Tanggal Tes' || key === 'Sesi Ujian') return { wch: 25 };
-        if (key === 'No Pendaftaran' || key === 'NISN' || key === 'NIK Siswa') return { wch: 18 };
+    const worksheet = XLSX.utils.json_to_sheet(excelData, { header: selectedColumns.map(col => col.label) });
+
+    worksheet['!cols'] = selectedColumns.map(col => {
+        if (['Nama Lengkap', 'Alamat Lengkap', 'Asal Sekolah'].includes(col.label)) return { wch: 30 };
+        if (['Keterangan Ujian', 'Tanggal Tes', 'Sesi Ujian', 'Pilihan Pesantren'].includes(col.label)) return { wch: 25 };
+        if (['No Pendaftaran', 'NISN', 'NIK Siswa', 'NIK Ayah', 'NIK Ibu'].includes(col.label)) return { wch: 18 };
         return { wch: 15 };
     });
-    
-    worksheet['!cols'] = wscols;
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pendaftar");
-    
-    const tgl = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
-    XLSX.writeFile(workbook, `Rekap_Lengkap_PMB_MAN1Tasik_${tgl}.xlsx`);
+
+    const tgl = new Date().toLocaleDateString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).split('/').reverse().join('-');
+
+    XLSX.writeFile(workbook, `${filenamePrefix}_PMB_MAN1Tasik_${tgl}.xlsx`);
+}
+
+function buildExportDialogHtml() {
+    const checkboxHtml = EXPORT_COLUMN_GROUPS.map(group => `
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#fff;">
+            <div style="font-weight:800; color:#0f172a; font-size:.78rem; margin-bottom:8px;">${escapeHTML(group.group)}</div>
+            <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px 10px;">
+                ${group.columns.map(col => `
+                    <label style="display:flex; gap:6px; align-items:flex-start; color:#334155; font-size:.75rem; line-height:1.35;">
+                        <input type="checkbox" class="export-col-check" value="${escapeHTML(col.key)}" checked style="margin-top:2px;">
+                        <span>${escapeHTML(col.label)}</span>
+                    </label>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+
+    return `
+        <div style="text-align:left;">
+            <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px;">
+                <label style="font-size:.75rem; color:#475569; font-weight:700;">
+                    Jenis Kelamin
+                    <select id="export-filter-gender" class="swal2-input" style="width:100%; margin:5px 0 0; height:38px; font-size:.8rem;">
+                        <option value="">Semua</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </label>
+                <label style="font-size:.75rem; color:#475569; font-weight:700;">
+                    Kelulusan
+                    <select id="export-filter-kelulusan" class="swal2-input" style="width:100%; margin:5px 0 0; height:38px; font-size:.8rem;">
+                        <option value="">Semua</option>
+                        <option value="DITERIMA">Diterima</option>
+                        <option value="PENDING">Waiting List / Menunggu</option>
+                        <option value="TIDAK DITERIMA">Tidak Diterima</option>
+                    </select>
+                </label>
+                <label style="font-size:.75rem; color:#475569; font-weight:700;">
+                    Daftar Ulang
+                    <select id="export-filter-daftar-ulang" class="swal2-input" style="width:100%; margin:5px 0 0; height:38px; font-size:.8rem;">
+                        <option value="">Semua</option>
+                        <option value="SUDAH">Sudah Daftar Ulang</option>
+                        <option value="BELUM">Belum Daftar Ulang</option>
+                    </select>
+                </label>
+                <label style="font-size:.75rem; color:#475569; font-weight:700;">
+                    Jalur
+                    <select id="export-filter-jalur" class="swal2-input" style="width:100%; margin:5px 0 0; height:38px; font-size:.8rem;">
+                        <option value="">Semua</option>
+                        <option value="REGULER">Reguler</option>
+                        <option value="PRESTASI">Prestasi</option>
+                    </select>
+                </label>
+                <label style="font-size:.75rem; color:#475569; font-weight:700; grid-column:1 / -1;">
+                    Status Berkas
+                    <select id="export-filter-verifikasi" class="swal2-input" style="width:100%; margin:5px 0 0; height:38px; font-size:.8rem;">
+                        <option value="">Semua</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="TERVERIFIKASI">Terverifikasi</option>
+                        <option value="DITOLAK">Ditolak</option>
+                    </select>
+                </label>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0 10px;">
+                <div style="font-weight:800; color:#0f172a; font-size:.85rem;">Kolom yang diexport</div>
+                <label style="font-size:.75rem; color:#334155; display:flex; gap:6px; align-items:center;">
+                    <input type="checkbox" id="export-check-all" checked>
+                    Pilih semua
+                </label>
+            </div>
+            <div style="max-height:320px; overflow:auto; display:grid; gap:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px;">
+                ${checkboxHtml}
+            </div>
+        </div>
+    `;
+}
+
+window.exportToExcel = async function() {
+    if (allPendaftar.length === 0) {
+        Swal.fire('Kosong', 'Belum ada data pendaftar untuk diexport.', 'info');
+        return;
+    }
+
+    const allColumnKeys = EXPORT_COLUMNS.map(col => col.key);
+    const result = await Swal.fire({
+        title: 'Download Data Excel',
+        html: buildExportDialogHtml(),
+        width: 780,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'Download Pilihan',
+        denyButtonText: 'Download Semua',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#00796b',
+        denyButtonColor: '#334155',
+        didOpen: () => {
+            const checkAll = document.getElementById('export-check-all');
+            const checkboxes = Array.from(document.querySelectorAll('.export-col-check'));
+
+            const syncCheckAll = () => {
+                checkAll.checked = checkboxes.every(cb => cb.checked);
+                checkAll.indeterminate = !checkAll.checked && checkboxes.some(cb => cb.checked);
+            };
+
+            checkAll.addEventListener('change', () => {
+                checkboxes.forEach(cb => { cb.checked = checkAll.checked; });
+            });
+            checkboxes.forEach(cb => cb.addEventListener('change', syncCheckAll));
+        },
+        preConfirm: () => {
+            const selectedColumnKeys = Array.from(document.querySelectorAll('.export-col-check:checked'))
+                .map(cb => cb.value);
+
+            if (selectedColumnKeys.length === 0) {
+                Swal.showValidationMessage('Pilih minimal satu kolom untuk diexport.');
+                return false;
+            }
+
+            return {
+                filters: {
+                    gender: document.getElementById('export-filter-gender').value,
+                    kelulusan: document.getElementById('export-filter-kelulusan').value,
+                    daftarUlang: document.getElementById('export-filter-daftar-ulang').value,
+                    jalur: document.getElementById('export-filter-jalur').value,
+                    verifikasi: document.getElementById('export-filter-verifikasi').value,
+                },
+                selectedColumnKeys,
+            };
+        }
+    });
+
+    if (result.isDenied) {
+        buildExportExcel(allPendaftar, allColumnKeys, 'Rekap_Lengkap');
+        return;
+    }
+
+    if (!result.isConfirmed || !result.value) return;
+
+    const filteredData = applyExportFilters(allPendaftar, result.value.filters);
+    if (filteredData.length === 0) {
+        Swal.fire('Data Tidak Ada', 'Tidak ada pendaftar yang cocok dengan filter export.', 'info');
+        return;
+    }
+
+    buildExportExcel(filteredData, result.value.selectedColumnKeys, 'Rekap_Custom');
 }
 
 window.processZipDownload = async function(pendaftarList, zipFilename) {
